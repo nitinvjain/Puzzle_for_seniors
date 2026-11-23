@@ -102,12 +102,12 @@ class _NarrativeRecallScreenState extends ConsumerState<NarrativeRecallScreen> {
   void _startStoryPhase() {
     _generateRandomStory();
     _showingStory = true;
-    _timeLeft = 25;
+    _timeLeft = SeniorMode.studySeconds(25);
     _currentQuestionIndex = 0;
     _userAnswers.clear();
 
     _timer?.cancel();
-    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.phaseCountdown(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_timeLeft > 1) {
           _timeLeft--;

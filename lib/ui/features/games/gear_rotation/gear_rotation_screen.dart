@@ -31,7 +31,7 @@ class _GearRotationScreenState extends ConsumerState<GearRotationScreen>
   bool? _userAnswer; // true = CW, false = CCW, null = unanswered
   bool _isAnswered = false;
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   @override

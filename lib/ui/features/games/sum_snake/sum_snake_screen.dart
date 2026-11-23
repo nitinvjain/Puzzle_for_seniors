@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,11 @@ class SumSnakeScreen extends ConsumerStatefulWidget {
 }
 
 class _SumSnakeScreenState extends ConsumerState<SumSnakeScreen> {
+  /// Sum Snake has no round counter of its own: solving one snake ends the
+  /// game. That is abrupt for a puzzle this quick, so the senior build counts
+  /// solved snakes and only finishes at the usual target.
+  int _solved = 0;
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +42,16 @@ class _SumSnakeScreenState extends ConsumerState<SumSnakeScreen> {
     ref.listen(sumSnakeNotifierProvider, (previous, next) {
       if (next.isVictory && !(previous?.isVictory ?? false)) {
         HapticFeedbackUtil.victory();
+        _solved++;
+        if (SeniorMode.overrideRoundLimits && _solved < SeniorMode.roundTarget) {
+          // Another snake, after a beat to register the success.
+          Future.delayed(const Duration(milliseconds: 900), () {
+            if (mounted) {
+              ref.read(sumSnakeNotifierProvider.notifier).initGame();
+            }
+          });
+          return;
+        }
         ref.read(gameStreakNotifierProvider.notifier).completeGame('sum_snake');
         showDialog(
           context: context,
@@ -49,6 +65,7 @@ class _SumSnakeScreenState extends ConsumerState<SumSnakeScreen> {
             },
             onPlayAgain: () {
               Navigator.of(context).pop();
+              _solved = 0;
               notifier.initGame();
             },
           ),

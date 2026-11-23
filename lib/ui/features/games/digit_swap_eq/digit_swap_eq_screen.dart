@@ -20,7 +20,7 @@ class DigitSwapEqScreen extends ConsumerStatefulWidget {
 class _DigitSwapEqScreenState extends ConsumerState<DigitSwapEqScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   // Each equation is represented as a list of 6 digits: [x_ten, x_unit, y_ten, y_unit, z_ten, z_unit]

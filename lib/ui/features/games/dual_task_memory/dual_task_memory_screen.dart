@@ -20,7 +20,7 @@ class DualTaskMemoryScreen extends ConsumerStatefulWidget {
 class _DualTaskMemoryScreenState extends ConsumerState<DualTaskMemoryScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   // Game flow:
   // 1. Memorize 4 words (study mode)
   // 2. Distractor stage: Solve 2 quick math questions

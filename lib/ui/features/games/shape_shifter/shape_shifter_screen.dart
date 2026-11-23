@@ -50,7 +50,7 @@ class _ShapeShifterScreenState extends ConsumerState<ShapeShifterScreen> {
 
   final List<FallingShape> _fallingShapes = [];
   int _score = 0;
-  final int _targetScore = 15;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
   bool _isGameOver = false;
 
   final List<Color> _colors = [

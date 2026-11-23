@@ -30,7 +30,7 @@ class _ChalkAndTalkScreenState extends ConsumerState<ChalkAndTalkScreen> {
   late String _visualWord; // Word shown on the blackboard (the distractor)
 
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   @override

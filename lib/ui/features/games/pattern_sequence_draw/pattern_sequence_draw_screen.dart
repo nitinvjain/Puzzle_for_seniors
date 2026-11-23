@@ -28,7 +28,7 @@ class _PatternSequenceDrawScreenState extends ConsumerState<PatternSequenceDrawS
   int _activeSeqIndex = -1; // dot currently highlighted in play mode
 
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   @override

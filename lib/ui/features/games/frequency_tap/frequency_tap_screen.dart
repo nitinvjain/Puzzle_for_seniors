@@ -32,7 +32,7 @@ class _FrequencyTapScreenState extends ConsumerState<FrequencyTapScreen> with Ti
   late int _targetIndex; // 0 for A, 1 for B
 
   int _score = 0;
-  final int _targetScore = 10;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
   bool _isGameOver = false;
 
   @override

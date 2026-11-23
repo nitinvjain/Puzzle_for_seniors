@@ -21,7 +21,7 @@ class DoubleTroubleScreen extends ConsumerStatefulWidget {
 class _DoubleTroubleScreenState extends ConsumerState<DoubleTroubleScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
 
   // Split side games states

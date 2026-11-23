@@ -32,7 +32,7 @@ class EventTimelineMemoryScreen extends ConsumerStatefulWidget {
 class _EventTimelineMemoryScreenState extends ConsumerState<EventTimelineMemoryScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   final List<HistoricalEvent> _eventsPool = [
     // Space & Science
     HistoricalEvent(title: 'Apollo 11 Moon Landing', year: 1969, description: 'First humans land on the Moon.'),

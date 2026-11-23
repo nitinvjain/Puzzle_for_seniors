@@ -20,7 +20,7 @@ class PrimeFactorTreesScreen extends ConsumerStatefulWidget {
 class _PrimeFactorTreesScreenState extends ConsumerState<PrimeFactorTreesScreen> {
   final PrimeFactorTreesEngine _engine = PrimeFactorTreesEngine();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
   int? _selectedNodeIndex;
 

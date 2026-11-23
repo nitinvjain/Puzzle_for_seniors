@@ -41,7 +41,7 @@ class _SemanticAssociationScreenState extends ConsumerState<SemanticAssociationS
 
   late SemanticAssociationPuzzle _currentPuzzle;
   int _score = 0;
-  final int _targetScore = 4;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 4);
   bool _isGameOver = false;
   bool _showHint = false;
 

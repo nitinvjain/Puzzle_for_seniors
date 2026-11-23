@@ -21,7 +21,7 @@ class ColorWordMatchUpScreen extends ConsumerStatefulWidget {
 class _ColorWordMatchUpScreenState extends ConsumerState<ColorWordMatchUpScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 15;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
   bool _isGameOver = false;
 
   // Word collections

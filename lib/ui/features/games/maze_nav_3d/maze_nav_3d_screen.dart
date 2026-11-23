@@ -20,7 +20,7 @@ class MazeNav3DScreen extends ConsumerStatefulWidget {
 class _MazeNav3DScreenState extends ConsumerState<MazeNav3DScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   // Directions
   static const int north = 0;
   static const int east = 1;

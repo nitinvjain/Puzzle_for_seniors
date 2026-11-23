@@ -20,7 +20,7 @@ class PercentageShoppingScreen extends ConsumerStatefulWidget {
 class _PercentageShoppingScreenState extends ConsumerState<PercentageShoppingScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   late String _itemName;

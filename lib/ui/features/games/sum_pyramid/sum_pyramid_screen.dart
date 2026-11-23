@@ -109,6 +109,15 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
       margin: const EdgeInsets.all(DesignSystem.spaceXS),
       width: blockSize,
       height: blockSize,
+      // The stock blocks relied on a soft drop shadow alone, which does not
+      // separate them clearly enough; an explicit outline does.
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(DesignSystem.radiusXS),
+        border: Border.all(
+          color: colorScheme.onSurface.withValues(alpha: 0.45),
+          width: 2.0,
+        ),
+      ),
       child: TangibleButton(
         depth: depth,
         color: blockColor,
@@ -125,6 +134,29 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
           child: Text(
             text.isEmpty ? '?' : text,
             style: textStyle,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// A row of upward arrows sitting between two tiers of the pyramid, one
+  /// under each block of the tier above, so it is visible that a block is fed
+  /// by the two blocks beneath it. [count] is the number of blocks in the
+  /// upper tier.
+  Widget _buildArrowTier(int count, double blockSize, ColorScheme colorScheme) {
+    final pitch = blockSize + DesignSystem.spaceXS * 2;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        count,
+        (_) => SizedBox(
+          width: pitch,
+          height: blockSize * 0.30,
+          child: Icon(
+            Icons.arrow_upward_rounded,
+            size: blockSize * 0.28,
+            color: colorScheme.primary.withValues(alpha: 0.75),
           ),
         ),
       ),
@@ -323,6 +355,7 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                               _buildBlock(9, maxBlockSize, colorScheme, state),
                             ],
                           ),
+                          _buildArrowTier(1, maxBlockSize, colorScheme),
                           // Row 2
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -331,6 +364,7 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                               _buildBlock(8, maxBlockSize, colorScheme, state),
                             ],
                           ),
+                          _buildArrowTier(2, maxBlockSize, colorScheme),
                           // Row 1
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -340,6 +374,7 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                               _buildBlock(6, maxBlockSize, colorScheme, state),
                             ],
                           ),
+                          _buildArrowTier(3, maxBlockSize, colorScheme),
                           // Row 0 (Base)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

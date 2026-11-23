@@ -21,7 +21,7 @@ class GridDisplacementScreen extends ConsumerStatefulWidget {
 class _GridDisplacementScreenState extends ConsumerState<GridDisplacementScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   // Phases: 'study' -> 'blank' -> 'recall'

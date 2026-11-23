@@ -26,7 +26,7 @@ class _MatrixMultiplierScreenState extends ConsumerState<MatrixMultiplierScreen>
   int? _selectedRow; // 0 or 1
   int? _selectedCol; // 0 or 1
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   @override

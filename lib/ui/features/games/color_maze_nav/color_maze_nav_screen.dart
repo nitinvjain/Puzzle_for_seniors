@@ -36,7 +36,7 @@ class _ColorMazeNavScreenState extends ConsumerState<ColorMazeNavScreen> {
   final int _targetCol = 4;
 
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
 
   final List<Color> _colors = [

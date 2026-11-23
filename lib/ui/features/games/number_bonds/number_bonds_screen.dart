@@ -20,7 +20,7 @@ class NumberBondsScreen extends ConsumerStatefulWidget {
 class _NumberBondsScreenState extends ConsumerState<NumberBondsScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   late int _v, _l, _r, _ll, _lr, _rl, _rr;

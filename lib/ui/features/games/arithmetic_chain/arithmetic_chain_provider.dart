@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'arithmetic_chain_engine.dart';
@@ -79,7 +80,11 @@ class ArithmeticChainNotifier extends _$ArithmeticChainNotifier {
   }
 
   void _startSequence() {
-    _sequenceTimer = Timer.periodic(const Duration(milliseconds: 1200), (timer) {
+    _sequenceTimer = Timer.periodic(
+        // 1.2s per step is brisk mental arithmetic; the senior build
+        // gives three seconds to take each one in.
+        SeniorMode.presentationPace(const Duration(milliseconds: 1200)),
+        (timer) {
       if (state.currentOpIndex < state.operations.length - 1) {
         state = state.copyWith(currentOpIndex: state.currentOpIndex + 1);
       } else {

@@ -20,7 +20,7 @@ class WordSnakeTrailScreen extends ConsumerStatefulWidget {
 class _WordSnakeTrailScreenState extends ConsumerState<WordSnakeTrailScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
 
   final int _gridSize = 4;

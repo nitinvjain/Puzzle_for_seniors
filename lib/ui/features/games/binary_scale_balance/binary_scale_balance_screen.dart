@@ -20,7 +20,7 @@ class BinaryScaleBalanceScreen extends ConsumerStatefulWidget {
 class _BinaryScaleBalanceScreenState extends ConsumerState<BinaryScaleBalanceScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   late int _targetWeight;

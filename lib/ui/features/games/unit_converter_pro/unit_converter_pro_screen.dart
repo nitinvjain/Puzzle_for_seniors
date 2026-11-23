@@ -34,7 +34,7 @@ class UnitConverterProScreen extends ConsumerStatefulWidget {
 class _UnitConverterProScreenState extends ConsumerState<UnitConverterProScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   late ConversionTask _currentTask;

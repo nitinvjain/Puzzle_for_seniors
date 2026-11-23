@@ -20,7 +20,7 @@ class BinomialMatchScreen extends ConsumerStatefulWidget {
 class _BinomialMatchScreenState extends ConsumerState<BinomialMatchScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
   bool _isGameOver = false;
 
   late int _a;

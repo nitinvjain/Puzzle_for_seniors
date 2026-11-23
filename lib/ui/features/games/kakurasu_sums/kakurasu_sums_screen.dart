@@ -20,7 +20,7 @@ class KakurasuSumsScreen extends ConsumerStatefulWidget {
 class _KakurasuSumsScreenState extends ConsumerState<KakurasuSumsScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
 
   final int _gridSize = 4; // 4x4 grid. Index weights are 1, 2, 3, 4

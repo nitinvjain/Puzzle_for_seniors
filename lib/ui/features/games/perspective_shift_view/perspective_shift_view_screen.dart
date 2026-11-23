@@ -19,7 +19,7 @@ class PerspectiveShiftViewScreen extends ConsumerStatefulWidget {
 class _PerspectiveShiftViewScreenState extends ConsumerState<PerspectiveShiftViewScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   // Camera rotation angle (radians) user can control to view the 3D space
   double _cameraAngle = 0.0;
 

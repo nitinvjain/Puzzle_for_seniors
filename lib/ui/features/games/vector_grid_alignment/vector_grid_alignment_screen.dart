@@ -19,7 +19,7 @@ class VectorGridAlignmentScreen extends ConsumerStatefulWidget {
 class _VectorGridAlignmentScreenState extends ConsumerState<VectorGridAlignmentScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   // Align shape states
   double _userRotation = 0.0; // rotation angle in radians
   double _userScale = 1.0; // scale factor

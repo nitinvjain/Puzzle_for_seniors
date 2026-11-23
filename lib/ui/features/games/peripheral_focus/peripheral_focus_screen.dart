@@ -34,7 +34,7 @@ class _PeripheralFocusScreenState extends ConsumerState<PeripheralFocusScreen> {
   late Color _peripheralColor;
 
   int _score = 0;
-  final int _targetScore = 12;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12);
   bool _isGameOver = false;
 
   final List<Color> _flashColors = [

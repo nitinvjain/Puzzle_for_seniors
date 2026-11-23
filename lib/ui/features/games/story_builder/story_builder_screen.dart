@@ -52,7 +52,7 @@ class _StoryBuilderScreenState extends ConsumerState<StoryBuilderScreen> {
   bool _isStudyMode = true;
 
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   bool _isGameOver = false;
 
   @override

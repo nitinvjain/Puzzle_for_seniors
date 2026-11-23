@@ -169,7 +169,7 @@ class _SimonCommandScreenState extends ConsumerState<SimonCommandScreen> {
                     color: colorScheme.onSurface,
                   ),
                 ),
-                Text(
+                SeniorMode.disableTimers ? const SizedBox.shrink() : Text(
                   "TIME: $_timeLeft s",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,

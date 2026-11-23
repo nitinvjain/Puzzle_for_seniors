@@ -41,7 +41,7 @@ class _DynamicSalienceScreenState extends ConsumerState<DynamicSalienceScreen> w
 
   final List<SalientShape> _shapes = [];
   int _score = 0;
-  final int _targetScore = 10;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
   bool _isGameOver = false;
 
   final List<Color> _colors = [

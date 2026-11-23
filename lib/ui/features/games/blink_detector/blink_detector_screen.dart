@@ -29,7 +29,7 @@ class _BlinkDetectorScreenState extends ConsumerState<BlinkDetectorScreen> {
   late int _targetCol;
 
   int _score = 0;
-  final int _targetScore = 10;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
   bool _isGameOver = false;
 
   @override

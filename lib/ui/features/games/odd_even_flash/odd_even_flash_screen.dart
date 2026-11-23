@@ -29,7 +29,7 @@ class _OddEvenFlashScreenState extends ConsumerState<OddEvenFlashScreen> {
   late Color _currentColor;
   late ParityRule _currentRule;
   int _score = 0;
-  final int _targetScore = 12;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12);
   int _flashesCount = 0;
   bool _isGameOver = false;
   bool _hasTappedThisFlash = false;

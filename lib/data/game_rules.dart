@@ -90,13 +90,13 @@ const Map<String, GameRules> gameRules = {
     example: 'From 4, 7, 8, 8 reach 24:  (8 ÷ 8 + 7) × 4 ÷ … — or 4 × 8 − 8 = 24.',
   ),
   'target_10': GameRules(
-    goal: 'Combine tiles so they add up to ten.',
+    goal: 'Clear tiles by picking ones that add up to ten.',
     steps: [
-      'The board shows number tiles.',
-      'Tap tiles that together make exactly 10.',
-      'They clear, and new tiles take their place.',
+      'The board is full of number tiles.',
+      'Tap two or more tiles that together make exactly 10.',
+      'They disappear and new tiles drop in.',
     ],
-    example: 'Tap 6 and 4 — together they make 10.',
+    example: 'Tap 6 and 4. Or tap 5, 3 and 2 — those also make 10.',
   ),
   'missing_operator': GameRules(
     goal: 'Put the right sign into the equation so it comes out true.',
@@ -135,13 +135,13 @@ const Map<String, GameRules> gameRules = {
     example: 'Target 15 from 6, 4, 5 along the path — 6 + 4 + 5 = 15.',
   ),
   'math_maze': GameRules(
-    goal: 'Trace a route through the maze that works out to the target.',
+    goal: 'Trace a path through the grid that works out to the target.',
     steps: [
-      'The target value is shown above the maze.',
-      'Follow a path through the squares, applying each sign as you pass it.',
-      'Finish when your running total matches the target.',
+      'Start at the top-left square and finish at the bottom-right.',
+      'Move one square at a time, applying each sign as you reach it.',
+      'Your running total at the end must equal the target shown.',
     ],
-    example: 'Along a path: 3, then × 4, then − 2, gives 10.',
+    example: 'Starting at 5, then passing + 3 and × 2, your total is 16.',
   ),
   'number_bonds': GameRules(
     goal: 'Join numbers together so they make the target sum.',
@@ -227,13 +227,13 @@ const Map<String, GameRules> gameRules = {
     example: '2, 4, 8, ?, 32 — each number doubles, so the answer is 16.',
   ),
   'fibonacci_merge': GameRules(
-    goal: 'Merge numbers that sit next to each other in the Fibonacci sequence.',
+    goal: 'Build bigger Fibonacci numbers by merging neighbours.',
     steps: [
-      'In Fibonacci, each number is the two before it added: 1, 1, 2, 3, 5, 8, 13…',
-      'Slide tiles so two consecutive Fibonacci numbers meet.',
-      'They merge into the next number in the sequence.',
+      'The Fibonacci run is 1, 1, 2, 3, 5, 8, 13, 21 — each is the two before it added.',
+      'Swipe to slide the tiles.',
+      'When two tiles that sit next to each other in that run touch, they merge into the next one.',
     ],
-    example: '5 and 8 sit next to each other in the sequence, so they merge into 13.',
+    example: 'A 3 tile meeting a 5 tile becomes 8, because 3 + 5 = 8.',
   ),
   'collatz': GameRules(
     goal: 'Follow the 3n+1 sequence down to 1.',
@@ -292,13 +292,13 @@ const Map<String, GameRules> gameRules = {
     example: 'Binary 101 is 5, so 101 + 3 = 8.',
   ),
   'binary_scale_balance': GameRules(
-    goal: 'Balance the scale using blocks that are powers of two.',
+    goal: 'Make the scale balance by choosing the right weights.',
     steps: [
-      'The weight to match is shown on one side.',
-      'The blocks available are 1, 2, 4, 8, 16 and so on.',
-      'Place blocks until both sides weigh the same.',
+      'A target weight is shown on one side.',
+      'The weights you can add are 1, 2, 4, 8, 16 and 32 — each double the last.',
+      'Tap weights until your side matches the target exactly.',
     ],
-    example: 'To make 13, use the 8, the 4 and the 1.',
+    example: 'To reach 22, use 16 + 4 + 2. Each weight may be used once.',
   ),
   'modulo_clock': GameRules(
     goal: 'Do the arithmetic the way a clock does, wrapping round at 12.',
@@ -319,13 +319,13 @@ const Map<String, GameRules> gameRules = {
     example: '10 + 4 = 14, which on a clock is 2.',
   ),
   'modulo_path': GameRules(
-    goal: 'Move through cells whose remainder matches the one asked for.',
+    goal: 'Walk from the top-left square to the bottom-right one.',
     steps: [
-      'A divisor and a remainder are given.',
-      'A remainder is what is left after dividing.',
-      'Step only onto cells whose number leaves that remainder.',
+      'The panel shows a divisor and a remainder, for example "divide by 3, remainder 1".',
+      'You may only step on a square whose number leaves exactly that remainder.',
+      'Move one square at a time, up, down, left or right.',
     ],
-    example: 'With divisor 3 and remainder 1, you may step on 4, 7 and 10.',
+    example: 'Divide by 3, remainder 1: you may step on 4, 7, 10 or 13, since each leaves 1. You may not step on 6 or 9.',
   ),
   'roman_arithmetic': GameRules(
     goal: 'Add or subtract numbers written as Roman numerals.',
@@ -449,13 +449,13 @@ const Map<String, GameRules> gameRules = {
     example: 'For y = 2x + 1, when x = 3 then y = 7, so plot (3, 7).',
   ),
   'area_perimeter_match': GameRules(
-    goal: 'Draw a rectangle with the area and perimeter asked for.',
+    goal: 'Draw a rectangle with both the area and the perimeter asked for.',
     steps: [
-      'Area is the two sides multiplied; perimeter is all four added.',
-      'Drag on the grid to draw a rectangle.',
-      'Adjust until both numbers match.',
+      'Area is the two sides multiplied together.',
+      'Perimeter is all four sides added up.',
+      'Drag on the grid to draw a rectangle, then adjust until both match.',
     ],
-    example: 'A 3 by 4 rectangle has area 12 and perimeter 14.',
+    example: 'For area 12 and perimeter 14, draw 3 squares by 4: 3 × 4 = 12, and 3 + 4 + 3 + 4 = 14.',
   ),
   'angle_finder': GameRules(
     goal: 'Work out the angle that is missing.',
@@ -532,13 +532,13 @@ const Map<String, GameRules> gameRules = {
     example: '5 × 3 and 20 − 4: that is 15 and 16, so the sign is <.',
   ),
   'balance_scale': GameRules(
-    goal: 'Work out what the last item weighs.',
+    goal: 'Work out what the last shape weighs.',
     steps: [
-      'Each scale shows two sides that balance.',
-      'Use the balanced scales to work out one item at a time.',
-      'Apply what you learn to the final scale.',
+      'Each scale shown is balanced: both sides weigh the same.',
+      'Use the first scales to find what one shape is worth.',
+      'Carry that into the next scale until you can answer the last one.',
     ],
-    example: 'If 2 circles balance 1 square, and 1 square weighs 6, a circle weighs 3.',
+    example: 'If 2 circles balance 1 square, and 1 square weighs 6, then a circle weighs 3.',
   ),
   'binomial_match': GameRules(
     goal: 'Match each quadratic to its factorised form.',
@@ -559,13 +559,13 @@ const Map<String, GameRules> gameRules = {
     example: 'In AB + B = CA, try digits until both columns add up correctly.',
   ),
   'digit_swap_eq': GameRules(
-    goal: 'Swap digits between the two equations so both become correct.',
+    goal: 'Make both sums correct by swapping one digit between them.',
     steps: [
-      'Both equations are wrong as they stand.',
-      'Find one digit in each that is in the wrong place.',
-      'Swap them over.',
+      'Two sums are shown, and both are wrong as they stand.',
+      'Tap a digit in the top sum, then tap a digit in the bottom sum.',
+      'The two digits trade places. Both sums should now be right.',
     ],
-    example: '2 + 3 = 7 and 4 + 3 = 5 — swap the 7 and the 5 and both are right.',
+    example: 'If the sums read 2 + 5 = 9 and 3 + 4 = 7, swapping the 2 and the 3 gives 3 + 5 = 8 — keep trying pairs until both work.',
   ),
   'set_theory_venn': GameRules(
     goal: 'Shade the part of the Venn diagram the formula describes.',
@@ -586,22 +586,22 @@ const Map<String, GameRules> gameRules = {
     example: '6 is even and a multiple of 3, so it goes in the overlap.',
   ),
   'mental_abacus': GameRules(
-    goal: 'Read and work the soroban abacus.',
+    goal: 'Read the soroban abacus and give the number it shows.',
     steps: [
-      'The bead above the bar is worth 5; each bead below is worth 1.',
-      'Beads count only when pushed towards the bar.',
-      'Read each column as one digit.',
+      'Each column is one digit. The bar runs across the middle.',
+      'The single bead ABOVE the bar is worth 5 when pushed down to it.',
+      'Each bead BELOW the bar is worth 1 when pushed up to it. Beads away from the bar count as nothing.',
     ],
-    example: 'The top bead down and two lower beads up makes 5 + 2 = 7.',
+    example: 'In one column, the top bead pushed down (5) with three lower beads pushed up (3) shows 8.',
   ),
   'mental_calendar': GameRules(
-    goal: 'Work out which day of the week a date falls on.',
+    goal: 'Say which day of the week a date falls on.',
     steps: [
-      'A date is shown.',
-      'Work it out from a day you know, counting in sevens.',
-      'Tap the day of the week.',
+      'You are told one day to anchor from, or you work from the month shown.',
+      'Days repeat every 7, so counting on in sevens keeps the same weekday.',
+      'Count the remaining days forward and tap the answer.',
     ],
-    example: 'If the 1st is a Monday, the 8th and the 15th are Mondays too.',
+    example: 'If the 3rd is a Tuesday, then the 10th, 17th and 24th are Tuesdays. The 20th is 17 + 3, so it is a Friday.',
   ),
   'game_2048': GameRules(
     goal: 'Merge matching tiles to build up to 2048.',

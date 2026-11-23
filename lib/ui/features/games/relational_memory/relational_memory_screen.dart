@@ -47,7 +47,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
   
   // Player placements: Position index -> Icon index in pool
   late Map<int, int> _playerPlacements;
-  int _secondsLeftToMemorize = 4;
+  int _secondsLeftToMemorize = SeniorMode.studySeconds(4);
   Timer? _memorizationTimer;
 
   @override
@@ -69,7 +69,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
       _selectedIconIndexFromTray = null;
       _playerPlacements = {};
       _targetsMap = {};
-      _secondsLeftToMemorize = 4;
+      _secondsLeftToMemorize = SeniorMode.studySeconds(4);
 
       final count = _itemsCount[_round - 1];
       
@@ -85,7 +85,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
       }
     });
 
-    _memorizationTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
+    _memorizationTimer = SeniorMode.phaseCountdown(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (_secondsLeftToMemorize > 1) {

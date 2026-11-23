@@ -177,7 +177,7 @@ class _WordWheelScreenState extends ConsumerState<WordWheelScreen> {
   String _currentInput = '';
   final Set<String> _foundWords = {};
   int _score = 0;
-  final int _targetScore = 4;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 4);
   bool _isGameOver = false;
 
   @override

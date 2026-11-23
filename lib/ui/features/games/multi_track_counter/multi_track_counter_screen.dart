@@ -22,7 +22,7 @@ class _MultiTrackCounterScreenState extends ConsumerState<MultiTrackCounterScree
   final Random _random = Random();
   late Timer _gameTimer;
   int _score = 0;
-  final int _targetScore = 10;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
   bool _isGameOver = false;
 
   // Game configuration

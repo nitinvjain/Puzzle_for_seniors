@@ -20,7 +20,7 @@ class AreaPerimeterMatchScreen extends ConsumerStatefulWidget {
 class _AreaPerimeterMatchScreenState extends ConsumerState<AreaPerimeterMatchScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 5;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
 
   late int _targetW;
   late int _targetH;

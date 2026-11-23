@@ -43,7 +43,7 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
   late List<String> _options;
 
   Timer? _memorizeTimer;
-  int _timeLeft = 5; // 5 seconds per avatar
+  int _timeLeft = SeniorMode.studySeconds(5); // study window per avatar
 
   @override
   void initState() {
@@ -76,10 +76,10 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
 
   void _startMemorizationCycle() {
     setState(() {
-      _timeLeft = 5;
+      _timeLeft = SeniorMode.studySeconds(5);
     });
 
-    _memorizeTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
+    _memorizeTimer = SeniorMode.phaseCountdown(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (_timeLeft > 1) {

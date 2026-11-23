@@ -60,7 +60,7 @@ class _FocusTunnelScreenState extends ConsumerState<FocusTunnelScreen> with Sing
   final List<TunnelSymbol> _activeSymbols = [];
   final List<IconData> _history = []; // 2-back history tracking
   int _score = 0;
-  final int _targetScore = 15;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
   bool _isGameOver = false;
 
   @override

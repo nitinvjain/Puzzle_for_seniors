@@ -57,6 +57,28 @@ class SeniorMode {
   /// where those limits are declared.
   static const int roundTarget = 50;
 
+  /// A timer that always runs, for countdowns that ADVANCE A PHASE rather
+  /// than apply pressure — "memorise this grid" becoming "now recall it".
+  ///
+  /// Stopping those does not relax the game, it strands the player on the
+  /// study screen with no way forward. They keep ticking; [studySeconds]
+  /// lengthens them instead.
+  static Timer phaseCountdown(Duration duration, void Function(Timer) cb) =>
+      Timer.periodic(duration, cb);
+
+  /// Lengthens a memorise-this phase.
+  ///
+  /// Four seconds to take in a grid is brisk for anyone and far too brisk
+  /// here, so study windows are tripled with a sensible floor.
+  static int studySeconds(int stock) =>
+      enabled ? (stock * 3).clamp(12, 180) : stock;
+
+  /// Slows a game that reveals items one at a time.
+  ///
+  /// Used where the pace of presentation, not a countdown, is the pressure.
+  static Duration presentationPace(Duration stock) =>
+      enabled ? stock * 2.5 : stock;
+
   /// Applies a wrong-answer time penalty, or doesn't.
   ///
   /// Several games dock the clock a few seconds for each mistake. With the
@@ -70,6 +92,14 @@ class SeniorMode {
 
   /// Master switch. Set to false to get the stock upstream behaviour back.
   static const bool enabled = true;
+
+  /// Games hidden from the catalogue regardless of [limitGameList].
+  ///
+  /// For games whose rules cannot be made clear enough to be worth the
+  /// confusion they cause.
+  static const List<String> hiddenGameIds = <String>[
+    'collatz', // the 3n+1 rule is unguessable without being told it
+  ];
 
   /// Whether to show only [enabledGameIds], or the whole catalogue.
   ///

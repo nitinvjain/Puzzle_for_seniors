@@ -20,7 +20,7 @@ class VektorVectorScreen extends ConsumerStatefulWidget {
 class _VektorVectorScreenState extends ConsumerState<VektorVectorScreen> {
   final Random _random = Random();
   int _score = 0;
-  final int _targetScore = 3;
+  final int _targetScore = (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
   // Vector vectors & coefficients
   late Point<int> _u;
   late Point<int> _v;
