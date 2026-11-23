@@ -54,8 +54,17 @@ class SeniorMode {
   /// Master switch. Set to false to get the stock upstream behaviour back.
   static const bool enabled = true;
 
-  /// The only games shown in the app, in the order they appear on the home
-  /// screen. These ids must match `GameMetadata.id`.
+  /// Whether to show only [enabledGameIds], or the whole catalogue.
+  ///
+  /// `false` shows all 304 games, still with every senior-mode behaviour
+  /// applied: no countdowns, no fail states, large type, no stats or settings
+  /// screens. Set it back to `true` to narrow the home screen again — a short
+  /// list is easier to learn, so that remains the gentler default.
+  static const bool limitGameList = false;
+
+  /// The games shown when [limitGameList] is true, in the order they appear on
+  /// the home screen. These ids must match `GameMetadata.id`, which is also the
+  /// folder name under lib/ui/features/games/.
   ///
   /// To change the selection, edit this list only — nothing else refers to
   /// individual games.
@@ -88,6 +97,14 @@ class SeniorMode {
 
   /// Hide the stats and settings destinations; one Back route only.
   static const bool simplifiedNavigation = true;
+
+  /// Whether the home screen keeps its search box and category filters.
+  ///
+  /// With a short curated list they are pure clutter. With the full catalogue
+  /// they are the only way to find anything among 304 tiles, so they come back
+  /// automatically — the stats and settings destinations stay hidden either
+  /// way.
+  static bool get showGameFilters => enabled && !limitGameList;
 
   // --- Presentation --------------------------------------------------------
 

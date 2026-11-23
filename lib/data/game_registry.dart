@@ -331,7 +331,7 @@ List<GameMetadata> get allGamesMetadata =>
 /// upstream merges keep applying cleanly and the selection can be changed by
 /// editing one list in senior_mode.dart.
 List<GameMetadata> _applySeniorFilter(List<GameMetadata> all) {
-  if (!SeniorMode.enabled) return all;
+  if (!SeniorMode.enabled || !SeniorMode.limitGameList) return all;
   final byId = <String, GameMetadata>{for (final g in all) g.id: g};
   return <GameMetadata>[
     for (final id in SeniorMode.enabledGameIds)

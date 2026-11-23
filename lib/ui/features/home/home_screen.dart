@@ -72,9 +72,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         selectedCategory: _selectedCategory,
         localizedTitles: localizedTitles));
 
-    // Senior build: one screen, one list of large tiles. No streak badge, no
-    // search, no category filters, no favourites row, no shuffle button --
-    // every one of those is a way to end up somewhere unexpected.
+    // Senior build: one screen of large tiles, no streak badge, no favourites
+    // row, no shuffle button -- each of those is a way to end up somewhere
+    // unexpected. Search and category filters are the exception: with a short
+    // curated list they are clutter, but with the full catalogue they are the
+    // only way to find anything, so SeniorMode.showGameFilters brings them back.
     if (SeniorMode.enabled) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
@@ -95,8 +97,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   letterSpacing: 2.0,
                 ),
               ),
+              actions: [
+                if (SeniorMode.showGameFilters)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: TangibleButton(
+                      color: Colors.transparent,
+                      drawBorder: false,
+                      padding: const EdgeInsets.all(12),
+                      onTap: () {
+                        setState(() {
+                          _isSearchVisible = !_isSearchVisible;
+                          if (!_isSearchVisible) {
+                            _searchQuery = "";
+                            _searchController.clear();
+                          }
+                        });
+                      },
+                      child: Icon(
+                        _isSearchVisible
+                            ? Icons.close_rounded
+                            : Icons.search_rounded,
+                        color: colorScheme.onSurface,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            _buildGameGrid(filteredGames),
+            if (SeniorMode.showGameFilters)
+              SliverToBoxAdapter(
+                child: _HomeFilterSection(
+                  isSearchVisible: _isSearchVisible,
+                  searchController: _searchController,
+                  searchQuery: _searchQuery,
+                  selectedCategory: _selectedCategory,
+                  onSearchChanged: (value) {
+                    if (_debounce?.isActive ?? false) _debounce!.cancel();
+                    _debounce = Timer(const Duration(milliseconds: 300), () {
+                      setState(() => _searchQuery = value);
+                    });
+                  },
+                  onSearchClear: () {
+                    _searchController.clear();
+                    setState(() => _searchQuery = "");
+                  },
+                  onCategorySelected: (value) =>
+                      setState(() => _selectedCategory = value),
+                ),
+              ),
+            filteredGames.isEmpty
+                ? const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: EmptyGamesState(),
+                  )
+                : _buildGameGrid(filteredGames),
           ],
         ),
       );

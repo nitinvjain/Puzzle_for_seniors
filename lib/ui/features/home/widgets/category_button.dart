@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:puzzle/utils/design_system.dart';
 
@@ -60,9 +61,14 @@ class CategoryButton extends StatelessWidget {
                 width: 68,
                 height: 68,
                 child: CircularProgressIndicator(
-                  value: progress,
+                  // The ring tracks games solved, which is streak data. With
+                  // streaks off it would sit permanently at zero — a quiet
+                  // "you have completed nothing" — so the senior build shows a
+                  // plain full ring instead.
+                  value: SeniorMode.disableStreaks ? 1.0 : progress,
                   backgroundColor: categoryStyle.color.withValues(alpha: 0.1),
-                  color: categoryStyle.color,
+                  color: categoryStyle.color.withValues(
+                      alpha: SeniorMode.disableStreaks ? 0.25 : 1.0),
                   strokeWidth: 3,
                   strokeCap: StrokeCap.round,
                 ),
