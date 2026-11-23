@@ -25,7 +25,7 @@ class _ModuloClockScreenState extends ConsumerState<ModuloClockScreen> {
   
   int _score = 0;
   int _correctAnswers = 0;
-  static const int targetAnswers = 10;
+  static const int targetAnswers = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
   
   late int _startHour;
   late int _addedHours;
@@ -167,7 +167,7 @@ class _ModuloClockScreenState extends ConsumerState<ModuloClockScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   "SOLVED: $_correctAnswers / $targetAnswers",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,

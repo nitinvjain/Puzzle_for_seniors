@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -92,7 +93,7 @@ class D2AttentionScreen extends ConsumerWidget {
                       depth: 2.0,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       radius: DesignSystem.radiusSM,
-                      child: Text(
+                      child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         'SCORE: ${state.score}',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: DesignSystem.primary),
                       ),

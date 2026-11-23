@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class CorsiBackwardSpanScreen extends ConsumerStatefulWidget {
 }
 
 class _CorsiBackwardSpanScreenState extends ConsumerState<CorsiBackwardSpanScreen> {
-  static const int targetScore = 6;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 6;
 
   late CorsiBackwardRound _currentRound;
   int _score = 0;
@@ -217,7 +218,7 @@ class _CorsiBackwardSpanScreenState extends ConsumerState<CorsiBackwardSpanScree
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

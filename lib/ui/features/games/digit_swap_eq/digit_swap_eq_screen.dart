@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -191,7 +192,7 @@ class _DigitSwapEqScreenState extends ConsumerState<DigitSwapEqScreen> {
                   color: DesignSystem.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
                 ),
-                child: Text(
+                child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   'Score: $_score / $_targetScore',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         color: DesignSystem.primary,

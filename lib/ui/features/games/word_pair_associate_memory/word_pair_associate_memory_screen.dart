@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class WordPairAssociateMemoryScreen extends ConsumerStatefulWidget {
 }
 
 class _WordPairAssociateMemoryScreenState extends ConsumerState<WordPairAssociateMemoryScreen> {
-  static const int targetScore = 8;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
 
   late WordPairAssociateRound _currentRound;
   int _score = 0;
@@ -210,7 +211,7 @@ class _WordPairAssociateMemoryScreenState extends ConsumerState<WordPairAssociat
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

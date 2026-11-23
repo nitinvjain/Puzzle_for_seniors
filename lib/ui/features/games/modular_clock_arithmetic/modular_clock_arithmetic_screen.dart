@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class ModularClockArithmeticScreen extends ConsumerStatefulWidget {
 }
 
 class _ModularClockArithmeticScreenState extends ConsumerState<ModularClockArithmeticScreen> {
-  static const int targetScore = 8;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
 
   late ModularClockQuestion _currentQuestion;
   int _score = 0;
@@ -176,7 +177,7 @@ class _ModularClockArithmeticScreenState extends ConsumerState<ModularClockArith
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

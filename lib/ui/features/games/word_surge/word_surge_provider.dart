@@ -18,7 +18,7 @@ class WordSurgeState {
   WordSurgeState({
     this.currentChallenge,
     this.score = 0,
-    this.targetScore = 15,
+    this.targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15,
     this.timeLeft = 30,
     this.isGameOver = false,
     this.isLoading = true,

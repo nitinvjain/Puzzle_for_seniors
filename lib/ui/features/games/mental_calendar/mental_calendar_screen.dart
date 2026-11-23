@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -56,7 +57,7 @@ class MentalCalendarScreen extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
+        SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
           '${state.totalTrials + 1} / 10',
           style: DesignSystem.theme.textTheme.labelLarge?.copyWith(
             color: DesignSystem.primary,

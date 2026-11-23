@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'conjunction_search_engine.dart';
@@ -172,7 +173,7 @@ class ConjunctionSearchScreen extends ConsumerWidget {
                       depth: 2.0,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       radius: DesignSystem.radiusSM,
-                      child: Text(
+                      child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         '${l10n.conjunctionSearchRound}${state.currentRound}/${state.totalRounds}',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                       ),

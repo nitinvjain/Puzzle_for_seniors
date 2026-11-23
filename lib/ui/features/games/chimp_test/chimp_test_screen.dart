@@ -24,7 +24,7 @@ class _ChimpTestScreenState extends ConsumerState<ChimpTestScreen> {
   static const int gridSize = 4;
   
   int _round = 1;
-  static const int totalRounds = 3;
+  static const int totalRounds = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 3;
   int _lives = 3;
   
   // Grid layout representation: index corresponds to cell position (0 to 15)
@@ -163,7 +163,7 @@ class _ChimpTestScreenState extends ConsumerState<ChimpTestScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                       "ROUND: $_round / $totalRounds",
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w900,

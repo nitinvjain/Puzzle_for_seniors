@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -158,7 +159,7 @@ class _VectorGridAlignmentScreenState extends ConsumerState<VectorGridAlignmentS
                 color: DesignSystem.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
               ),
-              child: Text(
+              child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'Aligned: $_score / $_targetScore',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: DesignSystem.primary,

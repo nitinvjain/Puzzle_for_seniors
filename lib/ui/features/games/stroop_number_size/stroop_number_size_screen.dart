@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ class StroopNumberSizeScreen extends ConsumerStatefulWidget {
 }
 
 class _StroopNumberSizeScreenState extends ConsumerState<StroopNumberSizeScreen> {
-  static const int totalTrials = 14;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 14;
 
   late NumberSizeTrial _currentTrial;
   int _trialCount = 0;
@@ -142,7 +143,7 @@ class _StroopNumberSizeScreenState extends ConsumerState<StroopNumberSizeScreen>
             children: [
               const Icon(Icons.format_size_rounded, size: 18, color: DesignSystem.gameRose),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'TRIAL $_trialCount / $totalTrials',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

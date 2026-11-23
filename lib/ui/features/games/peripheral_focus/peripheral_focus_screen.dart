@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -239,7 +240,7 @@ class _PeripheralFocusScreenState extends ConsumerState<PeripheralFocusScreen> {
                     color: DesignSystem.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
                   ),
-                  child: Text(
+                  child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     'Score: $_score / $_targetScore',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: DesignSystem.primary,

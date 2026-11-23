@@ -88,7 +88,7 @@ class _WordSurgeScreenState extends ConsumerState<WordSurgeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   'Score: ${state.score} / ${state.targetScore}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),

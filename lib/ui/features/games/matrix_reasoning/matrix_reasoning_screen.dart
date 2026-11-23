@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -81,14 +82,14 @@ class _MatrixReasoningScreenState extends ConsumerState<MatrixReasoningScreen> {
               children: [
                 TangibleContainer(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
+                  child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     'Score: ${state.score}',
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
                 TangibleContainer(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
+                  child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     state.isTrialMode ? 'Trials: ${state.totalTrials}/${state.targetTrials}' : 'Time: ${state.timeLeft}s',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,

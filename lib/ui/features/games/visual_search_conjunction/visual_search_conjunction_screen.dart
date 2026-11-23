@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ class VisualSearchConjunctionScreen extends ConsumerStatefulWidget {
 }
 
 class _VisualSearchConjunctionScreenState extends ConsumerState<VisualSearchConjunctionScreen> {
-  static const int totalTrials = 12;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
 
   late VisualSearchRound _currentRound;
   int _trialCount = 0;
@@ -137,7 +138,7 @@ class _VisualSearchConjunctionScreenState extends ConsumerState<VisualSearchConj
             children: [
               const Icon(Icons.manage_search_rounded, size: 18, color: DesignSystem.gameRose),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'TRIAL $_trialCount / $totalTrials',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

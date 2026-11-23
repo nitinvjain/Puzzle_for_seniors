@@ -24,7 +24,7 @@ class BoxCompletionState {
     this.isGameOver = false,
     this.isLoading = true,
     this.isTrialMode = false,
-    this.targetTrials = 20,
+    this.targetTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 20,
   });
 
   BoxCompletionState copyWith({

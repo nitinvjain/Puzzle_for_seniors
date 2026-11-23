@@ -25,7 +25,7 @@ class _BinaryCodeScreenState extends ConsumerState<BinaryCodeScreen> {
   
   int _score = 0;
   int _correctAnswers = 0;
-  static const int targetAnswers = 10;
+  static const int targetAnswers = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
   
   late int _targetDecimal;
   late String _binaryString;
@@ -162,7 +162,7 @@ class _BinaryCodeScreenState extends ConsumerState<BinaryCodeScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   "TRANSLATED: $_correctAnswers / $targetAnswers",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,

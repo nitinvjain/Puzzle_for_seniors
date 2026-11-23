@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'mental_abacus_engine.dart';
 
@@ -31,7 +32,7 @@ class MentalAbacusState {
     required this.rods,
     this.currentProblem,
     this.score = 0,
-    this.targetScore = 5,
+    this.targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 5,
     this.isVictory = false,
     this.isLoading = true,
   });

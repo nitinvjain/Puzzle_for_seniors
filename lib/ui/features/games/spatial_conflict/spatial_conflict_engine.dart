@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math';
 
 enum Direction {
@@ -20,7 +21,7 @@ class ConflictTrial {
 
 class SpatialConflictEngine {
   final Random _random = Random();
-  static const int totalTrials = 15;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15;
 
   List<ConflictTrial> generateTrials() {
     final List<ConflictTrial> trials = [];

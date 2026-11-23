@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'verbal_analogies_engine.dart';
 
@@ -15,7 +16,7 @@ class VerbalAnalogiesState {
   VerbalAnalogiesState({
     this.currentAnalogy,
     this.score = 0,
-    this.targetScore = 10,
+    this.targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10,
     this.isVictory = false,
     this.isLoading = true,
     this.selectedOption,

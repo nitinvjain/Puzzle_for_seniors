@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class ProbeDigitSpanScreen extends ConsumerStatefulWidget {
 }
 
 class _ProbeDigitSpanScreenState extends ConsumerState<ProbeDigitSpanScreen> {
-  static const int totalTrials = 8;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
 
   late ProbeDigitTrial _currentTrial;
   int _trialCount = 0;
@@ -180,7 +181,7 @@ class _ProbeDigitSpanScreenState extends ConsumerState<ProbeDigitSpanScreen> {
             children: [
               const Icon(Icons.dialpad_rounded, size: 18, color: DesignSystem.gameIndigo),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'TRIAL $_trialCount / $totalTrials',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',
@@ -200,7 +201,7 @@ class _ProbeDigitSpanScreenState extends ConsumerState<ProbeDigitSpanScreen> {
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'SCORE: $_score',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

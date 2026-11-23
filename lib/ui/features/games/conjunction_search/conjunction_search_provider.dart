@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'conjunction_search_engine.dart';
 import '../../../../providers/user_providers.dart';
@@ -47,7 +48,7 @@ class ConjunctionSearchState {
 @riverpod
 class ConjunctionSearchNotifier extends _$ConjunctionSearchNotifier {
   final ConjunctionSearchEngine _engine = ConjunctionSearchEngine();
-  static const int maxRounds = 5;
+  static const int maxRounds = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 5;
 
   @override
   ConjunctionSearchState build() {

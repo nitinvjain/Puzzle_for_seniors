@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -178,7 +179,7 @@ class _MultiTrackCounterScreenState extends ConsumerState<MultiTrackCounterScree
                           color: DesignSystem.gameOrange,
                         ),
                   ),
-                  Text(
+                  SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     '$_score / $_targetScore',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,

@@ -77,7 +77,7 @@ class _NumericalEstimationScreenState extends ConsumerState<NumericalEstimationS
               children: [
                 _buildStatCard(context, 'SCORE', state.score.toString()),
                 state.isTrialMode
-                    ? _buildStatCard(context, 'TRIALS', '${state.totalTrials}/${state.targetTrials}')
+                    ? SeniorMode.disableScoring ? const SizedBox.shrink() : _buildStatCard(context, 'TRIALS', '${state.totalTrials}/${state.targetTrials}')
                     : SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStatCard(context, 'TIME', '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],
             ),

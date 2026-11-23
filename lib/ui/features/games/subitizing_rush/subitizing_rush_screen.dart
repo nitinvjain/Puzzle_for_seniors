@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class SubitizingRushScreen extends ConsumerStatefulWidget {
 }
 
 class _SubitizingRushScreenState extends ConsumerState<SubitizingRushScreen> {
-  static const int targetScore = 10;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
   static const int flashDurationMs = 600;
 
   late SubitizingRound _currentRound;
@@ -194,7 +195,7 @@ class _SubitizingRushScreenState extends ConsumerState<SubitizingRushScreen> {
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

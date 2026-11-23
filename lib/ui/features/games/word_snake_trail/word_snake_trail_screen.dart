@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -202,7 +203,7 @@ class _WordSnakeTrailScreenState extends ConsumerState<WordSnakeTrailScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold, color: DesignSystem.primary, fontSize: 16),
                   ),
                 ),
-                Text(
+                SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   '${AppLocalizations.of(context)!.statScore}: $_score / $_targetScore',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),

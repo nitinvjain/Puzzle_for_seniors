@@ -82,7 +82,7 @@ class _SyllableStackScreenState extends ConsumerState<SyllableStackScreen> {
               children: [
                 TangibleContainer(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
+                  child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     'Score: ${state.score}',
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),

@@ -24,7 +24,7 @@ class MentalRotationState {
     this.isGameOver = false,
     this.lastResult,
     this.isTrialMode = false,
-    this.targetTrials = 20,
+    this.targetTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 20,
   });
 
   MentalRotationState copyWith({

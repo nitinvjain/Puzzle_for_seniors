@@ -112,7 +112,7 @@ class _CrossSectionSliceScreenState extends ConsumerState<CrossSectionSliceScree
           if (!state.isTrialMode)
             SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStatCard(l10n.timeLeft, "${state.timeLeft}s", theme.colorScheme.secondary)
           else
-            _buildStatCard(l10n.trials, "${state.totalTrials}/${state.targetTrials}", theme.colorScheme.secondary),
+            SeniorMode.disableScoring ? const SizedBox.shrink() : _buildStatCard(l10n.trials, "${state.totalTrials}/${state.targetTrials}", theme.colorScheme.secondary),
         ],
       ),
     );

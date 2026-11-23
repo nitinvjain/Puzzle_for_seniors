@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -17,7 +18,7 @@ class NavonHierarchicalScreen extends ConsumerStatefulWidget {
 }
 
 class _NavonHierarchicalScreenState extends ConsumerState<NavonHierarchicalScreen> {
-  static const int targetScore = 12;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
 
   late NavonStimulus _currentStimulus;
   int _score = 0;
@@ -152,7 +153,7 @@ class _NavonHierarchicalScreenState extends ConsumerState<NavonHierarchicalScree
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

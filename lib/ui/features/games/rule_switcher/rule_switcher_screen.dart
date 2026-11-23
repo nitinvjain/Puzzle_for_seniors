@@ -84,7 +84,7 @@ class _RuleSwitcherScreenState extends ConsumerState<RuleSwitcherScreen> {
               children: [
                 _buildStat('SCORE', state.score.toString()),
                 if (state.isTrialMode)
-                  _buildStat('TRIALS', '${state.totalTrials}/${state.targetTrials}')
+                  SeniorMode.disableScoring ? const SizedBox.shrink() : _buildStat('TRIALS', '${state.totalTrials}/${state.targetTrials}')
                 else
                   SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat('TIME', '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],

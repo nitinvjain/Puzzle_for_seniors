@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class Wireframe3DRotationScreen extends ConsumerStatefulWidget {
 }
 
 class _Wireframe3DRotationScreenState extends ConsumerState<Wireframe3DRotationScreen> {
-  static const int targetScore = 8;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
 
   late WireframeRound _currentRound;
   int _score = 0;
@@ -187,7 +188,7 @@ class _Wireframe3DRotationScreenState extends ConsumerState<Wireframe3DRotationS
             children: [
               const Icon(Icons.stars_rounded, size: 18, color: DesignSystem.primary),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 '$_score / $targetScore',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

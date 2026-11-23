@@ -258,7 +258,7 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                           children: [
                             Icon(Icons.stars_rounded, color: DesignSystem.accentAmber, size: 20),
                             const SizedBox(width: DesignSystem.spaceXS),
-                            Text(
+                            SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                               'SCORE: ${state.score}',
                               style: const TextStyle(
                                 fontWeight: FontWeight.w900,

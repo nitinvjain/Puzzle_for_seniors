@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -214,7 +215,7 @@ class _OddEvenFlashScreenState extends ConsumerState<OddEvenFlashScreen> {
           // Score Tracker
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Text(
+            child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
               'Score: $_score / $_targetScore',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,

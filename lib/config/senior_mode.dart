@@ -40,6 +40,25 @@ class SeniorMode {
     return Timer.periodic(duration, callback);
   }
 
+  /// Whether a game runs until the player leaves, rather than stopping after
+  /// a set number of rounds.
+  ///
+  /// Many games finish at a target — eight correct answers, twelve trials —
+  /// and then put up a modal offering "Play Again". That modal interrupts the
+  /// flow and asks for a decision, which is exactly the kind of friction this
+  /// build exists to remove. With this set, the target is raised out of reach
+  /// and play simply continues.
+  static const bool endlessPlay = true;
+
+  /// A round or question target no session will ever reach.
+  ///
+  /// Games substitute this for their own limit, so every `score >= target`
+  /// test stays false and play continues. Raising the target rather than
+  /// rewriting each game's completion logic keeps the change to one token per
+  /// site, and this is a plain `const int` so it is still valid in the
+  /// constructor defaults and `static const` fields where those limits live.
+  static const int endlessRounds = 1 << 24;
+
   /// Applies a wrong-answer time penalty, or doesn't.
   ///
   /// Several games dock the clock a few seconds for each mistake. With the

@@ -84,7 +84,7 @@ class _SentenceUnscrambleScreenState extends ConsumerState<SentenceUnscrambleScr
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Center(
                     child: FittedBox(
-                      child: Text(
+                      child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         'SCORE: ${state.score}',
                         style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
                       ),

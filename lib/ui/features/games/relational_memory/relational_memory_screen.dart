@@ -25,7 +25,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
   static const int gridSize = 3;
 
   int _round = 1;
-  static const int totalRounds = 3;
+  static const int totalRounds = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 3;
 
   // Level config: how many items to remember
   final List<int> _itemsCount = [3, 4, 5];
@@ -211,7 +211,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                       "ROUND: $_round / $totalRounds",
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w900,

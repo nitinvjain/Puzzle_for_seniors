@@ -88,7 +88,7 @@ class _VisualStatisticalLearningScreenState extends ConsumerState<VisualStatisti
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         'SCORE: ${state.score}',
                         style: TextStyle(
                           fontSize: 20,

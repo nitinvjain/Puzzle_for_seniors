@@ -35,7 +35,7 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
   
   int _quizQuestionIndex = 0;
   int _correctAnswers = 0;
-  static const int totalQuestions = 3;
+  static const int totalQuestions = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 3;
   
   // Current question states
   late String _questionText;
@@ -285,7 +285,7 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
 
             // Quiz display
             if (_isQuizPhase) ...[
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 "QUESTION: ${_quizQuestionIndex + 1} / $totalQuestions",
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w900,

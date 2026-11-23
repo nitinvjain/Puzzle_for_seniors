@@ -25,7 +25,7 @@ class _SimonCommandScreenState extends ConsumerState<SimonCommandScreen> {
   
   int _score = 0;
   int _correctAnswers = 0;
-  static const int targetScore = 15;
+  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15;
   
   late int _shapeSide; // 0: Left side, 1: Right side
   late int _shapeColor; // 0: Indigo (Blue), 1: Berry (Red)
@@ -162,7 +162,7 @@ class _SimonCommandScreenState extends ConsumerState<SimonCommandScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
+                SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                   "MATCHES: $_correctAnswers / $targetScore",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,

@@ -82,7 +82,7 @@ class _BoxCompletionScreenState extends ConsumerState<BoxCompletionScreen> {
               children: [
                 _buildStat(l10n.score.toUpperCase(), state.score.toString()),
                 if (state.isTrialMode)
-                  _buildStat(l10n.trials.toUpperCase(), '${state.totalTrials}/${state.targetTrials}')
+                  SeniorMode.disableScoring ? const SizedBox.shrink() : _buildStat(l10n.trials.toUpperCase(), '${state.totalTrials}/${state.targetTrials}')
                 else
                   SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],

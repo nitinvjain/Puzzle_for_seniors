@@ -88,7 +88,7 @@ class _WisconsinCardSortingScreenState extends ConsumerState<WisconsinCardSortin
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         'SCORE: ${state.score}',
                         style: TextStyle(
                           fontSize: 20,

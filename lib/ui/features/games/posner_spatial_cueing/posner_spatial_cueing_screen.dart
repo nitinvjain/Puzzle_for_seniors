@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class PosnerSpatialCueingScreen extends ConsumerStatefulWidget {
 }
 
 class _PosnerSpatialCueingScreenState extends ConsumerState<PosnerSpatialCueingScreen> {
-  static const int totalTrials = 12;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
 
   late PosnerTrial _currentTrial;
   int _trialCount = 0;
@@ -195,7 +196,7 @@ class _PosnerSpatialCueingScreenState extends ConsumerState<PosnerSpatialCueingS
             children: [
               const Icon(Icons.track_changes_rounded, size: 18, color: DesignSystem.gameRose),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'TRIAL $_trialCount / $totalTrials',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

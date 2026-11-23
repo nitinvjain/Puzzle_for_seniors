@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -274,7 +275,7 @@ class _ShapeShifterScreenState extends ConsumerState<ShapeShifterScreen> {
                     color: DesignSystem.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
                   ),
-                  child: Text(
+                  child: SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                     '$_score / $_targetScore',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           color: DesignSystem.primary,

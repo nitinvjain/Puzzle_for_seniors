@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,7 +19,7 @@ class VisualCrowdingAcuityScreen extends ConsumerStatefulWidget {
 }
 
 class _VisualCrowdingAcuityScreenState extends ConsumerState<VisualCrowdingAcuityScreen> {
-  static const int totalTrials = 12;
+  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
 
   late VisualCrowdingTrial _currentTrial;
   int _trialCount = 0;
@@ -137,7 +138,7 @@ class _VisualCrowdingAcuityScreenState extends ConsumerState<VisualCrowdingAcuit
             children: [
               const Icon(Icons.remove_red_eye_rounded, size: 18, color: DesignSystem.gameRose),
               const SizedBox(width: 6),
-              Text(
+              SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                 'TRIAL $_trialCount / $totalTrials',
                 style: const TextStyle(
                   fontFamily: 'Bebas Neue',

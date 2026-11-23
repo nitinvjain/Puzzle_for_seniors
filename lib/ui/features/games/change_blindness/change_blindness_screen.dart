@@ -311,7 +311,7 @@ class _ChangeBlindnessScreenState extends ConsumerState<ChangeBlindnessScreen> {
                         ],
                       ),
                       const SizedBox(height: DesignSystem.spaceMD),
-                      Text(
+                      SeniorMode.disableScoring ? const SizedBox.shrink() : Text(
                         'SCORE: ${state.score}',
                         style: TextStyle(
                           fontSize: 20,
