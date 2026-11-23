@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'dart:math' as math;
+import '../../../data/game_rules.dart';
 import '../../../utils/design_system.dart';
 import '../../../widgets/tangible.dart';
 import '../../../data/game_registry.dart';
@@ -275,7 +276,13 @@ class _GameScaffoldState extends ConsumerState<GameScaffold> {
       ],
     };
 
-    final rulesList = gameId != null ? detailedRules[gameId] : null;
+    // Prefer the fuller senior-build text (goal + steps + a worked example)
+    // where it exists, and fall back to the original short rules otherwise.
+    final richRules = gameId != null ? gameRules[gameId] : null;
+    final rulesList =
+        richRules?.steps ?? (gameId != null ? detailedRules[gameId] : null);
+    final goalText = richRules?.goal ?? resolvedSubtitle;
+    final exampleText = richRules?.example;
 
     showDialog(
       context: context,
@@ -285,11 +292,18 @@ class _GameScaffoldState extends ConsumerState<GameScaffold> {
           elevation: 0,
           insetPadding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 380),
+            // The senior-build help text is several times longer than the
+            // stock one-liner, so the dialog is capped and made scrollable
+            // rather than overflowing on a phone-sized screen.
+            constraints: BoxConstraints(
+              maxWidth: 380,
+              maxHeight: MediaQuery.sizeOf(context).height * 0.82,
+            ),
             child: TangibleContainer(
               radius: DesignSystem.radiusLG,
               padding: const EdgeInsets.all(DesignSystem.spaceLG),
-              child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
@@ -337,12 +351,12 @@ class _GameScaffoldState extends ConsumerState<GameScaffold> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          resolvedSubtitle ?? "Objective: Solve the puzzle by completing the goals.",
+                          goalText ?? "Objective: Solve the puzzle by completing the goals.",
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface.withValues(alpha: 0.9),
-                            fontSize: 14.0,
-                            height: 1.4,
+                            fontSize: 15.0,
+                            height: 1.5,
                           ),
                         ),
                         if (rulesList != null && rulesList.isNotEmpty) ...[
@@ -375,15 +389,55 @@ class _GameScaffoldState extends ConsumerState<GameScaffold> {
                                   child: Text(
                                     rule,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurface.withValues(alpha: 0.8),
-                                      fontSize: 13.0,
-                                      height: 1.35,
+                                      color: colorScheme.onSurface.withValues(alpha: 0.9),
+                                      fontSize: 14.5,
+                                      height: 1.45,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           )),
+                        ],
+                        // A worked example, set apart so it reads as something
+                        // to follow rather than another rule.
+                        if (exampleText != null) ...[
+                          const SizedBox(height: DesignSystem.spaceMD),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(DesignSystem.spaceMD),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary.withValues(alpha: 0.08),
+                              borderRadius:
+                                  BorderRadius.circular(DesignSystem.radiusMD),
+                              border: Border.all(
+                                color: colorScheme.primary.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "EXAMPLE",
+                                  style: TextStyle(
+                                    fontSize: DesignSystem.fontSizeSM,
+                                    fontWeight: FontWeight.w900,
+                                    color: colorScheme.primary,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                                const SizedBox(height: DesignSystem.spaceXS),
+                                Text(
+                                  exampleText,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurface,
+                                    fontSize: 15.0,
+                                    height: 1.45,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ],
                     ),
@@ -405,6 +459,7 @@ class _GameScaffoldState extends ConsumerState<GameScaffold> {
                     ),
                   ),
                 ],
+                ),
               ),
             ),
           ),
