@@ -2,8 +2,10 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // Kotlin compilation is handled by AGP's built-in support
+    // (android.builtInKotlin=true); the standalone org.jetbrains.kotlin.android
+    // plugin is not compatible with AGP 9's new DSL.
+    // The Flutter Gradle Plugin must be applied after the Android plugin.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -60,12 +62,6 @@ android {
     packaging {
         dex.useLegacyPackaging = true
         jniLibs.useLegacyPackaging = true
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
