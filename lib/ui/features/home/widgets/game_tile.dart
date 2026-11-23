@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 import 'package:puzzle/data/game_metadata.dart';
@@ -33,9 +34,13 @@ class GameTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final gameId = game.id;
-    final isSolvedToday = streak?.solvedToday ?? false;
-    final streakCount = streak?.currentStreak ?? 0;
-    final isNew = streak == null;
+    // Senior build shows a plain tile: no flame badge, no NEW badge, no
+    // "solved today" tick. The tile is a door into the game, not a report card.
+    final isSolvedToday =
+        SeniorMode.disableStreaks ? false : (streak?.solvedToday ?? false);
+    final streakCount =
+        SeniorMode.disableStreaks ? 0 : (streak?.currentStreak ?? 0);
+    final isNew = SeniorMode.disableStreaks ? false : streak == null;
     final l10n = AppLocalizations.of(context)!;
     final isMobile = MediaQuery.sizeOf(context).width < 600;
 

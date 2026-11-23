@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
 import 'target_10_engine.dart';
@@ -69,6 +70,8 @@ class Target10Notifier extends _$Target10Notifier {
   }
 
   void _startTimer() {
+    // Senior build: no countdown. See sum_pyramid_provider for the rationale.
+    if (SeniorMode.disableTimers) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);

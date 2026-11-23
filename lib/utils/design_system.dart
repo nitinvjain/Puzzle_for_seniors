@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../config/senior_mode.dart';
+
 class DesignSystem {
+  /// Senior build: every size in the type scale is multiplied by this.
+  /// 1.0 restores the stock scale.
+  static const double _typeScale =
+      SeniorMode.enabled ? SeniorMode.fontScale : 1.0;
+
   // --- Elegant Typographic System (Scale) ---
-  static const double fontSizeHero = 36.0;
-  static const double fontSize3XL  = 28.0;
-  static const double fontSize2XL  = 24.0;
-  static const double fontSizeXL   = 20.0;
-  static const double fontSizeLG   = 18.0;
-  static const double fontSizeMD   = 16.0;
-  static const double fontSizeSM   = 14.0;
-  static const double fontSizeXS   = 13.0;
-  static const double fontSize2XS  = 12.0;
+  static const double fontSizeHero = 36.0 * _typeScale;
+  static const double fontSize3XL  = 28.0 * _typeScale;
+  static const double fontSize2XL  = 24.0 * _typeScale;
+  static const double fontSizeXL   = 20.0 * _typeScale;
+  static const double fontSizeLG   = 18.0 * _typeScale;
+  static const double fontSizeMD   = 16.0 * _typeScale;
+  static const double fontSizeSM   = 14.0 * _typeScale;
+  static const double fontSizeXS   = 13.0 * _typeScale;
+  static const double fontSize2XS  = 12.0 * _typeScale;
 
   // --- Strict Spacing Grid ---
   static const double spaceXS = 6.0;
@@ -44,7 +51,10 @@ class DesignSystem {
   static const Color background = Color(0xFFF8FAFC);
   static const Color surface = Color(0xFFFCFBF4);
   static const Color ink = Color(0xFF0F172A);
-  static const Color inkSlate = Color(0xFF334155);
+  // Senior build darkens secondary text so body copy keeps near-primary
+  // contrast against the light surface rather than sitting at mid-slate.
+  static const Color inkSlate =
+      SeniorMode.enabled ? Color(0xFF1E293B) : Color(0xFF334155);
   static const Color outline = Color(0xFFE2E8F0);
   static const Color outlineVariant = Color(0xFFCBD5E1);
 
@@ -87,8 +97,11 @@ class DesignSystem {
   static const Curve curveBounce = Curves.elasticOut;
 
   // --- Touch Targets (Accessibility) ---
-  static const double minTouchTarget = 48.0;
-  static const double recommendedTouchTarget = 56.0;
+  // Material's 48dp minimum assumes a steady hand; the senior build raises it.
+  static const double minTouchTarget =
+      SeniorMode.enabled ? SeniorMode.minTapTarget : 48.0;
+  static const double recommendedTouchTarget =
+      SeniorMode.enabled ? SeniorMode.minTapTarget : 56.0;
 
   // --- Theme Building (cached) ---
   static final ThemeData lightTheme = _buildTheme(Brightness.light);

@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -230,13 +231,17 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
           // Compute size of blocks in the pyramid
           // The base has 4 blocks. Width of 4 blocks + margins should fit within constraints width
           final double availableWidth = constraints.maxWidth - (DesignSystem.spaceMD * 2);
-          final double maxBlockSize = (availableWidth / 5.2).clamp(42.0, 75.0);
+          final double maxBlockSize = SeniorMode.enabled
+              ? (availableWidth / 4.6).clamp(SeniorMode.minGridCell, 104.0)
+              : (availableWidth / 5.2).clamp(42.0, 75.0);
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceMD, vertical: DesignSystem.spaceSM),
             child: Column(
               children: [
-                // Top status bar
+                // Top status bar — removed in the senior build: it carried both
+                // the score and the countdown clock, and neither belongs here.
+                if (!SeniorMode.enabled)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

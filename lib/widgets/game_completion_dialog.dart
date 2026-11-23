@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -122,6 +123,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Senior build hides the review / report-issue links: both open
+              // an external browser, which is a dead end for him.
+              if (!SeniorMode.enabled)
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Row(
@@ -199,6 +203,9 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 ),
               ),
               const SizedBox(height: DesignSystem.spaceSM),
+              // The per-game message carries the score ("SCORE: 240"), so the
+              // senior build drops it and leaves the congratulation alone.
+              if (!SeniorMode.disableScoring)
               Text(
                 widget.message.toUpperCase(),
                 textAlign: TextAlign.center,

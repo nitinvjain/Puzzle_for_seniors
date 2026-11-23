@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
+import 'config/senior_mode.dart';
 import 'data/models/user_data.dart';
 import 'data/models/game_streak.dart';
 import 'data/repositories/user_repository.dart';
@@ -90,6 +91,13 @@ class MyApp extends ConsumerWidget {
       case AppThemeMode.system:
         themeMode = ThemeMode.system;
         break;
+    }
+
+    // Senior build is always dark-on-light: a dark theme that follows the
+    // system at dusk would silently change the app's appearance, which reads
+    // as "something is wrong with it".
+    if (SeniorMode.enabled) {
+      themeMode = ThemeMode.light;
     }
 
     return MaterialApp(

@@ -1,4 +1,5 @@
 import 'game_metadata.dart';
+import '../config/senior_mode.dart';
 
 import '../ui/features/games/shikaku/shikaku_metadata.dart';
 import '../ui/features/games/countdown_math/countdown_math_metadata.dart';
@@ -322,7 +323,21 @@ import '../ui/features/games/corsi_backward_span/corsi_backward_span_metadata.da
 
 List<GameMetadata>? _cachedGames;
 
-List<GameMetadata> get allGamesMetadata => _cachedGames ??= _buildGameList();
+List<GameMetadata> get allGamesMetadata =>
+    _cachedGames ??= _applySeniorFilter(_buildGameList());
+
+/// Narrows the full catalogue down to [SeniorMode.enabledGameIds], preserving
+/// the order given there. The full list below is left untouched so that
+/// upstream merges keep applying cleanly and the selection can be changed by
+/// editing one list in senior_mode.dart.
+List<GameMetadata> _applySeniorFilter(List<GameMetadata> all) {
+  if (!SeniorMode.enabled) return all;
+  final byId = <String, GameMetadata>{for (final g in all) g.id: g};
+  return <GameMetadata>[
+    for (final id in SeniorMode.enabledGameIds)
+      if (byId.containsKey(id)) byId[id]!,
+  ];
+}
 
 List<GameMetadata> _buildGameList() {
   return [

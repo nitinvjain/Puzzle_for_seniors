@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:puzzle/config/senior_mode.dart';
+
 class MagicSquaresEngine {
   final Random _random = Random();
 
@@ -22,8 +24,12 @@ class MagicSquaresEngine {
       baseSquare = _reflect(baseSquare);
     }
 
-    // Hide some cells
-    int cellsToHide = 3 + difficulty + _random.nextInt(2);
+    // Hide some cells. The senior build pins this to the easiest setting:
+    // exactly three blanks, with no random extra, so every puzzle is the same
+    // gentle shape rather than occasionally jumping to six.
+    int cellsToHide = SeniorMode.lockEasiestDifficulty
+        ? 3
+        : 3 + difficulty + _random.nextInt(2);
     List<List<int?>> puzzle = baseSquare.map((row) => row.map<int?>((val) => val).toList()).toList();
     List<List<bool>> fixed = List.generate(3, (_) => List.filled(3, true));
 

@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -109,7 +110,8 @@ class _Target10ScreenState extends ConsumerState<Target10Screen> {
             padding: const EdgeInsets.all(DesignSystem.spaceMD),
             child: Column(
               children: [
-                // Top status bar
+                // Top status bar — removed in the senior build (score + clock).
+                if (!SeniorMode.enabled)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

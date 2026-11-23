@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
 import 'sum_pyramid_engine.dart';
@@ -86,6 +87,9 @@ class SumPyramidNotifier extends _$SumPyramidNotifier {
   }
 
   void _startTimer() {
+    // Senior build: no countdown, so the puzzle can never run out and declare
+    // a loss. The player finishes it or puts the tablet down.
+    if (SeniorMode.disableTimers) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);

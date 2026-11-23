@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../config/senior_mode.dart';
 import '../../../providers/user_providers.dart';
 import '../../../utils/design_system.dart';
 import '../home/home_screen.dart';
@@ -36,6 +37,9 @@ class _MainShellState extends ConsumerState<MainShell>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Streak tracking is switched off entirely in the senior build: nothing
+    // should ever be able to tell him he broke a run.
+    if (SeniorMode.disableStreaks) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(gameStreakNotifierProvider.notifier).refreshStatus();
     });
@@ -46,6 +50,7 @@ class _MainShellState extends ConsumerState<MainShell>
   }
 
   void _checkDayChange() {
+    if (SeniorMode.disableStreaks) return;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     if (_lastCheckedDate == null || today != _lastCheckedDate) {
@@ -63,6 +68,7 @@ class _MainShellState extends ConsumerState<MainShell>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (SeniorMode.disableStreaks) return;
     if (state == AppLifecycleState.resumed) {
       ref.read(gameStreakNotifierProvider.notifier).refreshStatus();
     }
@@ -73,6 +79,15 @@ class _MainShellState extends ConsumerState<MainShell>
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isMobile = MediaQuery.sizeOf(context).width <= 600;
+
+    // Senior build: the games list is the whole app. No tab bar, no side rail,
+    // no stats or settings destinations to wander into and get stuck in.
+    if (SeniorMode.simplifiedNavigation) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: _getScreen(1),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

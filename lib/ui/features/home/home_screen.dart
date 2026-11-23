@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/data/game_registry.dart';
 import 'package:puzzle/providers/game_providers.dart';
 import 'package:puzzle/providers/game_session_provider.dart';
@@ -70,6 +71,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         searchQuery: _searchQuery,
         selectedCategory: _selectedCategory,
         localizedTitles: localizedTitles));
+
+    // Senior build: one screen, one list of large tiles. No streak badge, no
+    // search, no category filters, no favourites row, no shuffle button --
+    // every one of those is a way to end up somewhere unexpected.
+    if (SeniorMode.enabled) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: theme.scaffoldBackgroundColor,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              toolbarHeight: 80,
+              title: Text(
+                l10n.gamesTitleLabel.toUpperCase(),
+                style: theme.textTheme.displaySmall?.copyWith(
+                  letterSpacing: 2.0,
+                ),
+              ),
+            ),
+            _buildGameGrid(filteredGames),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
