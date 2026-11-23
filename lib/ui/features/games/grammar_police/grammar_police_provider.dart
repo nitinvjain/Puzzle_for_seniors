@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'grammar_police_engine.dart';
 
@@ -61,6 +62,10 @@ class GrammarPoliceNotifier extends _$GrammarPoliceNotifier {
         lastAnswerWasCorrect: true,
         currentSentence: GrammarPoliceEngine.generateSentence(),
       );
+    } else if (SeniorMode.disableFailStates) {
+      // A wrong answer ends the stock game outright. Here it just doesn't
+      // advance: the same sentence stays up, flagged as not-yet-right.
+      state = state.copyWith(lastAnswerWasCorrect: false);
     } else {
       state = state.copyWith(
         lives: 0,

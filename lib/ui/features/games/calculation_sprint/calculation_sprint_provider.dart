@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
@@ -65,7 +66,7 @@ class CalculationSprintNotifier extends _$CalculationSprintNotifier {
     );
 
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeRemaining > 0) {
         state = state.copyWith(timeRemaining: state.timeRemaining - 1);
       } else {

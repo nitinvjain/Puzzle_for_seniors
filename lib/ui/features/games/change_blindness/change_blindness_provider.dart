@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'change_blindness_engine.dart';
@@ -105,7 +106,7 @@ class ChangeBlindnessNotifier extends _$ChangeBlindnessNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         timer.cancel();
         state = state.copyWith(isGameOver: true, isFlickerActive: false);
@@ -196,7 +197,7 @@ class ChangeBlindnessNotifier extends _$ChangeBlindnessNotifier {
       state = state.copyWith(
         streak: 0,
         multiplier: 1,
-        timeLeft: (state.timeLeft - 2).clamp(0, 60),
+        timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 2).clamp(0, 60),
         lastTappedIndex: index,
         lastTapSuccess: false,
       );

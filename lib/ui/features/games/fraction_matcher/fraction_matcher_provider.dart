@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
@@ -69,7 +70,7 @@ class FractionMatcherNotifier extends _$FractionMatcherNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -90,7 +91,8 @@ class FractionMatcherNotifier extends _$FractionMatcherNotifier {
     final isCorrect = index == level.correctOptionIndex;
 
     final nextScore = isCorrect ? state.score + 1 : state.score;
-    final penaltyOrBonus = isCorrect ? 2 : -3;
+    final penaltyOrBonus =
+        isCorrect ? 2 : (SeniorMode.disableFailStates ? 0 : -3);
     final nextTime = (state.timeLeft + penaltyOrBonus).clamp(0, 30);
 
     if (nextTime == 0) {

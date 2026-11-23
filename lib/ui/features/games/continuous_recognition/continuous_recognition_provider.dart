@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -167,7 +168,7 @@ class ContinuousRecognitionNotifier extends _$ContinuousRecognitionNotifier {
   }
 
   void _startTimer() {
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _gameTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         _endGame();
       } else {

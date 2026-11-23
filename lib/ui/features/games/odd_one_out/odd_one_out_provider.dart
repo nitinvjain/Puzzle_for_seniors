@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'odd_one_out_engine.dart';
 
@@ -82,7 +83,8 @@ class OddOneOutNotifier extends _$OddOneOutNotifier {
       }
     } else {
       // Increased penalty for wrong answer
-      state = state.copyWith(timeLeft: state.timeLeft - 4);
+      state = state.copyWith(
+          timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 4));
       if (state.timeLeft <= 0) {
         state = state.copyWith(timeLeft: 0, isGameOver: true);
       }

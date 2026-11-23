@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -64,7 +65,7 @@ class SdmtNotifier extends _$SdmtNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         _endGame();
       } else {
@@ -83,7 +84,7 @@ class SdmtNotifier extends _$SdmtNotifier {
       );
     } else {
       state = state.copyWith(
-        timeLeft: state.timeLeft > 2 ? state.timeLeft - 2 : 0,
+        timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 2).clamp(0, 999),
       );
     }
   }

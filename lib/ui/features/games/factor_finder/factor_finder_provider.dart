@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
@@ -74,7 +75,7 @@ class FactorFinderNotifier extends _$FactorFinderNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -127,7 +128,8 @@ class FactorFinderNotifier extends _$FactorFinderNotifier {
       }
     } else {
       // Wrong tap! Deduct 3 seconds
-      final penaltyTime = (state.timeLeft - 3).clamp(0, 45);
+      final penaltyTime =
+          SeniorMode.applyTimePenalty(state.timeLeft, 3).clamp(0, 45);
       
       state = state.copyWith(
         timeLeft: penaltyTime,

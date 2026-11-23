@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'spelling_sprint_engine.dart';
 
@@ -108,7 +109,8 @@ class SpellingSprintNotifier extends _$SpellingSprintNotifier {
       }
     } else {
       // Wrong letter penalty
-      state = state.copyWith(timeLeft: state.timeLeft - 2);
+      state = state.copyWith(
+          timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 2));
     }
   }
 }

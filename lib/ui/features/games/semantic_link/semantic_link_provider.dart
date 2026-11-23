@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'semantic_link_engine.dart';
@@ -62,7 +63,7 @@ class SemanticLinkNotifier extends _$SemanticLinkNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 0) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {

@@ -9,8 +9,47 @@
 /// performance. A wrong answer simply does not advance.
 library;
 
+import 'dart:async';
+
 class SeniorMode {
   const SeniorMode._();
+
+  /// Drop-in replacement for `Timer.periodic` at **pressure countdown** call
+  /// sites only — the once-a-second tick that decrements a clock and ends the
+  /// game when it hits zero.
+  ///
+  /// When [disableTimers] is set this returns a timer that never fires, so the
+  /// clock never advances and the timeout branch (which is what sets
+  /// `isGameOver`) is never reached. It is a real [Timer], so the `_timer?.
+  /// cancel()` calls scattered through the providers keep working untouched.
+  ///
+  /// Deliberately NOT used for:
+  ///   * sub-second game loops and animation ticks — stopping those freezes
+  ///     the game rather than relaxing it;
+  ///   * phase-advance countdowns in the memory games, which move the player
+  ///     from "study the grid" to "now recall it". Without them the game sits
+  ///     on the study screen forever.
+  static Timer periodicCountdown(
+    Duration duration,
+    void Function(Timer) callback,
+  ) {
+    if (disableTimers) {
+      // Far-future one-shot: never realistically fires, cancels cleanly.
+      return Timer(const Duration(days: 365000), () {});
+    }
+    return Timer.periodic(duration, callback);
+  }
+
+  /// Applies a wrong-answer time penalty, or doesn't.
+  ///
+  /// Several games dock the clock a few seconds for each mistake. With the
+  /// countdown stopped those deductions become a disguised attempt limit —
+  /// enough wrong answers still drive the clock to zero and end the game — so
+  /// the senior build returns the clock unchanged and the penalty is inert.
+  static int applyTimePenalty(int current, int penalty) {
+    if (disableTimers || disableFailStates) return current;
+    return current - penalty;
+  }
 
   /// Master switch. Set to false to get the stock upstream behaviour back.
   static const bool enabled = true;

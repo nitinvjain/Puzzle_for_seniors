@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'reverse_stroop_engine.dart';
@@ -60,7 +61,7 @@ class ReverseStroopNotifier extends _$ReverseStroopNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 0) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -86,7 +87,7 @@ class ReverseStroopNotifier extends _$ReverseStroopNotifier {
         score: (state.score - 5).clamp(0, 9999),
         currentStimulus: ReverseStroopEngine.generateStimulus(state.difficulty),
         lastAnswerCorrect: false,
-        timeLeft: (state.timeLeft - 3).clamp(0, 60),
+        timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 3).clamp(0, 60),
       );
     }
   }

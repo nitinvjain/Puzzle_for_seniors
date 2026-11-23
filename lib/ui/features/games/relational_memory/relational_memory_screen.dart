@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -84,7 +85,7 @@ class _RelationalMemoryScreenState extends ConsumerState<RelationalMemoryScreen>
       }
     });
 
-    _memorizationTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _memorizationTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (_secondsLeftToMemorize > 1) {

@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -106,7 +107,7 @@ class _NarrativeRecallScreenState extends ConsumerState<NarrativeRecallScreen> {
     _userAnswers.clear();
 
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_timeLeft > 1) {
           _timeLeft--;

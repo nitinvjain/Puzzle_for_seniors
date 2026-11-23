@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
@@ -120,7 +121,9 @@ class DistractorMatrixNotifier extends _$DistractorMatrixNotifier {
       });
     } else {
       final strikes = state.mathStrikes + 1;
-      if (strikes >= 3) {
+      // Senior build: strikes never accumulate to a failure, so a wrong answer
+      // just brings up another question.
+      if (strikes >= 3 && !SeniorMode.disableFailStates) {
         state = state.copyWith(
           status: DistractorMatrixStatus.failure,
           mathAnsweredCorrectly: false,

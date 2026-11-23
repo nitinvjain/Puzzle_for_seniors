@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'trail_making_engine.dart';
@@ -60,7 +61,7 @@ class TrailMakingNotifier extends _$TrailMakingNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         _endGame();
       } else {
@@ -87,7 +88,7 @@ class TrailMakingNotifier extends _$TrailMakingNotifier {
     } else {
       // Penalty for wrong tap
       state = state.copyWith(
-        timeLeft: state.timeLeft > 2 ? state.timeLeft - 2 : 0,
+        timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 2).clamp(0, 999),
       );
     }
   }

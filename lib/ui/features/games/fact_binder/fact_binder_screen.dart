@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
 import 'dart:async';
@@ -78,7 +79,7 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
       _timeLeft = 5;
     });
 
-    _memorizeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _memorizeTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       setState(() {
         if (_timeLeft > 1) {

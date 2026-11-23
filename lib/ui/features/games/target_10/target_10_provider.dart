@@ -72,7 +72,7 @@ class Target10Notifier extends _$Target10Notifier {
   void _startTimer() {
     // Senior build: no countdown. See sum_pyramid_provider for the rationale.
     if (SeniorMode.disableTimers) return;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -128,7 +128,8 @@ class Target10Notifier extends _$Target10Notifier {
     } else {
       // Sum > 10: Overflow!
       // Deduct 2 seconds
-      final nextTime = (state.timeLeft - 2).clamp(0, 45);
+      final nextTime =
+          SeniorMode.applyTimePenalty(state.timeLeft, 2).clamp(0, 45);
       
       state = state.copyWith(
         selectedIndices: {},

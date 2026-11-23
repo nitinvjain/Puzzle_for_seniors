@@ -90,7 +90,7 @@ class SumPyramidNotifier extends _$SumPyramidNotifier {
     // Senior build: no countdown, so the puzzle can never run out and declare
     // a loss. The player finishes it or puts the tablet down.
     if (SeniorMode.disableTimers) return;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 1) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -213,7 +213,8 @@ class SumPyramidNotifier extends _$SumPyramidNotifier {
     } else {
       // Wrong answers present
       // Apply 5-second penalty
-      final nextTime = (state.timeLeft - 5).clamp(0, 99);
+      final nextTime =
+          SeniorMode.applyTimePenalty(state.timeLeft, 5).clamp(0, 99);
       state = state.copyWith(
         wrongBlocks: wrongIndices,
         timeLeft: nextTime,

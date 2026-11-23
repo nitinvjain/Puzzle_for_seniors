@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'n_back_engine.dart';
@@ -78,7 +79,7 @@ class NBackNotifier extends _$NBackNotifier {
   }
 
   void _startTimers() {
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _gameTimer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         _endGame();
       } else {
@@ -121,7 +122,7 @@ class NBackNotifier extends _$NBackNotifier {
     } else {
       state = state.copyWith(
         lastMatchResult: false,
-        timeLeft: state.timeLeft > 3 ? state.timeLeft - 3 : 0,
+        timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 3).clamp(0, 999),
       );
     }
     

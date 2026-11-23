@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'semantic_distance_engine.dart';
@@ -78,7 +79,7 @@ class SemanticDistanceNotifier extends _$SemanticDistanceNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 0) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {
@@ -101,7 +102,8 @@ class SemanticDistanceNotifier extends _$SemanticDistanceNotifier {
     if (state.isGameOver || state.puzzle == null) return;
     final target = state.puzzle!.target;
     final nextHintsUsed = state.hintsUsed + 1;
-    final newTimeLeft = (state.timeLeft - 15).clamp(1, 999);
+    final newTimeLeft =
+        SeniorMode.applyTimePenalty(state.timeLeft, 15).clamp(1, 999);
     String hint;
     if (nextHintsUsed == 1) {
       hint = 'Starts with "${target[0]}" and has ${target.length} letters';

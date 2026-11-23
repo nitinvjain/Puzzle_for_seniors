@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
@@ -89,8 +90,14 @@ class _ChimpTestScreenState extends ConsumerState<ChimpTestScreen> {
         }
       }
     } else {
-      // Wrong tap
+      // Wrong tap. In the senior build this costs nothing: the round simply
+      // restarts, so a mistake means "try that again" rather than losing a
+      // life and eventually the game.
       HapticFeedbackUtil.error();
+      if (SeniorMode.disableFailStates) {
+        _startRound();
+        return;
+      }
       setState(() {
         _lives--;
       });
@@ -163,15 +170,17 @@ class _ChimpTestScreenState extends ConsumerState<ChimpTestScreen> {
                         color: colorScheme.onSurface,
                       ),
                     ),
-                    Row(
-                      children: List.generate(3, (index) {
-                        return Icon(
-                          index < _lives ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: DesignSystem.error,
-                          size: 24,
-                        );
-                      }),
-                    ),
+                    // Hearts hidden in the senior build — nothing is at stake.
+                    if (!SeniorMode.disableFailStates)
+                      Row(
+                        children: List.generate(3, (index) {
+                          return Icon(
+                            index < _lives ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                            color: DesignSystem.error,
+                            size: 24,
+                          );
+                        }),
+                      ),
                   ],
                 ),
                 const SizedBox(height: DesignSystem.spaceLG),

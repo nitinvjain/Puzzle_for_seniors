@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'typing_speed_engine.dart';
@@ -68,7 +69,7 @@ class TypingSpeedNotifier extends _$TypingSpeedNotifier {
 
   void startTimer() {
     if (_timer != null) return;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         timer.cancel();
         _timer = null;

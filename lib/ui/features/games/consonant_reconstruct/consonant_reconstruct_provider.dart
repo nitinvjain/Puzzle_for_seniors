@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'consonant_reconstruct_engine.dart';
@@ -65,7 +66,7 @@ class ConsonantReconstructNotifier extends _$ConsonantReconstructNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft > 0) {
         state = state.copyWith(timeLeft: state.timeLeft - 1);
       } else {

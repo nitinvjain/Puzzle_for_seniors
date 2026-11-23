@@ -35,11 +35,16 @@ class GameCompletionDialog extends ConsumerStatefulWidget {
 }
 
 class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
+  /// Senior build: there is no such thing as losing. Whatever the game passed
+  /// in, the dialog is presented as a finish rather than a defeat — no "Game
+  /// Over" heading, no error-buzz haptic, no score line.
+  bool get _isVictory => SeniorMode.disableFailStates ? true : widget.isVictory;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.isVictory) {
+      if (_isVictory) {
         HapticFeedbackUtil.victory();
       } else {
         HapticFeedbackUtil.vibrate();
@@ -195,7 +200,12 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               ),
               const SizedBox(height: DesignSystem.spaceMD),
               Text(
-                widget.title.toUpperCase(),
+                // A game that passed a defeat title ("Game Over", "You Lose")
+                // gets a neutral, already-localised heading instead.
+                (SeniorMode.disableFailStates && !widget.isVictory
+                        ? l10n.wellDone
+                        : widget.title)
+                    .toUpperCase(),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.displaySmall?.copyWith(
                   fontSize: 32,

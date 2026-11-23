@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -84,7 +85,7 @@ class SwitchTaskNotifier extends _$SwitchTaskNotifier {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = SeniorMode.periodicCountdown(const Duration(seconds: 1), (timer) {
       if (state.timeLeft <= 0) {
         timer.cancel();
         state = state.copyWith(isGameOver: true, isGameWon: state.score >= 15);
@@ -109,7 +110,8 @@ class SwitchTaskNotifier extends _$SwitchTaskNotifier {
       );
     } else {
       if (state.timeLeft > 2) {
-        state = state.copyWith(timeLeft: state.timeLeft - 2);
+        state = state.copyWith(
+            timeLeft: SeniorMode.applyTimePenalty(state.timeLeft, 2));
       }
     }
   }
