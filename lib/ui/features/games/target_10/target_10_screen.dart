@@ -141,7 +141,7 @@ class _Target10ScreenState extends ConsumerState<Target10Screen> {
                       ),
                     ),
                     const SizedBox(width: DesignSystem.spaceMD),
-                    Expanded(
+                    SeniorMode.disableTimers ? const SizedBox.shrink() : Expanded(
                       child: TangibleContainer(
                         depth: 4.0,
                         padding: const EdgeInsets.symmetric(

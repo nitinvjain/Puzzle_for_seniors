@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/juice/game_scaffold.dart';
@@ -88,7 +89,7 @@ class _FlankerTestScreenState extends ConsumerState<FlankerTestScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
                       child: Row(
                         children: [
-                          Expanded(child: _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', DesignSystem.accentBerry)),
+                          SeniorMode.disableTimers ? const SizedBox.shrink() : Expanded(child: _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', DesignSystem.accentBerry)),
                           const SizedBox(width: DesignSystem.spaceMD),
                           Expanded(child: _buildStat(l10n.score.toUpperCase(), '${state.score}', DesignSystem.accentEmerald)),
                         ],

@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -91,7 +92,7 @@ class _WordSurgeScreenState extends ConsumerState<WordSurgeScreen> {
                   'Score: ${state.score} / ${state.targetScore}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                Container(
+                SeniorMode.disableTimers ? const SizedBox.shrink() : Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: state.timeLeft <= 5 ? DesignSystem.error.withValues(alpha: 0.1) : colorScheme.surface,

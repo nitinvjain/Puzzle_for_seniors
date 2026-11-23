@@ -271,7 +271,7 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                       ),
                     ),
                     const SizedBox(width: DesignSystem.spaceMD),
-                    Expanded(
+                    SeniorMode.disableTimers ? const SizedBox.shrink() : Expanded(
                       child: TangibleContainer(
                         depth: 4.0,
                         padding: const EdgeInsets.symmetric(

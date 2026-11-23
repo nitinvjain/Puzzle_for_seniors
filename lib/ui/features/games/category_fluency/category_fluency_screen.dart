@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import "package:puzzle/l10n/app_localizations.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -108,7 +109,7 @@ class _CategoryFluencyScreenState extends ConsumerState<CategoryFluencyScreen> {
                     ),
                   ],
                 ),
-                Container(
+                SeniorMode.disableTimers ? const SizedBox.shrink() : Container(
                   padding: const EdgeInsets.all(DesignSystem.spaceMD),
                   decoration: BoxDecoration(
                     color: state.timeLeft <= 10 ? DesignSystem.error.withValues(alpha: 0.1) : colorScheme.surface,

@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -83,7 +84,7 @@ class _BoxCompletionScreenState extends ConsumerState<BoxCompletionScreen> {
                 if (state.isTrialMode)
                   _buildStat(l10n.trials.toUpperCase(), '${state.totalTrials}/${state.targetTrials}')
                 else
-                  _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
+                  SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],
             ),
           ),

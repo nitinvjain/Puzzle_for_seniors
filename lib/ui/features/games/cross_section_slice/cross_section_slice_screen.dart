@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,7 +110,7 @@ class _CrossSectionSliceScreenState extends ConsumerState<CrossSectionSliceScree
         children: [
           _buildStatCard(l10n.score, state.score.toString(), theme.colorScheme.primary),
           if (!state.isTrialMode)
-            _buildStatCard(l10n.timeLeft, "${state.timeLeft}s", theme.colorScheme.secondary)
+            SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStatCard(l10n.timeLeft, "${state.timeLeft}s", theme.colorScheme.secondary)
           else
             _buildStatCard(l10n.trials, "${state.totalTrials}/${state.targetTrials}", theme.colorScheme.secondary),
         ],

@@ -85,7 +85,7 @@ class RadicalRootsNotifier extends _$RadicalRootsNotifier {
         isInvalidGuess: false,
       );
     } else {
-      final newTime = state.timeRemaining - 3;
+      final newTime = SeniorMode.applyTimePenalty(state.timeRemaining, 3);
       if (newTime <= 0) {
         state = state.copyWith(timeRemaining: 0, isInvalidGuess: true);
         _endGame();

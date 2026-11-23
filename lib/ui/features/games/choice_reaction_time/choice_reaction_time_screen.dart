@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import "package:puzzle/l10n/app_localizations.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,7 +83,7 @@ class _ChoiceReactionTimeScreenState extends ConsumerState<ChoiceReactionTimeScr
       body: Column(
         children: [
           const SizedBox(height: DesignSystem.spaceXL),
-          Text(
+          SeniorMode.disableTimers ? const SizedBox.shrink() : Text(
             'Time Remaining: ${state.timeLeft}s',
             style: TextStyle(
               fontSize: 20,

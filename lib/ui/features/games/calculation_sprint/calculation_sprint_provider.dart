@@ -87,7 +87,7 @@ class CalculationSprintNotifier extends _$CalculationSprintNotifier {
       );
     } else {
       // Penalty for wrong answer (time deduction)
-      final newTime = state.timeRemaining - 3;
+      final newTime = SeniorMode.applyTimePenalty(state.timeRemaining, 3);
       if (newTime <= 0) {
         state = state.copyWith(timeRemaining: 0, isInvalidGuess: true);
         _endGame();

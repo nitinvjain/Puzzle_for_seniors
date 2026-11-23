@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../utils/design_system.dart';
@@ -80,7 +81,7 @@ class _LetterCancellationScreenState extends ConsumerState<LetterCancellationScr
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildStat(l10n.letterCancellationFound, '${state.foundIndices.length}/${state.targetCount}'),
-                _buildStat(l10n.letterCancellationTime, '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
+                SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat(l10n.letterCancellationTime, '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],
             ),
           ),

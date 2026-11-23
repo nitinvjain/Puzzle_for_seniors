@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
@@ -273,7 +274,7 @@ class _ReadingSpanScreenState extends ConsumerState<ReadingSpanScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStat(l10n.statTime, '${state.timeLeft}s', state.timeLeft < 10 ? DesignSystem.error : DesignSystem.primary, isSmall),
+          SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat(l10n.statTime, '${state.timeLeft}s', state.timeLeft < 10 ? DesignSystem.error : DesignSystem.primary, isSmall),
           _buildStat(l10n.readingSpanLength, '${state.currentLength}', DesignSystem.accentAmber, isSmall),
           _buildStat(l10n.statScore, '${state.score}', DesignSystem.success, isSmall),
         ],

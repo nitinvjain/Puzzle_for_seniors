@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -131,7 +132,7 @@ class _SemanticDistanceScreenState extends ConsumerState<SemanticDistanceScreen>
                     style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
-                TangibleContainer(
+                SeniorMode.disableTimers ? const SizedBox.shrink() : TangibleContainer(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'Time: ${state.timeLeft}s',

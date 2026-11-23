@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -85,7 +86,7 @@ class _RuleSwitcherScreenState extends ConsumerState<RuleSwitcherScreen> {
                 if (state.isTrialMode)
                   _buildStat('TRIALS', '${state.totalTrials}/${state.targetTrials}')
                 else
-                  _buildStat('TIME', '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
+                  SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat('TIME', '${state.timeLeft}s', color: state.timeLeft < 10 ? DesignSystem.error : null),
               ],
             ),
           ),

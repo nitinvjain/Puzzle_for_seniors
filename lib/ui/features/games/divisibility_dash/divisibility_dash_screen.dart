@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,7 +80,7 @@ class _DivisibilityDashScreenState extends ConsumerState<DivisibilityDashScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', DesignSystem.accentBerry),
+                      SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStat(l10n.timeLeft.toUpperCase(), '${state.timeLeft}s', DesignSystem.accentBerry),
                       _buildStat(l10n.score.toUpperCase(), '${state.score}', DesignSystem.accentEmerald),
                     ],
                   ),

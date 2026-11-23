@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -62,7 +63,7 @@ class _AttentionalBlinkScreenState extends ConsumerState<AttentionalBlinkScreen>
           ? l10n.attentionalBlinkSubtitleWatch
           : l10n.attentionalBlinkSubtitleInput,
       actions: [
-        TangibleContainer(
+        SeniorMode.disableTimers ? const SizedBox.shrink() : TangibleContainer(
           color: colorScheme.surface,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           radius: DesignSystem.radiusSM,

@@ -111,7 +111,7 @@ class _OddOneOutScreenState extends ConsumerState<OddOneOutScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildStatCard(context, 'SCORE', '${state.score}', DesignSystem.primary),
-        _buildStatCard(
+        SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStatCard(
           context,
           'TIME', 
           '${state.timeLeft}s', 

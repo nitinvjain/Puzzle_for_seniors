@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -63,7 +64,7 @@ class _WisconsinCardSortingScreenState extends ConsumerState<WisconsinCardSortin
       title: L10nGameHelpers.getGameTitle(context, 'wisconsin_card_sorting'),
       subtitle: l10n.wisconsinCardSortingSubtitle,
       actions: [
-        TangibleContainer(
+        SeniorMode.disableTimers ? const SizedBox.shrink() : TangibleContainer(
           color: colorScheme.surface,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           radius: DesignSystem.radiusSM,

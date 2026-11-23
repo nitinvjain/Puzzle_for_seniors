@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,7 +73,7 @@ class _OperationSpanScreenState extends ConsumerState<OperationSpanScreen> {
       title: l10n.operationSpanTitle,
       subtitle: _getSubtitle(context, state.phase),
       actions: [
-        _buildTimer(state.timeLeft),
+        SeniorMode.disableTimers ? const SizedBox.shrink() : _buildTimer(state.timeLeft),
       ],
       body: Padding(
         padding: const EdgeInsets.all(DesignSystem.spaceLG),
@@ -115,7 +116,7 @@ class _OperationSpanScreenState extends ConsumerState<OperationSpanScreen> {
       color: timeLeft < 10 ? DesignSystem.error.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       radius: DesignSystem.radiusSM,
-      child: Row(
+      child: SeniorMode.disableTimers ? const SizedBox.shrink() : Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(

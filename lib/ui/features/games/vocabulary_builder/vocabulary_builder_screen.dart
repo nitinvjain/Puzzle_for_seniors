@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -90,7 +91,7 @@ class _VocabularyBuilderScreenState extends ConsumerState<VocabularyBuilderScree
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildStatCard('SCORE', state.score.toString(), DesignSystem.primary),
-        _buildStatCard('TIME', '${state.timeLeft}s', state.timeLeft < 10 ? DesignSystem.error : DesignSystem.secondary),
+        SeniorMode.disableTimers ? const SizedBox.shrink() : _buildStatCard('TIME', '${state.timeLeft}s', state.timeLeft < 10 ? DesignSystem.error : DesignSystem.secondary),
       ],
     );
   }

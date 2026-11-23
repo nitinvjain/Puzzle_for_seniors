@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 
@@ -93,7 +94,7 @@ class _DualCodingScreenState extends ConsumerState<DualCodingScreen> {
       title: L10nGameHelpers.getGameTitle(context, 'dual_coding'),
       subtitle: L10nGameHelpers.getGameTitle(context, 'dual_coding'),
       actions: [
-        _buildTimer(state.timeLeft),
+        SeniorMode.disableTimers ? const SizedBox.shrink() : _buildTimer(state.timeLeft),
       ],
       body: Padding(
         padding: const EdgeInsets.all(DesignSystem.spaceLG),
@@ -224,7 +225,7 @@ class _DualCodingScreenState extends ConsumerState<DualCodingScreen> {
       color: timeLeft < 10 ? DesignSystem.error.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       radius: DesignSystem.radiusSM,
-      child: Row(
+      child: SeniorMode.disableTimers ? const SizedBox.shrink() : Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
