@@ -145,7 +145,7 @@ class MentalCalendarScreen extends ConsumerWidget {
     Future.microtask(() {
       if (!context.mounted) return;
       final score = state.correctCount;
-      if (score >= 7) {
+      if (score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 7)) {
         ref.read(gameStreakNotifierProvider.notifier).completeGame('mental_calendar');
       }
       showDialog(

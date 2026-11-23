@@ -27,7 +27,7 @@ class _SymmetrySpanScreenState extends ConsumerState<SymmetrySpanScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 20;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 20);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('symmetry_span');

@@ -25,7 +25,7 @@ class _QuickMathScreenState extends ConsumerState<QuickMathScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 5;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('quick_math');

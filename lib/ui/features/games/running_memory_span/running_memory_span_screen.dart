@@ -28,7 +28,7 @@ class _RunningMemorySpanScreenState extends ConsumerState<RunningMemorySpanScree
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    bool won = score >= 12;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('running_memory_span');

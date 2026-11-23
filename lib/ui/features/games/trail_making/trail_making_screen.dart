@@ -26,7 +26,7 @@ class _TrailMakingScreenState extends ConsumerState<TrailMakingScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 3;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('trail_making');

@@ -25,7 +25,7 @@ class _NBackScreenState extends ConsumerState<NBackScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 10;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       HapticFeedbackUtil.victory();

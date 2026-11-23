@@ -25,7 +25,7 @@ class _SDMTScreenState extends ConsumerState<SDMTScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 30;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 30);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       HapticFeedbackUtil.victory();

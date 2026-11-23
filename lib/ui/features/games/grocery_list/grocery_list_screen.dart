@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,7 @@ class _GroceryListScreenState extends ConsumerState<GroceryListScreen> {
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    bool won = score >= 50;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 50);
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('grocery_list');
     }

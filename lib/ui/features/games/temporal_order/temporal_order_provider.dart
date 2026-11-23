@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../providers/user_providers.dart';
@@ -134,7 +135,7 @@ class TemporalOrderNotifier extends _$TemporalOrderNotifier {
     if (isCorrect) {
       state = state.copyWith(status: TemporalOrderStatus.success);
       _transitionTimer = Timer(const Duration(milliseconds: 1200), () {
-        if (state.currentRound >= 3) {
+        if (state.currentRound >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3)) {
           if (state.currentLevel >= 5) {
             _completeGame();
           } else {

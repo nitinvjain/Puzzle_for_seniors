@@ -25,7 +25,7 @@ class _ReflexTapScreenState extends ConsumerState<ReflexTapScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 15;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('reflex_tap');

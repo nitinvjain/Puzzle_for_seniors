@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +44,7 @@ class _OrbitTapScreenState extends ConsumerState<OrbitTapScreen> with SingleTick
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 10;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('orbit_tap');

@@ -27,7 +27,7 @@ class _ContinuousRecognitionScreenState extends ConsumerState<ContinuousRecognit
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 15;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('continuous_recognition');

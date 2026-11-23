@@ -111,7 +111,7 @@ class RadicalRootsNotifier extends _$RadicalRootsNotifier {
       bestScore: newBest,
     );
 
-    if (state.score >= 10) {
+    if (state.score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10)) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('radical_roots', xpAmount: 20 + (state.score ~/ 2));
     }
   }

@@ -25,7 +25,7 @@ class _StopSignalScreenState extends ConsumerState<StopSignalScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 20;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 20);
     final l10n = AppLocalizations.of(context)!;
     if (won) {
       HapticFeedbackUtil.victory();

@@ -27,7 +27,7 @@ class _VennNumbersScreenState extends ConsumerState<VennNumbersScreen> {
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    final won = score >= 5;
+    final won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('venn_numbers');
     }

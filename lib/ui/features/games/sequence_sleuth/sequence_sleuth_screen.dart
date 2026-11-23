@@ -27,7 +27,7 @@ class _SequenceSleuthScreenState extends ConsumerState<SequenceSleuthScreen> {
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    bool won = score >= 5;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('sequence_sleuth');
     }

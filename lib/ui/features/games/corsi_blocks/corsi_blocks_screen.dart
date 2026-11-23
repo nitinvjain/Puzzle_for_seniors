@@ -25,7 +25,7 @@ class _CorsiBlocksScreenState extends ConsumerState<CorsiBlocksScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 5;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('corsi_blocks');

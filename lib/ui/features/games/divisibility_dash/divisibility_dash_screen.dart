@@ -27,7 +27,7 @@ class _DivisibilityDashScreenState extends ConsumerState<DivisibilityDashScreen>
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    bool won = score >= 5;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5);
     if (won) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('divisibility_dash');
     }

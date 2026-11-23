@@ -26,7 +26,7 @@ class _FlankerTestScreenState extends ConsumerState<FlankerTestScreen> {
 
   void _showGameOverDialog(int score) {
     final l10n = AppLocalizations.of(context)!;
-    bool won = score >= 15;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('flanker_test');

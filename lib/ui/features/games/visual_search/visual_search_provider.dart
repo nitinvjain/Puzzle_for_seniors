@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'visual_search_engine.dart';
 
@@ -72,7 +73,7 @@ class VisualSearchNotifier extends _$VisualSearchNotifier {
     if (index == state.targetIndex) {
       final newScore = state.score + 1;
       
-      if (newScore >= 15) {
+      if (newScore >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15)) {
         state = state.copyWith(
           score: newScore,
           isGameOver: true,

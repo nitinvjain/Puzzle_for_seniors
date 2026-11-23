@@ -28,7 +28,7 @@ class _SwitchTaskScreenState extends ConsumerState<SwitchTaskScreen> {
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 15;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('switch_task');

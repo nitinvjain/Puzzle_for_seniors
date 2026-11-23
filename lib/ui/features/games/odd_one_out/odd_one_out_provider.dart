@@ -78,7 +78,7 @@ class OddOneOutNotifier extends _$OddOneOutNotifier {
       );
       
       // Increased solved threshold
-      if (newScore >= 50) {
+      if (newScore >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 50)) {
         state = state.copyWith(isSolved: true);
       }
     } else {

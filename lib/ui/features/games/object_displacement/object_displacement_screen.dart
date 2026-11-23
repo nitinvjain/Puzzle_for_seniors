@@ -27,7 +27,7 @@ class _ObjectDisplacementScreenState extends ConsumerState<ObjectDisplacementScr
   }
 
   void _showGameOverDialog(int score) {
-    bool won = score >= 12;
+    bool won = score >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12);
     if (won) {
       HapticFeedbackUtil.victory();
       ref.read(gameStreakNotifierProvider.notifier).completeGame('object_displacement');

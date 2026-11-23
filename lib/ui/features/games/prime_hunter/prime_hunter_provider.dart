@@ -1,3 +1,4 @@
+import 'package:puzzle/config/senior_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'prime_hunter_engine.dart';
 
@@ -69,7 +70,7 @@ class PrimeHunterNotifier extends _$PrimeHunterNotifier {
     if (swipedLeft == state.isPrime) {
       final newScore = state.score + 1;
       
-      if (newScore >= 10) {
+      if (newScore >= (SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10)) {
         state = state.copyWith(
           roundId: 'victory',
           score: newScore,
