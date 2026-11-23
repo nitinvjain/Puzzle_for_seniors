@@ -19,7 +19,7 @@ class SubitizingRushScreen extends ConsumerStatefulWidget {
 }
 
 class _SubitizingRushScreenState extends ConsumerState<SubitizingRushScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10;
   static const int flashDurationMs = 600;
 
   late SubitizingRound _currentRound;

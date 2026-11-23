@@ -22,7 +22,7 @@ class NumericalEstimationState {
     this.score = 0,
     this.timeLeft = 60,
     this.totalTrials = 0,
-    this.targetTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 20,
+    this.targetTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 20,
     this.isGameOver = false,
     this.isLastCorrect,
     this.selectedAnswer,

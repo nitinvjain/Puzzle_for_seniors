@@ -19,7 +19,7 @@ class VisualCrowdingAcuityScreen extends ConsumerStatefulWidget {
 }
 
 class _VisualCrowdingAcuityScreenState extends ConsumerState<VisualCrowdingAcuityScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12;
 
   late VisualCrowdingTrial _currentTrial;
   int _trialCount = 0;

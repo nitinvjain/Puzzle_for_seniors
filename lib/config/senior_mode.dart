@@ -40,24 +40,22 @@ class SeniorMode {
     return Timer.periodic(duration, callback);
   }
 
-  /// Whether a game runs until the player leaves, rather than stopping after
-  /// a set number of rounds.
+  /// Whether every game uses one common round target in place of its own.
   ///
-  /// Many games finish at a target — eight correct answers, twelve trials —
-  /// and then put up a modal offering "Play Again". That modal interrupts the
-  /// flow and asks for a decision, which is exactly the kind of friction this
-  /// build exists to remove. With this set, the target is raised out of reach
-  /// and play simply continues.
-  static const bool endlessPlay = true;
+  /// Stock limits vary from eight correct answers to twenty trials, and each
+  /// game interrupts with a "Play Again" modal when it gets there. Overriding
+  /// them with a single, much higher target means a session lasts as long as
+  /// he wants to keep going, while still ending somewhere rather than running
+  /// forever.
+  static const bool overrideRoundLimits = true;
 
-  /// A round or question target no session will ever reach.
+  /// The common target substituted for each game's own limit.
   ///
-  /// Games substitute this for their own limit, so every `score >= target`
-  /// test stays false and play continues. Raising the target rather than
-  /// rewriting each game's completion logic keeps the change to one token per
-  /// site, and this is a plain `const int` so it is still valid in the
-  /// constructor defaults and `static const` fields where those limits live.
-  static const int endlessRounds = 1 << 24;
+  /// Set long enough that reaching it is a real sitting rather than a
+  /// interruption after a couple of minutes. A plain `const int`, so it stays
+  /// valid in both the `static const` fields and the constructor defaults
+  /// where those limits are declared.
+  static const int roundTarget = 50;
 
   /// Applies a wrong-answer time penalty, or doesn't.
   ///
@@ -105,8 +103,13 @@ class SeniorMode {
   /// accepted and the player tries again.
   static const bool disableFailStates = true;
 
-  /// No scores, no stars, no accuracy percentages, no leaderboards.
-  static const bool disableScoring = true;
+  /// Hide in-game score and progress readouts.
+  ///
+  /// Off: he likes seeing the count climb, and a score within a single
+  /// sitting is encouragement rather than comparison. What stays off is
+  /// [disableStreaks] — the day-to-day history that invites comparison with
+  /// how he did last week.
+  static const bool disableScoring = false;
 
   /// No daily streaks. A missed day must never be surfaced.
   static const bool disableStreaks = true;

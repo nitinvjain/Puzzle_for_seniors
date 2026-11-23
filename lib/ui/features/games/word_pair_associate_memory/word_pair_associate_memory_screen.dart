@@ -19,7 +19,7 @@ class WordPairAssociateMemoryScreen extends ConsumerStatefulWidget {
 }
 
 class _WordPairAssociateMemoryScreenState extends ConsumerState<WordPairAssociateMemoryScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late WordPairAssociateRound _currentRound;
   int _score = 0;

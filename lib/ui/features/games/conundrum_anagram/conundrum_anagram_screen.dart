@@ -18,7 +18,7 @@ class ConundrumAnagramScreen extends ConsumerStatefulWidget {
 }
 
 class _ConundrumAnagramScreenState extends ConsumerState<ConundrumAnagramScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 5;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5;
 
   late ConundrumRound _currentRound;
   int _score = 0;

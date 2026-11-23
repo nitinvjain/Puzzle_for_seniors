@@ -19,7 +19,7 @@ class Wireframe3DRotationScreen extends ConsumerStatefulWidget {
 }
 
 class _Wireframe3DRotationScreenState extends ConsumerState<Wireframe3DRotationScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late WireframeRound _currentRound;
   int _score = 0;

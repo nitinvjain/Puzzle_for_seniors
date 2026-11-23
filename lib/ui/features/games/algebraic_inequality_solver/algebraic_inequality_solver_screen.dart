@@ -18,7 +18,7 @@ class AlgebraicInequalitySolverScreen extends ConsumerStatefulWidget {
 }
 
 class _AlgebraicInequalitySolverScreenState extends ConsumerState<AlgebraicInequalitySolverScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late InequalityQuestion _currentQuestion;
   int _score = 0;

@@ -19,7 +19,7 @@ class CorsiBackwardSpanScreen extends ConsumerStatefulWidget {
 }
 
 class _CorsiBackwardSpanScreenState extends ConsumerState<CorsiBackwardSpanScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 6;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 6;
 
   late CorsiBackwardRound _currentRound;
   int _score = 0;

@@ -18,7 +18,7 @@ class VisualSearchConjunctionScreen extends ConsumerStatefulWidget {
 }
 
 class _VisualSearchConjunctionScreenState extends ConsumerState<VisualSearchConjunctionScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12;
 
   late VisualSearchRound _currentRound;
   int _trialCount = 0;

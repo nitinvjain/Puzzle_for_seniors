@@ -18,7 +18,7 @@ class VectorDotProductScreen extends ConsumerStatefulWidget {
 }
 
 class _VectorDotProductScreenState extends ConsumerState<VectorDotProductScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late VectorDotQuestion _currentQuestion;
   int _score = 0;

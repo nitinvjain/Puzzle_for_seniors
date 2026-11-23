@@ -18,7 +18,7 @@ class SetTheoryVennScreen extends ConsumerStatefulWidget {
 }
 
 class _SetTheoryVennScreenState extends ConsumerState<SetTheoryVennScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late SetVennQuestion _currentQuestion;
   final Set<VennRegion> _selectedRegions = {};

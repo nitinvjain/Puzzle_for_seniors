@@ -18,7 +18,7 @@ class WordLadderStepScreen extends ConsumerStatefulWidget {
 }
 
 class _WordLadderStepScreenState extends ConsumerState<WordLadderStepScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late WordLadderQuestion _currentQuestion;
   int _score = 0;

@@ -19,7 +19,7 @@ class PosnerSpatialCueingScreen extends ConsumerStatefulWidget {
 }
 
 class _PosnerSpatialCueingScreenState extends ConsumerState<PosnerSpatialCueingScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12;
 
   late PosnerTrial _currentTrial;
   int _trialCount = 0;

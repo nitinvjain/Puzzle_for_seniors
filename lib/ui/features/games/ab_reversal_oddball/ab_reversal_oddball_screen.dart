@@ -18,7 +18,7 @@ class ABReversalOddballScreen extends ConsumerStatefulWidget {
 }
 
 class _ABReversalOddballScreenState extends ConsumerState<ABReversalOddballScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 14;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 14;
 
   late ABReversalTrial _currentTrial;
   int _trialCount = 0;

@@ -110,8 +110,9 @@ class _Target10ScreenState extends ConsumerState<Target10Screen> {
             padding: const EdgeInsets.all(DesignSystem.spaceMD),
             child: Column(
               children: [
-                // Top status bar — removed in the senior build (score + clock).
-                if (!SeniorMode.enabled)
+                // Top status bar. See sum_pyramid_screen: the clock inside is
+                // hidden by disableTimers, the row by disableScoring.
+                if (!SeniorMode.disableScoring)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

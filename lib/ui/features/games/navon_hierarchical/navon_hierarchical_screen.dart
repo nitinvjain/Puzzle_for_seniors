@@ -18,7 +18,7 @@ class NavonHierarchicalScreen extends ConsumerStatefulWidget {
 }
 
 class _NavonHierarchicalScreenState extends ConsumerState<NavonHierarchicalScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12;
 
   late NavonStimulus _currentStimulus;
   int _score = 0;

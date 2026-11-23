@@ -18,7 +18,7 @@ class StroopNumberSizeScreen extends ConsumerStatefulWidget {
 }
 
 class _StroopNumberSizeScreenState extends ConsumerState<StroopNumberSizeScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 14;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 14;
 
   late NumberSizeTrial _currentTrial;
   int _trialCount = 0;

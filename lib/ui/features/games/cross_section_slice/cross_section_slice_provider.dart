@@ -24,7 +24,7 @@ class CrossSectionSliceState {
     this.isGameOver = false,
     this.lastResult,
     this.isTrialMode = false,
-    this.targetTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15,
+    this.targetTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15,
   });
 
   CrossSectionSliceState copyWith({

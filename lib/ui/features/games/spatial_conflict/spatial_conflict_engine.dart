@@ -21,7 +21,7 @@ class ConflictTrial {
 
 class SpatialConflictEngine {
   final Random _random = Random();
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15;
 
   List<ConflictTrial> generateTrials() {
     final List<ConflictTrial> trials = [];

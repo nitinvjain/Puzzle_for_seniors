@@ -19,7 +19,7 @@ class ModularClockArithmeticScreen extends ConsumerStatefulWidget {
 }
 
 class _ModularClockArithmeticScreenState extends ConsumerState<ModularClockArithmeticScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late ModularClockQuestion _currentQuestion;
   int _score = 0;

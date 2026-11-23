@@ -18,7 +18,7 @@ class BinaryMatrixRankScreen extends ConsumerStatefulWidget {
 }
 
 class _BinaryMatrixRankScreenState extends ConsumerState<BinaryMatrixRankScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late BinaryMatrixRankQuestion _currentQuestion;
   int _score = 0;

@@ -32,7 +32,7 @@ class MentalAbacusState {
     required this.rods,
     this.currentProblem,
     this.score = 0,
-    this.targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 5,
+    this.targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5,
     this.isVictory = false,
     this.isLoading = true,
   });

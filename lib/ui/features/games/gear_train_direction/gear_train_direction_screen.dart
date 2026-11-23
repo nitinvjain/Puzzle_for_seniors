@@ -19,7 +19,7 @@ class GearTrainDirectionScreen extends ConsumerStatefulWidget {
 }
 
 class _GearTrainDirectionScreenState extends ConsumerState<GearTrainDirectionScreen> with SingleTickerProviderStateMixin {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late GearTrainPuzzle _puzzle;
   late AnimationController _animController;

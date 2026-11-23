@@ -239,9 +239,10 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
             padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceMD, vertical: DesignSystem.spaceSM),
             child: Column(
               children: [
-                // Top status bar — removed in the senior build: it carried both
-                // the score and the countdown clock, and neither belongs here.
-                if (!SeniorMode.enabled)
+                // Top status bar. The clock half is hidden separately by
+                // SeniorMode.disableTimers; the row itself only disappears when
+                // scores are off too.
+                if (!SeniorMode.disableScoring)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

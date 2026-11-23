@@ -35,7 +35,7 @@ class _FactBinderScreenState extends ConsumerState<FactBinderScreen> {
   
   int _quizQuestionIndex = 0;
   int _correctAnswers = 0;
-  static const int totalQuestions = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 3;
+  static const int totalQuestions = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 3;
   
   // Current question states
   late String _questionText;

@@ -19,7 +19,7 @@ class ProbeDigitSpanScreen extends ConsumerStatefulWidget {
 }
 
 class _ProbeDigitSpanScreenState extends ConsumerState<ProbeDigitSpanScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late ProbeDigitTrial _currentTrial;
   int _trialCount = 0;

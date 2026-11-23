@@ -25,7 +25,7 @@ class _SimonCommandScreenState extends ConsumerState<SimonCommandScreen> {
   
   int _score = 0;
   int _correctAnswers = 0;
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 15;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 15;
   
   late int _shapeSide; // 0: Left side, 1: Right side
   late int _shapeColor; // 0: Indigo (Blue), 1: Berry (Red)

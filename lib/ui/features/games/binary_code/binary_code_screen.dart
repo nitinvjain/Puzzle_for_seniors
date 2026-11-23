@@ -25,7 +25,7 @@ class _BinaryCodeScreenState extends ConsumerState<BinaryCodeScreen> {
   
   int _score = 0;
   int _correctAnswers = 0;
-  static const int targetAnswers = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
+  static const int targetAnswers = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10;
   
   late int _targetDecimal;
   late String _binaryString;

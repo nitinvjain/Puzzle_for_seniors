@@ -18,7 +18,7 @@ class PrimeGapHuntScreen extends ConsumerStatefulWidget {
 }
 
 class _PrimeGapHuntScreenState extends ConsumerState<PrimeGapHuntScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late PrimeGapQuestion _currentQuestion;
   int _score = 0;

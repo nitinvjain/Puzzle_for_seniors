@@ -19,7 +19,7 @@ class TemporalOrderJudgmentScreen extends ConsumerStatefulWidget {
 }
 
 class _TemporalOrderJudgmentScreenState extends ConsumerState<TemporalOrderJudgmentScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 12;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 12;
 
   late TemporalTrial _currentTrial;
   int _trialCount = 0;

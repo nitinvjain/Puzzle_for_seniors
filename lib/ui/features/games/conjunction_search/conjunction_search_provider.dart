@@ -48,7 +48,7 @@ class ConjunctionSearchState {
 @riverpod
 class ConjunctionSearchNotifier extends _$ConjunctionSearchNotifier {
   final ConjunctionSearchEngine _engine = ConjunctionSearchEngine();
-  static const int maxRounds = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 5;
+  static const int maxRounds = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 5;
 
   @override
   ConjunctionSearchState build() {

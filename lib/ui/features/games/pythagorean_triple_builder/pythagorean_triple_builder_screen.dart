@@ -18,7 +18,7 @@ class PythagoreanTripleBuilderScreen extends ConsumerStatefulWidget {
 }
 
 class _PythagoreanTripleBuilderScreenState extends ConsumerState<PythagoreanTripleBuilderScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late PythagoreanQuestion _currentQuestion;
   int _score = 0;

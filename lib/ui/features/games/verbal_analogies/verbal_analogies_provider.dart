@@ -16,7 +16,7 @@ class VerbalAnalogiesState {
   VerbalAnalogiesState({
     this.currentAnalogy,
     this.score = 0,
-    this.targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10,
+    this.targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10,
     this.isVictory = false,
     this.isLoading = true,
     this.selectedOption,

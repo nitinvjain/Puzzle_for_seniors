@@ -18,7 +18,7 @@ class ExponentTowerScreen extends ConsumerStatefulWidget {
 }
 
 class _ExponentTowerScreenState extends ConsumerState<ExponentTowerScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late ExponentTowerRound _currentRound;
   late List<PowerItem> _userTower;

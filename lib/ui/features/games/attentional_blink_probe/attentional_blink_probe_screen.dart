@@ -19,7 +19,7 @@ class AttentionalBlinkProbeScreen extends ConsumerStatefulWidget {
 }
 
 class _AttentionalBlinkProbeScreenState extends ConsumerState<AttentionalBlinkProbeScreen> {
-  static const int totalTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 10;
+  static const int totalTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10;
 
   late RSVPStreamTrial _currentTrial;
   int _trialCount = 0;

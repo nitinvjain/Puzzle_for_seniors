@@ -24,7 +24,7 @@ class MatrixReasoningState {
     this.isGameOver = false,
     this.lastResult,
     this.isTrialMode = false,
-    this.targetTrials = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 20,
+    this.targetTrials = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 20,
   });
 
   MatrixReasoningState copyWith({

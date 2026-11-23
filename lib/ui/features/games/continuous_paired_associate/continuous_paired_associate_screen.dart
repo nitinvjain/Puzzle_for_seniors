@@ -19,7 +19,7 @@ class ContinuousPairedAssociateScreen extends ConsumerStatefulWidget {
 }
 
 class _ContinuousPairedAssociateScreenState extends ConsumerState<ContinuousPairedAssociateScreen> {
-  static const int targetScore = SeniorMode.endlessPlay ? SeniorMode.endlessRounds : 8;
+  static const int targetScore = SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 8;
 
   late PairedAssociateRound _currentRound;
   int _score = 0;
