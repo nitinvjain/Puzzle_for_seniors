@@ -74,14 +74,14 @@ const List<QuizQuestion> geographyQuestions = [
   QuizQuestion(question: 'The Periyar wildlife sanctuary is in which state?', options: ['Tamil Nadu', 'Goa', 'Karnataka', 'Kerala'], answer: 3, difficulty: 3, topic: 'Geography'),
 
   // ------------------------------------------------------------------ world
-  QuizQuestion(question: 'What is the capital of Nepal?', options: ['Biratnagar', 'Pokhara', 'Kathmandu', 'Lalitpur'], answer: 2, difficulty: 1, topic: 'Geography'),
-  QuizQuestion(question: 'What is the capital of Sri Lanka’s commercial life, its largest city?', options: ['Colombo', 'Galle', 'Jaffna', 'Kandy'], answer: 0, difficulty: 2, topic: 'Geography'),
+  QuizQuestion(question: 'What is the capital of Nepal?', options: ['Kathmandu', 'Lalitpur', 'Biratnagar', 'Pokhara'], answer: 0, difficulty: 1, topic: 'Geography'),
+  QuizQuestion(question: 'What is the capital of Sri Lanka’s commercial life, its largest city?', options: ['Galle', 'Jaffna', 'Kandy', 'Colombo'], answer: 3, difficulty: 2, topic: 'Geography'),
   QuizQuestion(question: 'What is the capital of Bhutan?', options: ['Punakha', 'Phuentsholing', 'Paro', 'Thimphu'], answer: 3, difficulty: 2, topic: 'Geography'),
   QuizQuestion(question: 'What is the capital of Japan?', options: ['Nagoya', 'Osaka', 'Tokyo', 'Kyoto'], answer: 2, difficulty: 1, topic: 'Geography'),
-  QuizQuestion(question: 'What is the capital of Australia?', options: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], answer: 2, difficulty: 2, topic: 'Geography'),
+  QuizQuestion(question: 'What is the capital of Australia?', options: ['Canberra', 'Perth', 'Sydney', 'Melbourne'], answer: 0, difficulty: 2, topic: 'Geography'),
   QuizQuestion(question: 'Which is the largest country in the world by area?', options: ['Russia', 'China', 'United States', 'Canada'], answer: 0, difficulty: 1, topic: 'Geography'),
   QuizQuestion(question: 'Which is the smallest country in the world?', options: ['San Marino', 'Nauru', 'Monaco', 'Vatican City'], answer: 3, difficulty: 2, topic: 'Geography'),
-  QuizQuestion(question: 'Which country has the Great Wall?', options: ['China', 'Mongolia', 'Korea', 'Japan'], answer: 0, difficulty: 1, topic: 'Geography'),
+  QuizQuestion(question: 'Which country has the Great Wall?', options: ['Korea', 'Japan', 'China', 'Mongolia'], answer: 2, difficulty: 1, topic: 'Geography'),
   QuizQuestion(question: 'The Suez Canal connects the Mediterranean Sea to which sea?', options: ['Caspian Sea', 'Arabian Sea', 'Black Sea', 'Red Sea'], answer: 3, difficulty: 3, topic: 'Geography'),
   QuizQuestion(question: 'Which line divides the Earth into northern and southern halves?', options: ['Tropic of Capricorn', 'Tropic of Cancer', 'Equator', 'Prime Meridian'], answer: 2, difficulty: 1, topic: 'Geography'),
   QuizQuestion(question: 'The Tropic of Cancer passes through roughly how many Indian states?', options: ['Two', 'Five', 'Eight', 'Twelve'], answer: 2, difficulty: 3, topic: 'Geography'),

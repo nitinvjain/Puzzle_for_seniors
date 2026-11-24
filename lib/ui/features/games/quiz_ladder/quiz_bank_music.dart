@@ -18,7 +18,7 @@ const List<QuizQuestion> musicQuestions = [
       answer: 2,
       difficulty: 1,
       topic: 'Film music'),
-  QuizQuestion(question: 'The film Aradhana, famous for its songs, starred which actor?', options: ['Shammi Kapoor', 'Jeetendra', 'Dev Anand', 'Rajesh Khanna'], answer: 3, difficulty: 2, topic: 'Film music'),
+  QuizQuestion(question: 'The film Aradhana, famous for its songs, starred which actor?', options: ['Rajesh Khanna', 'Shammi Kapoor', 'Jeetendra', 'Dev Anand'], answer: 0, difficulty: 2, topic: 'Film music'),
   QuizQuestion(
       question: 'Which singer was the usual playback voice for Raj Kapoor’s songs?',
       options: ['Hemant Kumar', 'Mohammed Rafi', 'Mukesh', 'Talat Mahmood'],
