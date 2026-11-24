@@ -14,8 +14,8 @@ const List<QuizQuestion> musicQuestions = [
   QuizQuestion(question: 'Which award is India’s highest honour for lifetime achievement in cinema?', options: ['Padma Shri', 'Filmfare Award', 'Dadasaheb Phalke Award', 'National Film Award'], answer: 2, difficulty: 2, topic: 'Film music'),
   QuizQuestion(
       question: 'Lata Mangeshkar and Asha Bhosle were related in what way?',
-      options: ['Not related', 'Cousins', 'Sisters', 'Aunt and niece'],
-      answer: 2,
+      options: ['Aunt and niece', 'Not related', 'Cousins', 'Sisters'],
+      answer: 3,
       difficulty: 1,
       topic: 'Film music'),
   QuizQuestion(question: 'The film Aradhana, famous for its songs, starred which actor?', options: ['Rajesh Khanna', 'Shammi Kapoor', 'Jeetendra', 'Dev Anand'], answer: 0, difficulty: 2, topic: 'Film music'),
@@ -25,7 +25,7 @@ const List<QuizQuestion> musicQuestions = [
       answer: 3,
       difficulty: 2,
       topic: 'Film music'),
-  QuizQuestion(question: '“Ae Mere Watan Ke Logon” was written in memory of the soldiers of which war?', options: ['The 1962 war with China', 'The 1965 war with Pakistan', 'The 1971 war', 'The 1947 Kashmir war'], answer: 0, difficulty: 3, topic: 'Film music'),
+  QuizQuestion(question: '“Ae Mere Watan Ke Logon” was written in memory of the soldiers of which war?', options: ['The 1971 war', 'The 1947 Kashmir war', 'The 1962 war with China', 'The 1965 war with Pakistan'], answer: 2, difficulty: 3, topic: 'Film music'),
   QuizQuestion(
       question: 'Kishore Kumar was also known for which other role in films?',
       options: ['Choreography', 'Cinematography', 'Only singing', 'Acting and directing'],

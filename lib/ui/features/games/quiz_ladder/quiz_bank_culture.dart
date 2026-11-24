@@ -71,9 +71,9 @@ const List<QuizQuestion> cultureQuestions = [
   QuizQuestion(question: 'Which was the first IIT, established in 1951?', options: ['IIT Madras', 'IIT Delhi', 'IIT Bombay', 'IIT Kharagpur'], answer: 3, difficulty: 3, topic: 'Schools'),
   QuizQuestion(question: 'The Right to Education covers children of which age group?', options: ['6 to 14 years', '5 to 16 years', '6 to 18 years', '3 to 10 years'], answer: 0, difficulty: 2, topic: 'Schools'),
   QuizQuestion(question: 'Which constitutional amendment made education a fundamental right?', options: ['101st', '42nd', '73rd', '86th'], answer: 3, difficulty: 3, topic: 'Schools'),
-  QuizQuestion(question: 'The midday meal scheme in schools is intended chiefly to do what?', options: ['Improve attendance and nutrition', 'Fund school buildings', 'Provide uniforms', 'Reduce teacher workload'], answer: 0, difficulty: 2, topic: 'Schools'),
+  QuizQuestion(question: 'The midday meal scheme in schools is intended chiefly to do what?', options: ['Provide uniforms', 'Reduce teacher workload', 'Improve attendance and nutrition', 'Fund school buildings'], answer: 2, difficulty: 2, topic: 'Schools'),
   QuizQuestion(question: 'National Education Day in India is observed on 11 November, marking whose birthday?', options: ['Jawaharlal Nehru', 'Ambedkar', 'S. Radhakrishnan', 'Maulana Abul Kalam Azad'], answer: 3, difficulty: 3, topic: 'Schools'),
   QuizQuestion(question: 'Which Indian university is among the oldest modern universities, founded in 1857?', options: ['University of Calcutta', 'Banaras Hindu University', 'Aligarh Muslim University', 'Delhi University'], answer: 0, difficulty: 3, topic: 'Schools'),
-  QuizQuestion(question: 'Who founded Banaras Hindu University?', options: ['Sir Syed Ahmed Khan', 'Annie Besant', 'Gopal Krishna Gokhale', 'Madan Mohan Malaviya'], answer: 3, difficulty: 3, topic: 'Schools'),
+  QuizQuestion(question: 'Who founded Banaras Hindu University?', options: ['Annie Besant', 'Gopal Krishna Gokhale', 'Madan Mohan Malaviya', 'Sir Syed Ahmed Khan'], answer: 2, difficulty: 3, topic: 'Schools'),
   QuizQuestion(question: 'Which day is observed as World Teachers’ Day internationally?', options: ['5 October', '14 November', '1 May', '5 September'], answer: 0, difficulty: 3, topic: 'Schools'),
 ];

@@ -28,12 +28,12 @@ const List<QuizQuestion> teachingQuestions = [
   QuizQuestion(
       question: 'What does IGNOU stand for?',
       options: [
-        'Indira Gandhi National Open University',
-        'Indian General National Online University',
         'Integrated Graduate National Open University',
-        'Indian Government National Open University'
+        'Indian Government National Open University',
+        'Indira Gandhi National Open University',
+        'Indian General National Online University'
       ],
-      answer: 0,
+      answer: 2,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -61,8 +61,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which body conducts the Class 10 and Class 12 board examinations for CBSE schools?',
-      options: ['UGC', 'AICTE', 'NCERT', 'CBSE itself'],
-      answer: 3,
+      options: ['CBSE itself', 'UGC', 'AICTE', 'NCERT'],
+      answer: 0,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -85,8 +85,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'In the Indian school system, what is Class 12 also commonly called?',
-      options: ['Primary', 'Matriculation', 'Higher Secondary', 'Middle School'],
-      answer: 2,
+      options: ['Middle School', 'Primary', 'Matriculation', 'Higher Secondary'],
+      answer: 3,
       difficulty: 1,
       topic: 'Teaching'),
   QuizQuestion(
@@ -117,8 +117,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which branch of mathematics uses letters to stand for numbers?',
-      options: ['Algebra', 'Arithmetic', 'Statistics', 'Geometry'],
-      answer: 0,
+      options: ['Statistics', 'Geometry', 'Algebra', 'Arithmetic'],
+      answer: 2,
       difficulty: 1,
       topic: 'Teaching'),
   QuizQuestion(
@@ -143,8 +143,8 @@ const List<QuizQuestion> teachingQuestions = [
   // -------------------------------------- the mathematicians and the scholars
   QuizQuestion(
       question: 'Which ancient Indian mathematician wrote the Aryabhatiya?',
-      options: ['Bhaskara', 'Varahamihira', 'Brahmagupta', 'Aryabhata'],
-      answer: 3,
+      options: ['Aryabhata', 'Bhaskara', 'Varahamihira', 'Brahmagupta'],
+      answer: 0,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -167,8 +167,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which Indian statistician founded the Indian Statistical Institute?',
-      options: ['Harish-Chandra', 'C. R. Rao', 'P. C. Mahalanobis', 'D. D. Kosambi'],
-      answer: 2,
+      options: ['D. D. Kosambi', 'Harish-Chandra', 'C. R. Rao', 'P. C. Mahalanobis'],
+      answer: 3,
       difficulty: 3,
       topic: 'Teaching'),
   QuizQuestion(
@@ -191,8 +191,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which Indian social reformer is remembered for founding schools for girls in 19th-century Maharashtra?',
-      options: ['Savitribai Phule', 'Pandita Ramabai', 'Annie Besant', 'Kamala Nehru'],
-      answer: 0,
+      options: ['Annie Besant', 'Kamala Nehru', 'Savitribai Phule', 'Pandita Ramabai'],
+      answer: 2,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -217,8 +217,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which book of tables was used in Indian schools for multiplication and division before calculators?',
-      options: ['Almanac', 'Gazetteer', 'Ledger', 'Logarithm tables'],
-      answer: 3,
+      options: ['Logarithm tables', 'Almanac', 'Gazetteer', 'Ledger'],
+      answer: 0,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(

@@ -30,8 +30,10 @@
 /// a repeat here is a repeat the player sees.
 library;
 
+import 'quiz_bank_bollywood.dart';
 import 'quiz_bank_classx.dart';
 import 'quiz_bank_culture.dart';
+import 'quiz_bank_filmmusic2.dart';
 import 'quiz_bank_films.dart';
 import 'quiz_bank_general.dart';
 import 'quiz_bank_geography.dart';
@@ -62,7 +64,9 @@ final List<QuizQuestion> quizQuestions = List<QuizQuestion>.unmodifiable([
   ...historyQuestions,
   ...cultureQuestions,
   ...filmQuestions,
+  ...bollywoodQuestions,
   ...musicQuestions,
+  ...filmMusic2Questions,
   ...sportsQuestions,
   ...teachingQuestions,
   ...quizbookQuestions,

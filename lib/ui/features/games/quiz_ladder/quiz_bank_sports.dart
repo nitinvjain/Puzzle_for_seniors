@@ -27,8 +27,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Which ground hosted the final of the 1983 Cricket World Cup?',
-      options: ['Headingley', 'The Oval', 'Lord’s', 'Old Trafford'],
-      answer: 2,
+      options: ['Old Trafford', 'Headingley', 'The Oval', 'Lord’s'],
+      answer: 3,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
@@ -51,8 +51,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Against which team did Anil Kumble take ten wickets in an innings in 1999?',
-      options: ['Pakistan', 'England', 'Sri Lanka', 'Australia'],
-      answer: 0,
+      options: ['Sri Lanka', 'Australia', 'Pakistan', 'England'],
+      answer: 2,
       difficulty: 3,
       topic: 'Sport'),
   QuizQuestion(question: 'How many stumps make up one wicket in cricket?', options: ['Two', 'Three', 'Four', 'Six'], answer: 1, difficulty: 1, topic: 'Sport'),
@@ -86,7 +86,7 @@ const List<QuizQuestion> sportsQuestions = [
       answer: 1,
       difficulty: 2,
       topic: 'Sport'),
-  QuizQuestion(question: 'Who was named Player of the Match in the 1983 Cricket World Cup final?', options: ['Sunil Gavaskar', 'Madan Lal', 'Kapil Dev', 'Mohinder Amarnath'], answer: 3, difficulty: 3, topic: 'Sport'),
+  QuizQuestion(question: 'Who was named Player of the Match in the 1983 Cricket World Cup final?', options: ['Mohinder Amarnath', 'Sunil Gavaskar', 'Madan Lal', 'Kapil Dev'], answer: 0, difficulty: 3, topic: 'Sport'),
   QuizQuestion(
       question: 'What is the term for a bowler dismissing three batsmen with three successive balls?',
       options: ['A triple', 'A maiden', 'A hat-trick', 'A double strike'],
@@ -121,8 +121,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'India’s National Sports Day is observed on the birthday of which sportsman?',
-      options: ['K. D. Jadhav', 'Balbir Singh', 'Dhyan Chand', 'Milkha Singh'],
-      answer: 2,
+      options: ['Milkha Singh', 'K. D. Jadhav', 'Balbir Singh', 'Dhyan Chand'],
+      answer: 3,
       difficulty: 2,
       topic: 'Sport'),
 
@@ -147,8 +147,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Who was the first Indian woman to win an Olympic medal?',
-      options: ['Karnam Malleswari', 'Saina Nehwal', 'Mary Kom', 'P. T. Usha'],
-      answer: 0,
+      options: ['Mary Kom', 'P. T. Usha', 'Karnam Malleswari', 'Saina Nehwal'],
+      answer: 2,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
@@ -177,8 +177,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'In badminton, which Indian player won the All England championship in 1980 and 1981?',
-      options: ['Syed Modi', 'Pullela Gopichand', 'Dinesh Khanna', 'Prakash Padukone'],
-      answer: 3,
+      options: ['Prakash Padukone', 'Syed Modi', 'Pullela Gopichand', 'Dinesh Khanna'],
+      answer: 0,
       difficulty: 3,
       topic: 'Sport'),
   QuizQuestion(
@@ -208,8 +208,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Which traditional Indian sport is a combat sport played on soil, and has akharas as its training grounds?',
-      options: ['Gilli-danda', 'Kabaddi', 'Kushti (wrestling)', 'Kho-kho'],
-      answer: 2,
+      options: ['Kho-kho', 'Gilli-danda', 'Kabaddi', 'Kushti (wrestling)'],
+      answer: 3,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
