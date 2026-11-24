@@ -55,6 +55,16 @@ const Map<String, GameRules> gameRules = {
     ],
     example: 'Join two 4s and you get 8. Join three 4s and that is 12, which rounds up to 16 — so longer chains are worth much more.',
   ),
+  'quiz_ladder': GameRules(
+    goal: 'Answer fifteen questions in a row to reach the top prize.',
+    steps: [
+      'Each question has four answers. Tap the one you think is right.',
+      'Every correct answer moves you one rung up the money ladder.',
+      'Two rungs are guaranteed: once you pass them, that amount is yours whatever happens afterwards.',
+      'The 50:50 button takes away two of the wrong answers, but it can only be used once in a game.',
+    ],
+    example: 'Get the first five right and \u20b910,000 is guaranteed. Slip at question nine and you still take home that \u20b910,000.',
+  ),
   'simple_sudoku': GameRules(
     goal: 'Fill every empty square so each row, column and 3x3 box holds 1 to 9.',
     steps: [

@@ -2,6 +2,7 @@ import 'game_metadata.dart';
 import '../config/senior_mode.dart';
 import '../ui/features/games/cross_math/cross_math_metadata.dart';
 import '../ui/features/games/number_connect/number_connect_metadata.dart';
+import '../ui/features/games/quiz_ladder/quiz_ladder_metadata.dart';
 import '../ui/features/games/simple_sudoku/simple_sudoku_metadata.dart';
 
 import '../ui/features/games/shikaku/shikaku_metadata.dart';
@@ -352,6 +353,7 @@ List<GameMetadata> _buildGameList() {
     crossMathMetadata,
     simpleSudokuMetadata,
     numberConnectMetadata,
+    quizLadderMetadata,
     slitherlinkMetadata,
     futoshikiMetadata,
     kakuroMetadata,
