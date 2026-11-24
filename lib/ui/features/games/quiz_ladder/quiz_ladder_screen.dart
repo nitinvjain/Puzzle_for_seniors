@@ -38,6 +38,52 @@ String formatIndianNumber(int value) {
   return '${groups.join(',')},$lastThree';
 }
 
+/// Hands out questions so the player works through the bank before meeting
+/// one again.
+///
+/// Drawing a fresh random five each game sounds like enough variety, but it
+/// is not: with five hard questions drawn from two hundred, a repeat turns up
+/// after about three games however big the bank gets. Growing the bank from
+/// 117 questions to over a thousand would have been nearly invisible. So
+/// instead each difficulty keeps a shuffled queue, and a game takes the next
+/// few from the front. Every question in the bank is asked once before any is
+/// asked twice -- around sixty-seven games at fifteen questions each.
+///
+/// The queues are static so they survive leaving the game and coming back.
+/// They start afresh when the app restarts, which is fine: a new shuffle is
+/// not a repeat.
+class _QuestionPool {
+  _QuestionPool._();
+
+  static final Map<int, List<QuizQuestion>> _queues = {};
+  static final Random _rng = Random();
+
+  static List<QuizQuestion> _shuffledPool(int difficulty) =>
+      quizQuestions.where((q) => q.difficulty == difficulty).toList()
+        ..shuffle(_rng);
+
+  static List<QuizQuestion> take(int difficulty, int count) {
+    final queue = _queues.putIfAbsent(difficulty, () => _shuffledPool(difficulty));
+
+    if (queue.length < count) {
+      // Refill, keeping whatever is left at the front and leaving those out of
+      // the new shuffle, so the queue holds each question exactly once and a
+      // single round can never draw the same question twice.
+      final leftover = List<QuizQuestion>.of(queue);
+      final refill = _shuffledPool(difficulty)
+        ..removeWhere((q) => leftover.contains(q));
+      queue
+        ..clear()
+        ..addAll(leftover)
+        ..addAll(refill);
+    }
+
+    final drawn = queue.take(count).toList();
+    queue.removeRange(0, drawn.length);
+    return drawn;
+  }
+}
+
 class QuizLadderScreen extends ConsumerStatefulWidget {
   const QuizLadderScreen({super.key});
 
@@ -63,14 +109,11 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   }
 
   void _startGame() {
-    final byDifficulty = {1: <QuizQuestion>[], 2: <QuizQuestion>[], 3: <QuizQuestion>[]};
-    for (final q in quizQuestions) {
-      byDifficulty[q.difficulty]?.add(q);
-    }
+    // Five easy, then five medium, then five hard: the ladder gets harder as
+    // the prize money climbs, the way the television show does it.
     final round = <QuizQuestion>[];
     for (final level in [1, 2, 3]) {
-      final pool = [...byDifficulty[level]!]..shuffle(_random);
-      round.addAll(pool.take(5));
+      round.addAll(_QuestionPool.take(level, 5));
     }
     setState(() {
       _round = round;
