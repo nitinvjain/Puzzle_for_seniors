@@ -94,6 +94,13 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     );
   }
 
+  /// The points earned in the game just finished, stages included.
+  ///
+  /// `late final` so it is taken from the log exactly once, on the first
+  /// build. Taking it inside build would show the figure the first time the
+  /// dialog painted and zero on every rebuild after it.
+  late final int _pointsEarned = RewardLog.take();
+
   /// What the reward banner should show.
   ///
   /// Everything here is derived from counters the app already keeps, so the
@@ -118,6 +125,8 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
         DateTime.now().difference(lastStreak.lastSolvedDate) <= Rewards.justNow;
 
     return RewardSnapshot(
+      pointsEarned: _pointsEarned,
+      totalPoints: userData.xp,
       totalGames: total,
       gamesToday: gamesToday,
       earnedStar: earned,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../providers/user_providers.dart';
+import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
 import '../../../../utils/sound_feedback.dart';
@@ -110,6 +111,10 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
     });
 
     if (_solved.length == _pairs.length) {
+      // A board cleared is a stage; there are six to a round.
+      ref
+          .read(gameStreakNotifierProvider.notifier)
+          .awardStage('visible_match', xpAmount: Rewards.pointsPerStage);
       Future.delayed(const Duration(milliseconds: 700), () {
         if (!mounted) return;
         if (_board >= _boards - 1) {

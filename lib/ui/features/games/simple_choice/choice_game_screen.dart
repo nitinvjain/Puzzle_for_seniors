@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/config/senior_mode.dart';
 
 import '../../../../providers/user_providers.dart';
+import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
 import '../../../../utils/sound_feedback.dart';
@@ -107,6 +108,9 @@ class _ChoiceGameScreenState extends ConsumerState<ChoiceGameScreen> {
     if (correct) {
       HapticFeedbackUtil.success();
       SoundFeedbackUtil.merge();
+      ref
+          .read(gameStreakNotifierProvider.notifier)
+          .awardStage(widget.gameId, xpAmount: Rewards.pointsPerStage);
     } else {
       HapticFeedbackUtil.selectionClick();
     }

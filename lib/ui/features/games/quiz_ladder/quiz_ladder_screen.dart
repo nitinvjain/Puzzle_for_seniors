@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../providers/user_providers.dart';
+import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
@@ -257,6 +258,10 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     final correct = index == _question.answer;
     if (correct) {
       HapticFeedbackUtil.success();
+      // Every right answer pays, not just reaching the top of the ladder.
+      ref
+          .read(gameStreakNotifierProvider.notifier)
+          .awardStage('quiz_ladder', xpAmount: Rewards.pointsPerStage);
       Future.delayed(const Duration(milliseconds: 1100), () {
         if (!mounted || generation != _generation) return;
         if (_rung >= _rungs - 1) {

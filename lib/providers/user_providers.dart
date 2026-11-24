@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../config/rewards.dart';
 import '../data/models/user_data.dart';
 import '../data/models/game_streak.dart';
 import '../data/repositories/user_repository.dart';
@@ -178,6 +179,23 @@ class GameStreakNotifier extends _$GameStreakNotifier {
     return state[gameId] ?? GameStreak.initial(gameId);
   }
 
+  /// Points for one stage finished correctly inside a game still in progress:
+  /// a question answered right in KBC India, a board cleared in Matching
+  /// Pairs, a round won in one of the choice games.
+  ///
+  /// Deliberately smaller than finishing the whole thing, and deliberately
+  /// separate from it: a stage moves the points total and nothing else. It
+  /// does not touch the streak and it does not count as a game finished, so
+  /// neither of those can be inflated by a long game.
+  ///
+  /// There is no penalty anywhere to match this. A wrong answer costs
+  /// nothing; it simply does not pay.
+  Future<void> awardStage(String gameId, {int xpAmount = 5}) async {
+    if (xpAmount <= 0) return;
+    RewardLog.add(xpAmount);
+    await ref.read(userDataNotifierProvider.notifier).addXp(xpAmount);
+  }
+
   Future<bool> completeGame(String gameId, {int xpAmount = 20}) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -189,17 +207,22 @@ class GameStreakNotifier extends _$GameStreakNotifier {
       currentStreak.lastSolvedDate.day,
     );
 
-    if (currentStreak.solvedToday && lastNormalized == today) {
-      return true;
-    }
+    // Finishing a game that was already finished today used to return here
+    // and award nothing at all, so a second round of the same game was worth
+    // no points. Playing the same game over and over is exactly what he does,
+    // so every correct finish now earns its points; what stays once a day is
+    // only the streak and the count of games finished.
+    final alreadyToday = currentStreak.solvedToday && lastNormalized == today;
 
     int newStreakCount = currentStreak.currentStreak;
-    if (currentStreak.lastSolvedDate.millisecondsSinceEpoch == 0) {
-      newStreakCount = 1;
-    } else if (today.difference(lastNormalized).inDays == 1) {
-      newStreakCount++;
-    } else if (today.difference(lastNormalized).inDays > 1) {
-      newStreakCount = 1;
+    if (!alreadyToday) {
+      if (currentStreak.lastSolvedDate.millisecondsSinceEpoch == 0) {
+        newStreakCount = 1;
+      } else if (today.difference(lastNormalized).inDays == 1) {
+        newStreakCount++;
+      } else if (today.difference(lastNormalized).inDays > 1) {
+        newStreakCount = 1;
+      }
     }
 
     final newStreak = currentStreak.copyWith(
@@ -214,8 +237,15 @@ class GameStreakNotifier extends _$GameStreakNotifier {
     final newUserData = ref.read(userDataNotifierProvider).copyWith(
       xp: newXp,
       level: newLevel,
-      totalSolved: (ref.read(userDataNotifierProvider).totalSolved ?? 0) + 1,
+      // Points go up every time. "Games finished" counts a game once a day,
+      // so that line keeps meaning what it says rather than turning into a
+      // second, differently-worded points total.
+      totalSolved: (ref.read(userDataNotifierProvider).totalSolved ?? 0) +
+          (alreadyToday ? 0 : 1),
     );
+
+    // Remember what this finish was worth, for the banner on the way out.
+    RewardLog.add(xpAmount);
 
     state = {...state, gameId: newStreak};
 

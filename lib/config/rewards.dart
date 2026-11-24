@@ -23,8 +23,48 @@
 ///     underneath it.
 library;
 
+/// Where points earned during a game are collected until the completion
+/// screen can show them.
+///
+/// Stages are awarded while he is still playing -- a right answer here, a
+/// board cleared there -- and the banner that reports them is not built until
+/// the game ends, so the amounts have to wait somewhere. They wait in memory
+/// rather than on disk: the running totals are already saved, and this is
+/// only the "you just earned 45" line, which is worth nothing once it has
+/// been read.
+///
+/// Reading clears it. If a game is abandoned halfway, its points stay on the
+/// pile and are shown at the end of the next one, which is harmless -- he did
+/// earn them, and the total they were added to was saved at the time.
+class RewardLog {
+  const RewardLog._();
+
+  static int _pending = 0;
+
+  static void add(int points) {
+    if (points > 0) _pending += points;
+  }
+
+  /// The points earned since this was last read, and clears the pile.
+  static int take() {
+    final p = _pending;
+    _pending = 0;
+    return p;
+  }
+
+  /// Reads without clearing, so a rebuild of the same screen shows the same
+  /// figure instead of dropping to zero.
+  static int peek() => _pending;
+}
+
 /// What to show on the completion screen.
 class RewardSnapshot {
+  /// Points earned in the game just finished, stages included.
+  final int pointsEarned;
+
+  /// Points in total, all time. Never decreases.
+  final int totalPoints;
+
   /// Games finished, all time. Never decreases.
   final int totalGames;
 
@@ -42,6 +82,8 @@ class RewardSnapshot {
   final String? milestone;
 
   const RewardSnapshot({
+    required this.pointsEarned,
+    required this.totalPoints,
     required this.totalGames,
     required this.gamesToday,
     required this.earnedStar,
@@ -124,6 +166,33 @@ class Rewards {
       return '$total games finished';
     }
     return null;
+  }
+
+  /// Points awarded for finishing a whole game, and for one stage inside one.
+  ///
+  /// The stage award is small on purpose. It should feel like the total is
+  /// moving while he plays without making the finish itself an afterthought.
+  static const int pointsPerGame = 20;
+  static const int pointsPerStage = 5;
+
+  /// The loud line: what he just earned.
+  static String earnedLine(int points) =>
+      points > 0 ? '+$points points' : 'Well played';
+
+  /// The running points total, with thousands separated so it stays readable
+  /// once it runs into four and five figures.
+  static String pointsLine(int totalPoints) =>
+      '${_grouped(totalPoints)} points in all';
+
+  static String _grouped(int n) {
+    final s = n.toString();
+    if (s.length <= 3) return s;
+    final out = StringBuffer();
+    for (int i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) out.write(',');
+      out.write(s[i]);
+    }
+    return out.toString();
   }
 
   /// The quiet line under the star.

@@ -16,6 +16,7 @@ import 'package:puzzle/utils/design_system.dart';
 import 'package:puzzle/utils/haptic_feedback.dart';
 import 'package:puzzle/utils/navigation_utils.dart';
 
+import 'widgets/player_greeting.dart';
 import 'widgets/favorites_section.dart';
 import 'widgets/category_button.dart';
 import 'widgets/search_bar.dart' as custom;
@@ -165,6 +166,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildAppBar(theme, colorScheme, l10n),
+          const SliverToBoxAdapter(child: PlayerGreeting()),
           SliverToBoxAdapter(
             child: FavoritesSection(
               selectedCategory: _selectedCategory,

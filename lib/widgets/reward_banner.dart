@@ -91,15 +91,44 @@ class _RewardBannerState extends State<RewardBanner>
             ),
           ),
           const SizedBox(height: DesignSystem.spaceSM),
-          // The running total, quiet.
+          // The loud line: what he just earned. This is the part that lands,
+          // so it is the biggest thing in the panel after the star itself.
+          if (snap.pointsEarned > 0)
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                Rewards.earnedLine(snap.pointsEarned),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Geist',
+                  fontSize: DesignSystem.fontSizeLG,
+                  fontWeight: FontWeight.w900,
+                  color: _deepAmber,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+          const SizedBox(height: 2),
+          // The running totals, quiet.
           Text(
-            Rewards.totalLine(snap.totalGames),
+            Rewards.pointsLine(snap.totalPoints),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: 'Geist',
               fontSize: DesignSystem.fontSizeMD,
               fontWeight: FontWeight.w800,
               color: colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            Rewards.totalLine(snap.totalGames),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Geist',
+              fontSize: DesignSystem.fontSizeSM,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
           if (today != null) ...[
