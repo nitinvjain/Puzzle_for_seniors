@@ -17,12 +17,12 @@ const List<QuizQuestion> teachingQuestions = [
   QuizQuestion(
       question: 'What does NEP stand for in Indian education?',
       options: [
-        'National Examination Programme',
         'National Educational Panel',
         'National Education Policy',
-        'New Education Plan'
+        'New Education Plan',
+        'National Examination Programme'
       ],
-      answer: 2,
+      answer: 1,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -55,8 +55,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which entrance examination is taken for admission to medical courses in India?',
-      options: ['NEET', 'CLAT', 'GATE', 'JEE'],
-      answer: 0,
+      options: ['JEE', 'NEET', 'CLAT', 'GATE'],
+      answer: 1,
       difficulty: 1,
       topic: 'Teaching'),
   QuizQuestion(
@@ -79,8 +79,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which organisation regulates university education in India?',
-      options: ['CBSE', 'NCERT', 'AICTE', 'UGC'],
-      answer: 3,
+      options: ['AICTE', 'UGC', 'CBSE', 'NCERT'],
+      answer: 1,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -111,8 +111,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'What is a mathematical statement believed true but not yet proved called?',
-      options: ['Identity', 'Theorem', 'Conjecture', 'Axiom'],
-      answer: 2,
+      options: ['Theorem', 'Conjecture', 'Axiom', 'Identity'],
+      answer: 1,
       difficulty: 3,
       topic: 'Teaching'),
   QuizQuestion(
@@ -135,8 +135,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which branch of mathematics studies triangles and the ratios of their sides?',
-      options: ['Trigonometry', 'Topology', 'Mensuration', 'Probability'],
-      answer: 0,
+      options: ['Probability', 'Trigonometry', 'Topology', 'Mensuration'],
+      answer: 1,
       difficulty: 2,
       topic: 'Teaching'),
 
@@ -161,8 +161,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'National Mathematics Day in India is observed on the birthday of which mathematician?',
-      options: ['Brahmagupta', 'Bhaskara II', 'Aryabhata', 'Srinivasa Ramanujan'],
-      answer: 3,
+      options: ['Aryabhata', 'Srinivasa Ramanujan', 'Brahmagupta', 'Bhaskara II'],
+      answer: 1,
       difficulty: 2,
       topic: 'Teaching'),
   QuizQuestion(
@@ -185,8 +185,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Taxila, one of the ancient world’s great centres of learning, lies in present-day which country?',
-      options: ['Nepal', 'India', 'Pakistan', 'Afghanistan'],
-      answer: 2,
+      options: ['India', 'Pakistan', 'Afghanistan', 'Nepal'],
+      answer: 1,
       difficulty: 3,
       topic: 'Teaching'),
   QuizQuestion(
@@ -211,8 +211,8 @@ const List<QuizQuestion> teachingQuestions = [
       topic: 'Teaching'),
   QuizQuestion(
       question: 'Which instrument in a school geometry box is used to measure angles?',
-      options: ['Protractor', 'Divider', 'Scale', 'Compass'],
-      answer: 0,
+      options: ['Compass', 'Protractor', 'Divider', 'Scale'],
+      answer: 1,
       difficulty: 1,
       topic: 'Teaching'),
   QuizQuestion(

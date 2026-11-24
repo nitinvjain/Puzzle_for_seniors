@@ -21,8 +21,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Who captained India to victory in the 1983 Cricket World Cup?',
-      options: ['Bishan Singh Bedi', 'Mohinder Amarnath', 'Sunil Gavaskar', 'Kapil Dev'],
-      answer: 3,
+      options: ['Sunil Gavaskar', 'Kapil Dev', 'Bishan Singh Bedi', 'Mohinder Amarnath'],
+      answer: 1,
       difficulty: 1,
       topic: 'Sport'),
   QuizQuestion(
@@ -45,8 +45,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Who was the first bowler to take all ten wickets in a Test innings for India?',
-      options: ['Bishan Singh Bedi', 'Erapalli Prasanna', 'Anil Kumble', 'Kapil Dev'],
-      answer: 2,
+      options: ['Erapalli Prasanna', 'Anil Kumble', 'Kapil Dev', 'Bishan Singh Bedi'],
+      answer: 1,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
@@ -82,8 +82,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Which Indian batsman was nicknamed the “Little Master” before Sachin Tendulkar?',
-      options: ['Sunil Gavaskar', 'Mohinder Amarnath', 'Chetan Chauhan', 'Gundappa Viswanath'],
-      answer: 0,
+      options: ['Gundappa Viswanath', 'Sunil Gavaskar', 'Mohinder Amarnath', 'Chetan Chauhan'],
+      answer: 1,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(question: 'Who was named Player of the Match in the 1983 Cricket World Cup final?', options: ['Sunil Gavaskar', 'Madan Lal', 'Kapil Dev', 'Mohinder Amarnath'], answer: 3, difficulty: 3, topic: 'Sport'),
@@ -109,8 +109,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'In which Olympic Games did India win its first hockey gold medal?',
-      options: ['1936 Berlin', '1948 London', '1920 Antwerp', '1928 Amsterdam'],
-      answer: 3,
+      options: ['1920 Antwerp', '1928 Amsterdam', '1936 Berlin', '1948 London'],
+      answer: 1,
       difficulty: 3,
       topic: 'Sport'),
   QuizQuestion(
@@ -141,8 +141,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'In which sport did K. D. Jadhav win his Olympic bronze medal?',
-      options: ['Shooting', 'Boxing', 'Wrestling', 'Weightlifting'],
-      answer: 2,
+      options: ['Boxing', 'Wrestling', 'Weightlifting', 'Shooting'],
+      answer: 1,
       difficulty: 3,
       topic: 'Sport'),
   QuizQuestion(
@@ -165,8 +165,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Who became India’s first chess Grandmaster?',
-      options: ['Viswanathan Anand', 'Pravin Thipsay', 'Dibyendu Barua', 'Krishnan Sasikiran'],
-      answer: 0,
+      options: ['Krishnan Sasikiran', 'Viswanathan Anand', 'Pravin Thipsay', 'Dibyendu Barua'],
+      answer: 1,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
@@ -202,8 +202,8 @@ const List<QuizQuestion> sportsQuestions = [
       topic: 'Sport'),
   QuizQuestion(
       question: 'Which Indian state is most closely associated with the sport of kabaddi’s traditional rural form?',
-      options: ['Assam', 'Odisha', 'Kerala', 'Punjab'],
-      answer: 3,
+      options: ['Kerala', 'Punjab', 'Assam', 'Odisha'],
+      answer: 1,
       difficulty: 2,
       topic: 'Sport'),
   QuizQuestion(
