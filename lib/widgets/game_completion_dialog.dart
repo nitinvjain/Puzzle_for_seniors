@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:puzzle/config/rewards.dart';
 import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/game_metadata.dart';
 import '../data/game_registry.dart';
+import '../data/models/game_streak.dart';
 import '../utils/design_system.dart';
 import '../utils/haptic_feedback.dart';
 import '../utils/navigation_utils.dart';
 import '../providers/game_providers.dart';
 import '../providers/game_session_provider.dart';
 import '../providers/user_providers.dart';
+import 'reward_banner.dart';
 import 'tangible.dart';
 
 class GameCompletionDialog extends ConsumerStatefulWidget {
@@ -88,6 +91,39 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  /// What the reward banner should show.
+  ///
+  /// Everything here is derived from counters the app already keeps, so the
+  /// reward needs no storage of its own and his existing history counts.
+  ///
+  /// Whether this finish earned a star is worked out from how recently the
+  /// game's record was written rather than from a flag threaded down through
+  /// every game screen: `completeGame` counts a game once a day and returns
+  /// early on a replay without touching the record, so a record written in
+  /// the last few seconds means this finish was a new one. The alternative
+  /// was changing three hundred call sites.
+  RewardSnapshot _rewardSnapshot(
+    Map<String, GameStreak> streaks,
+    String? lastGameId,
+  ) {
+    final userData = ref.read(userDataNotifierProvider);
+    final total = userData.totalSolved ?? 0;
+    final gamesToday = streaks.values.where((s) => s.solvedToday).length;
+
+    final lastStreak = lastGameId == null ? null : streaks[lastGameId];
+    final earned = lastStreak != null &&
+        DateTime.now().difference(lastStreak.lastSolvedDate) <= Rewards.justNow;
+
+    return RewardSnapshot(
+      totalGames: total,
+      gamesToday: gamesToday,
+      earnedStar: earned,
+      // Only when this finish crossed it. Without the guard a replay would
+      // re-announce the same milestone every time, which empties it out.
+      milestone: earned ? Rewards.milestoneLabel(total) : null,
     );
   }
 
@@ -264,6 +300,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                   fontSize: 13.5,
                 ),
               ),
+              if (Rewards.enabled) ...[
+                const SizedBox(height: DesignSystem.spaceMD),
+                RewardBanner(snapshot: _rewardSnapshot(streaks, session.lastGameId)),
+              ],
               const SizedBox(height: DesignSystem.spaceLG),
               if (next != null && !isSameGame)
                 Row(
