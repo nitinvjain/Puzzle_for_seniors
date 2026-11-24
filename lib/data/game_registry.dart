@@ -7,7 +7,7 @@ import '../ui/features/games/simple_choice/song_title_metadata.dart';
 import '../ui/features/games/simple_choice/kahavat_metadata.dart';
 import '../ui/features/games/simple_choice/which_came_first_metadata.dart';
 import '../ui/features/games/simple_choice/tables_metadata.dart';
-import '../ui/features/games/simple_choice/odd_one_out_metadata.dart';
+import '../ui/features/games/simple_choice/not_like_the_others_metadata.dart';
 import '../ui/features/games/visible_match/visible_match_metadata.dart';
 import '../ui/features/games/simple_sudoku/simple_sudoku_metadata.dart';
 
@@ -364,7 +364,7 @@ List<GameMetadata> _buildGameList() {
     kahavatMetadata,
     whichCameFirstMetadata,
     tablesMetadata,
-    oddOneOutMetadata,
+    notLikeTheOthersMetadata,
     visibleMatchMetadata,
     slitherlinkMetadata,
     futoshikiMetadata,

@@ -92,7 +92,7 @@ const Map<String, GameRules> gameRules = {
     ],
     example: '7 \u00d7 8 is 56. The other answers offered might be 48, 63 or 65.',
   ),
-  'odd_one_out': GameRules(
+  'not_like_the_others': GameRules(
     goal: 'Find the one that is not like the others.',
     steps: [
       'Four words are shown.',
