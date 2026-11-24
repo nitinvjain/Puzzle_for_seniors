@@ -45,6 +45,16 @@ const Map<String, GameRules> gameRules = {
     ],
     example: 'If a line reads  [ ] x 2 = 8, the missing number is 4. If that same box is also the start of a downward sum, the 4 must work there too.',
   ),
+  'number_connect': GameRules(
+    goal: 'Join tiles showing the same number to build bigger ones.',
+    steps: [
+      'Put your finger on a tile and drag, without lifting it, onto a touching tile with the SAME number.',
+      'Corners count as touching, so you may move diagonally.',
+      'Keep going for as long as you like, then lift your finger. The tiles join into one.',
+      'Drag back onto the tile before to undo a step.',
+    ],
+    example: 'Join two 4s and you get 8. Join three 4s and that is 12, which rounds up to 16 — so longer chains are worth much more.',
+  ),
   'simple_sudoku': GameRules(
     goal: 'Fill every empty square so each row, column and 3x3 box holds 1 to 9.',
     steps: [
