@@ -1,4 +1,4 @@
-/// General awareness and civics questions for Quiz Ladder.
+/// General awareness and civics questions for KBC India.
 ///
 /// Civics here is structural and factual — how Parliament, the Constitution
 /// and the institutions actually work. Nothing turns on who currently holds

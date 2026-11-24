@@ -56,7 +56,7 @@ const Map<String, GameRules> gameRules = {
     example: 'Join two 4s and you get 8. Join three 4s and that is 12, which rounds up to 16 — so longer chains are worth much more.',
   ),
   'quiz_ladder': GameRules(
-    goal: 'Answer fifteen questions in a row to reach the top prize.',
+    goal: 'Answer fifteen questions in a row to climb the prize ladder to the top.',
     steps: [
       'Each question has four answers. Tap the one you think is right.',
       'Every correct answer moves you one rung up the money ladder.',

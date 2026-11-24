@@ -144,6 +144,13 @@ class SeniorMode {
   /// No daily streaks. A missed day must never be surfaced.
   static const bool disableStreaks = true;
 
+  /// Short confirming sounds when something lands -- a merge, a finished game.
+  ///
+  /// Worth having for him specifically: a change on screen can pass unnoticed,
+  /// and a sound says "that worked" without his having to spot what moved.
+  /// Set to false to go back to a silent game.
+  static const bool soundFeedback = true;
+
   /// Always generate the easiest variant and hide any difficulty selector.
   static const bool lockEasiestDifficulty = true;
 

@@ -1,4 +1,4 @@
-/// Question bank for Quiz Ladder -- the combiner.
+/// Question bank for KBC India -- the combiner.
 ///
 /// The questions themselves live in quiz_bank_*.dart, one file per subject.
 /// This file only joins them together, so `quizQuestions` stays the single

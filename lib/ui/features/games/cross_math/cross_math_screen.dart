@@ -44,7 +44,9 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
 
   void _newPuzzle() {
     setState(() {
-      _puzzle = _engine.generate(blankCount: 4);
+      // Ten tiles to place on a nine-by-nine board, rather than four on a
+      // five-by-five one.
+      _puzzle = _engine.generate(blankCount: 10);
       _placed.clear();
       _tileAt.clear();
       _selectedTile = null;

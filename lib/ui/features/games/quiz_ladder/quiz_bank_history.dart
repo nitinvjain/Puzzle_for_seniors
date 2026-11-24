@@ -1,4 +1,4 @@
-/// History questions for Quiz Ladder, weighted towards India.
+/// History questions for KBC India, weighted towards India.
 ///
 /// Dates, dynasties, the freedom struggle and monuments. Factual throughout;
 /// where a period is contested by historians, the question sticks to what is

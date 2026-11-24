@@ -673,7 +673,9 @@ class _HiddenGameTile extends StatelessWidget {
                 color: game.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(DesignSystem.radiusXS),
               ),
-              child: Icon(game.icon, color: game.color, size: 22),
+              child: game.logoBuilder != null
+                  ? Center(child: game.logoBuilder!(context, 26))
+                  : Icon(game.icon, color: game.color, size: 22),
             ),
             const SizedBox(width: DesignSystem.spaceMD),
             Expanded(

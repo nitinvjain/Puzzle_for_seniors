@@ -8,6 +8,7 @@ import 'package:puzzle/l10n/app_localizations.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
+import '../../../../utils/sound_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
 import '../../../core/juice/game_scaffold.dart';
 import 'number_connect_engine.dart';
@@ -29,6 +30,13 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
 
   int _merges = 0;
   double _cellSize = 56;
+
+  /// Which cell the last merge produced, and which cells were refilled behind
+  /// it. [_mergeSeq] changes on every merge and is used as the animation key,
+  /// so each merge replays the animation instead of the first one sticking.
+  Point<int>? _mergedAt;
+  Set<Point<int>> _freshCells = {};
+  int _mergeSeq = 0;
 
   @override
   void initState() {
@@ -101,13 +109,20 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
       setState(() => _path = []);
       return;
     }
-    final produced = _engine.applyChain(_board, _path);
+    final outcome = _engine.applyChain(_board, _path);
+    final produced = outcome.value;
     setState(() {
       _path = [];
-      if (produced > 0) _merges++;
+      if (produced > 0) {
+        _merges++;
+        _mergeSeq++;
+        _mergedAt = outcome.landing;
+        _freshCells = outcome.spawned.toSet();
+      }
     });
     if (produced > 0) {
       HapticFeedbackUtil.success();
+      SoundFeedbackUtil.merge();
       if (!_engine.hasMove(_board)) {
         // Effectively unreachable, but better than leaving him stuck.
         setState(() => _engine.reshuffle(_board));
@@ -120,6 +135,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
 
   void _onComplete() {
     HapticFeedbackUtil.victory();
+    SoundFeedbackUtil.complete();
     ref.read(gameStreakNotifierProvider.notifier).completeGame('number_connect');
     final l10n = AppLocalizations.of(context)!;
     showDialog(
@@ -138,6 +154,8 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
             _merges = 0;
             _board = _engine.newBoard();
             _path = [];
+            _mergedAt = null;
+            _freshCells = {};
           });
         },
       ),
@@ -203,6 +221,8 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
           onPressed: () => setState(() {
             _board = _engine.newBoard();
             _path = [];
+            _mergedAt = null;
+            _freshCells = {};
           }),
         ),
       ],
@@ -283,7 +303,8 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
 
   Widget _buildTile(int r, int c) {
     final value = _board.cells[r][c];
-    final inPath = _path.contains(Point(r, c));
+    final cell = Point(r, c);
+    final inPath = _path.contains(cell);
     final color = _colorFor(value);
 
     return Positioned(
@@ -291,9 +312,11 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
       top: r * _cellSize,
       width: _cellSize,
       height: _cellSize,
-      child: Padding(
-        padding: EdgeInsets.all(_cellSize * 0.06),
-        child: AnimatedContainer(
+      child: _animateArrival(
+        cell,
+        Padding(
+          padding: EdgeInsets.all(_cellSize * 0.06),
+          child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           decoration: BoxDecoration(
             color: color.withValues(alpha: inPath ? 1.0 : 0.85),
@@ -311,22 +334,65 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
                   ]
                 : null,
           ),
-          child: Center(
-            child: Text(
-              '$value',
-              style: TextStyle(
-                // Long numbers shrink so 1024 still fits inside its tile.
-                fontSize: _cellSize * (value >= 1000 ? 0.26 : 0.36),
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-                shadows: const [
-                  Shadow(color: Color(0x55000000), blurRadius: 2),
-                ],
+            child: Center(
+              child: Text(
+                '$value',
+                style: TextStyle(
+                  // Long numbers shrink so 1024 still fits inside its tile.
+                  fontSize: _cellSize * (value >= 1000 ? 0.26 : 0.36),
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  shadows: const [
+                    Shadow(color: Color(0x55000000), blurRadius: 2),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  /// Animates a tile that has just appeared.
+  ///
+  /// Two different arrivals, because they mean different things and should not
+  /// look the same: the merged tile is the result of what he just did, so it
+  /// swells into place and is the thing the eye is drawn to; the tiles
+  /// refilling the board behind it are not his doing, so they only fade down
+  /// from above, quietly.
+  ///
+  /// Keyed on [_mergeSeq] so every merge replays rather than only the first
+  /// one animating.
+  Widget _animateArrival(Point<int> cell, Widget tile) {
+    if (cell == _mergedAt) {
+      return TweenAnimationBuilder<double>(
+        key: ValueKey('merged-$_mergeSeq'),
+        tween: Tween(begin: 0.4, end: 1.0),
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutBack,
+        builder: (_, t, child) => Transform.scale(scale: t, child: child),
+        child: tile,
+      );
+    }
+
+    if (_freshCells.contains(cell)) {
+      return TweenAnimationBuilder<double>(
+        key: ValueKey('fresh-$_mergeSeq'),
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOut,
+        builder: (_, t, child) => Opacity(
+          opacity: t,
+          child: Transform.translate(
+            offset: Offset(0, -_cellSize * 0.35 * (1 - t)),
+            child: child,
+          ),
+        ),
+        child: tile,
+      );
+    }
+
+    return tile;
   }
 }

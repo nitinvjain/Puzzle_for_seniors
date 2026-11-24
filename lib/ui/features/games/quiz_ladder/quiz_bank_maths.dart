@@ -1,4 +1,4 @@
-/// Maths questions for Quiz Ladder.
+/// Maths questions for KBC India.
 ///
 /// Generated rather than hand-written: every answer is computed, so no sum in
 /// this file can be wrong. The wrong options are deliberate near-misses --

@@ -91,11 +91,16 @@ class GameTile extends ConsumerWidget {
               bottom: isMobile ? -40 : -30,
               child: Transform.rotate(
                 angle: isMobile ? 0 : -0.2, // Tilted left for big screens
-                child: Icon(
-                  game.icon,
-                  size: isMobile ? 180 : 240,
-                  color: game.color.withValues(alpha: 0.06),
-                ),
+                child: game.logoBuilder != null
+                    ? Opacity(
+                        opacity: 0.06,
+                        child: game.logoBuilder!(context, isMobile ? 180 : 240),
+                      )
+                    : Icon(
+                        game.icon,
+                        size: isMobile ? 180 : 240,
+                        color: game.color.withValues(alpha: 0.06),
+                      ),
               ),
             ),
             // Content

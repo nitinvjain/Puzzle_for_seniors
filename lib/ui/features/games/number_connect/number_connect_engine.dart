@@ -25,6 +25,30 @@ class NumberConnectBoard {
   });
 }
 
+/// What a merge did, so the screen can animate it.
+class MergeOutcome {
+  /// The value produced, or 0 when the chain was too short to merge.
+  final int value;
+
+  /// Where the merged tile comes to rest once everything has fallen. This is
+  /// not the tile the finger was lifted on: the chain emptied cells, and any
+  /// of those below the merge mean it falls further.
+  final Point<int> landing;
+
+  /// The cells that received fresh tiles dropping in at the top.
+  final List<Point<int>> spawned;
+
+  const MergeOutcome({
+    required this.value,
+    required this.landing,
+    required this.spawned,
+  });
+
+  /// Nothing happened: the chain was too short to merge.
+  static const MergeOutcome none =
+      MergeOutcome(value: 0, landing: Point(0, 0), spawned: []);
+}
+
 class NumberConnectEngine {
   final Random _random;
   final int rows;
@@ -95,23 +119,37 @@ class NumberConnectEngine {
 
   /// Applies a chain: the merged tile lands on the LAST tile dragged to, the
   /// rest empty out, everything above falls, and fresh tiles drop in at the
-  /// top. Returns the value produced, or 0 if the chain was too short.
-  int applyChain(NumberConnectBoard board, List<Point<int>> path) {
+  /// top.
+  MergeOutcome applyChain(NumberConnectBoard board, List<Point<int>> path) {
     final value = mergedValue(board, path);
-    if (value == 0) return 0;
+    if (value == 0) return MergeOutcome.none;
 
     for (final p in path) {
       board.cells[p.x][p.y] = 0;
     }
-    final landing = path.last;
-    board.cells[landing.x][landing.y] = value;
+    final dropped = path.last;
+    board.cells[dropped.x][dropped.y] = value;
 
-    _collapse(board);
-    return value;
+    // Work out where the merged tile will finish before gravity runs, so the
+    // screen can animate the right cell. The column packs downwards, so it
+    // ends up directly above however many filled cells are still below it.
+    var filledBelow = 0;
+    for (var r = dropped.x + 1; r < board.rows; r++) {
+      if (board.cells[r][dropped.y] != 0) filledBelow++;
+    }
+    final landing = Point(board.rows - 1 - filledBelow, dropped.y);
+
+    return MergeOutcome(
+      value: value,
+      landing: landing,
+      spawned: _collapse(board),
+    );
   }
 
-  /// Gravity, then refill from the top.
-  void _collapse(NumberConnectBoard board) {
+  /// Gravity, then refill from the top. Returns the cells that got fresh
+  /// tiles, so they can be animated in rather than blinking into place.
+  List<Point<int>> _collapse(NumberConnectBoard board) {
+    final spawned = <Point<int>>[];
     for (var c = 0; c < board.cols; c++) {
       final column = <int>[];
       for (var r = board.rows - 1; r >= 0; r--) {
@@ -119,10 +157,15 @@ class NumberConnectEngine {
       }
       for (var r = board.rows - 1; r >= 0; r--) {
         final index = board.rows - 1 - r;
-        board.cells[r][c] =
-            index < column.length ? column[index] : _spawn();
+        if (index < column.length) {
+          board.cells[r][c] = column[index];
+        } else {
+          board.cells[r][c] = _spawn();
+          spawned.add(Point(r, c));
+        }
       }
     }
+    return spawned;
   }
 
   /// True when at least one pair of touching tiles share a value.

@@ -309,7 +309,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     ];
 
     return GameScaffold(
-      title: 'QUIZ LADDER',
+      title: 'KBC INDIA',
       subtitle: 'Fifteen questions, climbing for the top prize',
       actions: [
         IconButton(

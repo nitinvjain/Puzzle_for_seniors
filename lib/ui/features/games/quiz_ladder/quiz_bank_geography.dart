@@ -1,4 +1,4 @@
-/// Geography questions for Quiz Ladder, weighted towards India.
+/// Geography questions for KBC India, weighted towards India.
 ///
 /// Physical and settled political geography only. No "which state has the
 /// most districts" or similar, because those change.

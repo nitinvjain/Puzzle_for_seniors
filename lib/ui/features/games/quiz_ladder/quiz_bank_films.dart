@@ -1,4 +1,4 @@
-/// Hindi cinema and film music questions for Quiz Ladder.
+/// Hindi cinema and film music questions for KBC India.
 ///
 /// Classic and settled: films, people and songs whose place is long
 /// established. Nothing about a recent release or a current box-office

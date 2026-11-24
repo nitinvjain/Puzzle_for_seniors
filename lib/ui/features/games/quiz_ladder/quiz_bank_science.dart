@@ -1,4 +1,4 @@
-/// Science questions for Quiz Ladder.
+/// Science questions for KBC India.
 ///
 /// Settled textbook science plus India's space and research institutions.
 /// Nothing that turns on a current mission status or a recent discovery.

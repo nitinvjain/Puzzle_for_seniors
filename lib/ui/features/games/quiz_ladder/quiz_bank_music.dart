@@ -1,4 +1,4 @@
-/// Hindi film music questions for Quiz Ladder.
+/// Hindi film music questions for KBC India.
 ///
 /// Weighted deliberately towards the 1950s to the 1980s: a player in his
 /// eighties grew up with this music, and a question he can answer from

@@ -1,4 +1,4 @@
-/// Sport questions for Quiz Ladder.
+/// Sport questions for KBC India.
 ///
 /// Rules this file follows:
 ///  * settled facts only -- nothing that turns on a current season, a squad

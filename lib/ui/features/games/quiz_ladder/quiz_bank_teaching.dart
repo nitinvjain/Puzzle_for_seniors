@@ -1,4 +1,4 @@
-/// Teaching, schools and the history of Indian mathematics, for Quiz Ladder.
+/// Teaching, schools and the history of Indian mathematics, for KBC India.
 ///
 /// Included at the player's own request: he taught maths to classes 10 to 12
 /// for a working lifetime, so this is the topic he is most likely to be sure
