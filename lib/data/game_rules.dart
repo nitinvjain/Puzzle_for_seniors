@@ -34,6 +34,27 @@ class GameRules {
 /// Keyed by `GameMetadata.id`. A game with no entry falls back to the stock
 /// subtitle, so this map can be filled in a category at a time.
 const Map<String, GameRules> gameRules = {
+  // --------------------------------------------------------------- board
+  'cross_math': GameRules(
+    goal: 'Fill the empty boxes so that every equation is true.',
+    steps: [
+      'Each line of boxes is one sum, read left to right or top to bottom.',
+      'Where two sums cross, the number in that box belongs to both of them.',
+      'Tap a number from the row underneath, then tap a grey box to place it.',
+      'Tap a number you have placed to take it back.',
+    ],
+    example: 'If a line reads  [ ] x 2 = 8, the missing number is 4. If that same box is also the start of a downward sum, the 4 must work there too.',
+  ),
+  'simple_sudoku': GameRules(
+    goal: 'Fill every empty square so each row, column and 3x3 box holds 1 to 9.',
+    steps: [
+      'No number may appear twice in the same row, column or box.',
+      'Tap an empty square, then tap a number from the pad below.',
+      'Look for a row, column or box with only one square missing — that one is easy.',
+    ],
+    example: 'If a row already shows 1 2 3 4 5 6 7 8 and one square is empty, that square must be 9.',
+  ),
+
   // ---------------------------------------------------------------- arithmetic
   'quick_math': GameRules(
     goal: 'Answer each arithmetic question correctly.',

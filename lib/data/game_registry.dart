@@ -1,5 +1,7 @@
 import 'game_metadata.dart';
 import '../config/senior_mode.dart';
+import '../ui/features/games/cross_math/cross_math_metadata.dart';
+import '../ui/features/games/simple_sudoku/simple_sudoku_metadata.dart';
 
 import '../ui/features/games/shikaku/shikaku_metadata.dart';
 import '../ui/features/games/countdown_math/countdown_math_metadata.dart';
@@ -345,6 +347,9 @@ List<GameMetadata> _applySeniorFilter(List<GameMetadata> all) {
 
 List<GameMetadata> _buildGameList() {
   return [
+    // Board games added by this fork (see lib/config/senior_mode.dart).
+    crossMathMetadata,
+    simpleSudokuMetadata,
     slitherlinkMetadata,
     futoshikiMetadata,
     kakuroMetadata,

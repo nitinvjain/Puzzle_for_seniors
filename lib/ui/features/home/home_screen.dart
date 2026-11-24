@@ -491,6 +491,10 @@ class _HomeFilterSection extends ConsumerWidget {
                       'SPATIAL',
                       solvedStatsMap['SPATIAL'] ?? 0,
                       totalStatsMap['SPATIAL'] ?? 1),
+                  // Literal label: adding an l10n key would mean regenerating
+                  // app_localizations.dart, and this category is fork-only.
+                  _buildCategoryBtn('Board', 'BOARD',
+                      solvedStatsMap['BOARD'] ?? 0, totalStatsMap['BOARD'] ?? 1),
                 ],
               ),
             ),
