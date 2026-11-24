@@ -167,8 +167,32 @@ class SeniorMode {
 
   // --- Presentation --------------------------------------------------------
 
-  /// Multiplier applied to the DesignSystem type scale.
-  static const double fontScale = 1.35;
+  /// Floor under the text scale for the WHOLE app, applied in main.dart.
+  ///
+  /// This is the one that does the heavy lifting: it reaches every piece of
+  /// text in every screen, including the thousand-odd styles that name a font
+  /// size outright and so never see [fontScale]. It is a floor, not a fixed
+  /// value, so a larger system font setting still wins.
+  static const double uiTextScale = 1.25;
+
+  /// Ceiling on the same scale.
+  ///
+  /// The screens were laid out against unscaled text. Past roughly 1.6 the
+  /// tighter ones begin to overflow, and a clipped board helps nobody, so a
+  /// very large system font setting is capped here rather than allowed to
+  /// break the layouts.
+  static const double uiTextScaleCeiling = 1.6;
+
+  /// Extra multiplier applied to the DesignSystem type scale, on top of
+  /// [uiTextScale].
+  ///
+  /// The two stack: DesignSystem text renders at roughly
+  /// `fontScale * uiTextScale`. This used to be 1.35 on its own, so it is set
+  /// to the figure that keeps that total unchanged (1.08 x 1.25 = 1.35) now
+  /// that the global scale carries most of the work. Without this the screens
+  /// already tuned by hand -- the quiz, Word Search, the board games -- would
+  /// jump by a further quarter and overflow.
+  static const double fontScale = 1.08;
 
   /// Minimum side of any interactive element, in logical pixels.
   /// Material's default is 48; older hands and tremor need more.

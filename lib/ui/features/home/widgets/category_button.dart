@@ -102,7 +102,9 @@ class CategoryButton extends StatelessWidget {
           Text(
             label.toUpperCase(),
             style: theme.textTheme.labelMedium?.copyWith(
-              fontSize: 10,
+              // These are the home screen's main navigation; 10 was far too
+              // small for the one control he has to hit to find anything.
+              fontSize: 13,
               fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
               color: isSelected
                   ? categoryStyle.color

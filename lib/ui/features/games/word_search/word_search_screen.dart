@@ -175,7 +175,15 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
           // nothing worth having.
           LayoutBuilder(builder: (context, inner) {
             final int rows = (words.length + _columns - 1) ~/ _columns;
-            final double fontSize = _chipFontSize(words, inner.maxWidth);
+            final double fontSize = _chipFontSize(
+              words,
+              inner.maxWidth,
+              // The app imposes a text scale floor, so a style asking for 20
+              // is painted larger than 20. The width budget below is in real
+              // pixels, so it has to know the factor or every chip overflows
+              // and the FittedBox shrinks them unevenly again.
+              MediaQuery.textScalerOf(context).scale(100.0) / 100.0,
+            );
             return Column(
               children: [
                 for (int row = 0; row < rows; row++)
@@ -231,7 +239,11 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
   /// narrow ones like EIFFEL sit near 0.55. Erring high means the text is
   /// occasionally a shade smaller than it had to be, never clipped, and the
   /// FittedBox below still catches anything this estimate misses.
-  static double _chipFontSize(List<WordSearchWord> words, double panelWidth) {
+  static double _chipFontSize(
+    List<WordSearchWord> words,
+    double panelWidth,
+    double textScale,
+  ) {
     if (words.isEmpty) return DesignSystem.fontSizeLG;
     final double chipWidth =
         (panelWidth - DesignSystem.spaceXS * (_columns - 1)) / _columns;
@@ -241,7 +253,14 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
       if (w.word.length > longest) longest = w.word.length;
     }
     if (longest == 0) return DesignSystem.fontSizeLG;
-    return (textBudget / (longest * 0.78)).clamp(14.0, DesignSystem.fontSizeLG);
+    final double scale = textScale <= 0 ? 1.0 : textScale;
+    // Solve for the size that, once the app's text scale has been applied to
+    // it, still fits the chip.
+    // The floor is in pre-scale units, so 12 is painted at about 15. With
+    // words of four to eight letters it never binds; it only guards against a
+    // freakishly narrow screen, where the FittedBox trims the overflow.
+    return (textBudget / (longest * 0.78 * scale))
+        .clamp(12.0, DesignSystem.fontSizeLG);
   }
 
   Widget _wordChip(WordSearchWord word, int index, double fontSize) {

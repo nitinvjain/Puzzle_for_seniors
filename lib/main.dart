@@ -106,6 +106,25 @@ class MyApp extends ConsumerWidget {
       theme: DesignSystem.lightTheme,
       darkTheme: DesignSystem.darkTheme,
       themeMode: themeMode,
+      // Enlarge the type across the whole app.
+      //
+      // DesignSystem.fontSize* is scaled for the senior build, but only about
+      // sixty of the app's thousand-odd text styles go through it -- the rest
+      // name a size outright, and a few hundred of those are under 14. Raising
+      // them one at a time across three hundred screens is not realistic, and
+      // every screen added later would start small again. Clamping the text
+      // scale here lifts all of them at once, including any screen written
+      // after this.
+      //
+      // A floor rather than a fixed scale, so a larger system font setting on
+      // his tablet still wins. The ceiling is there because these screens were
+      // laid out against unscaled text: past about 1.6 the tighter ones start
+      // to overflow, and a clipped board is worse than slightly smaller type.
+      builder: (context, child) => MediaQuery.withClampedTextScaling(
+        minScaleFactor: SeniorMode.enabled ? SeniorMode.uiTextScale : 1.0,
+        maxScaleFactor: SeniorMode.enabled ? SeniorMode.uiTextScaleCeiling : double.infinity,
+        child: child ?? const SizedBox.shrink(),
+      ),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

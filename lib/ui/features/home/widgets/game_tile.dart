@@ -148,7 +148,10 @@ class GameTile extends ConsumerWidget {
           child: Text(
             game.category.toUpperCase(),
             style: theme.textTheme.labelSmall?.copyWith(
-              fontSize: 10.0,
+              // The category is the only small text left on a tile once the
+              // streak badges are off, and the tiles are the screen he reads
+              // most. 13 before the app's text scale, so about 16 painted.
+              fontSize: 13.0,
               fontWeight: FontWeight.w900,
               color: game.color,
               letterSpacing: 0.8,
@@ -169,7 +172,7 @@ class GameTile extends ConsumerWidget {
                   l10n.newGameLabel.toUpperCase(),
                   style: const TextStyle(
                     fontFamily: 'Geist',
-                    fontSize: 9.0,
+                    fontSize: 12.0,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                     letterSpacing: 1.0,
@@ -245,9 +248,11 @@ class GameTile extends ConsumerWidget {
         IconButton(
           icon: Icon(
             Icons.info_outline_rounded,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            // Was 0.5, which on this background is under the 3:1 that a
+            // control needs to be made out at all.
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
           ),
-          iconSize: isMobile ? 20 : 28,
+          iconSize: isMobile ? 26 : 32,
           onPressed: () {
             Navigator.push(
               context,
