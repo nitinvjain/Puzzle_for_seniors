@@ -30,6 +30,7 @@
 /// a repeat here is a repeat the player sees.
 library;
 
+import 'quiz_bank_classx.dart';
 import 'quiz_bank_culture.dart';
 import 'quiz_bank_films.dart';
 import 'quiz_bank_general.dart';
@@ -54,6 +55,7 @@ export 'quiz_question.dart';
 /// so the order here does not decide the order of play.
 final List<QuizQuestion> quizQuestions = List<QuizQuestion>.unmodifiable([
   ...mathsQuestions,
+  ...classXMathsQuestions,
   ...scienceQuestions,
   ...generalQuestions,
   ...geographyQuestions,

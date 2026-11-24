@@ -9,21 +9,21 @@ import 'quiz_question.dart';
 
 const List<QuizQuestion> historyQuestions = [
   // --------------------------------------------------------- ancient India
-  QuizQuestion(question: 'Who founded the Maurya Empire?', options: ['Ashoka', 'Bindusara', 'Chandragupta Maurya', 'Samudragupta'], answer: 2, difficulty: 2, topic: 'History'),
+  QuizQuestion(question: 'Who founded the Maurya Empire?', options: ['Samudragupta', 'Ashoka', 'Bindusara', 'Chandragupta Maurya'], answer: 3, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Emperor Ashoka belonged to which dynasty?', options: ['Chola', 'Mughal', 'Gupta', 'Maurya'], answer: 3, difficulty: 1, topic: 'History'),
   QuizQuestion(question: 'After which battle did Ashoka turn to Buddhism?', options: ['Battle of Kalinga', 'Battle of Hydaspes', 'Battle of Talikota', 'Battle of Panipat'], answer: 0, difficulty: 2, topic: 'History'),
-  QuizQuestion(question: 'Who wrote the Arthashastra?', options: ['Panini', 'Banabhatta', 'Kalidasa', 'Chanakya'], answer: 3, difficulty: 2, topic: 'History'),
+  QuizQuestion(question: 'Who wrote the Arthashastra?', options: ['Banabhatta', 'Kalidasa', 'Chanakya', 'Panini'], answer: 2, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'The Gupta period is often called India’s what?', options: ['Age of Discovery', 'Dark Age', 'Golden Age', 'Iron Age'], answer: 2, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Which ancient university was in present-day Bihar?', options: ['Nalanda', 'Vallabhi', 'Odantapuri', 'Takshashila'], answer: 0, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'The Indus Valley Civilisation is also known by which name?', options: ['Mauryan Civilisation', 'Dravidian Civilisation', 'Vedic Civilisation', 'Harappan Civilisation'], answer: 3, difficulty: 1, topic: 'History'),
   QuizQuestion(question: 'Mohenjo-daro, a major Indus Valley site, is in present-day which country?', options: ['Iran', 'India', 'Pakistan', 'Afghanistan'], answer: 2, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Which metal was NOT known to the Indus Valley people?', options: ['Iron', 'Gold', 'Copper', 'Bronze'], answer: 0, difficulty: 3, topic: 'History'),
-  QuizQuestion(question: 'Which script was used in Ashoka’s edicts?', options: ['Brahmi', 'Kharosthi only', 'Grantha', 'Devanagari'], answer: 0, difficulty: 3, topic: 'History'),
+  QuizQuestion(question: 'Which script was used in Ashoka’s edicts?', options: ['Kharosthi only', 'Grantha', 'Devanagari', 'Brahmi'], answer: 3, difficulty: 3, topic: 'History'),
 
   // ------------------------------------------------------- medieval India
   QuizQuestion(question: 'Who built the Taj Mahal?', options: ['Aurangzeb', 'Akbar', 'Jahangir', 'Shah Jahan'], answer: 3, difficulty: 1, topic: 'History'),
   QuizQuestion(question: 'In whose memory was the Taj Mahal built?', options: ['Roshanara', 'Nur Jahan', 'Mumtaz Mahal', 'Jodha Bai'], answer: 2, difficulty: 1, topic: 'History'),
-  QuizQuestion(question: 'Who founded the Mughal Empire in India?', options: ['Humayun', 'Shah Jahan', 'Akbar', 'Babur'], answer: 3, difficulty: 2, topic: 'History'),
+  QuizQuestion(question: 'Who founded the Mughal Empire in India?', options: ['Babur', 'Humayun', 'Shah Jahan', 'Akbar'], answer: 0, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'The First Battle of Panipat was fought in which year?', options: ['1426', '1526', '1556', '1761'], answer: 1, difficulty: 3, topic: 'History'),
   QuizQuestion(question: 'Which Mughal emperor built Fatehpur Sikri?', options: ['Aurangzeb', 'Babur', 'Akbar', 'Jahangir'], answer: 2, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Who was the Maratha ruler crowned at Raigad in 1674?', options: ['Shivaji', 'Sambhaji', 'Baji Rao I', 'Shahu'], answer: 0, difficulty: 1, topic: 'History'),
@@ -33,7 +33,7 @@ const List<QuizQuestion> historyQuestions = [
   QuizQuestion(question: 'The Vijayanagara Empire had its capital at which site?', options: ['Badami', 'Warangal', 'Bijapur', 'Hampi'], answer: 3, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Who was known as the Tiger of Mysore?', options: ['Chikka Devaraja', 'Hyder Ali', 'Tipu Sultan', 'Krishnaraja Wodeyar'], answer: 2, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Which Sikh Guru founded the Khalsa in 1699?', options: ['Guru Gobind Singh', 'Guru Tegh Bahadur', 'Guru Nanak', 'Guru Arjan'], answer: 0, difficulty: 2, topic: 'History'),
-  QuizQuestion(question: 'Who founded Sikhism?', options: ['Guru Nanak', 'Guru Angad', 'Guru Gobind Singh', 'Guru Ram Das'], answer: 0, difficulty: 1, topic: 'History'),
+  QuizQuestion(question: 'Who founded Sikhism?', options: ['Guru Angad', 'Guru Gobind Singh', 'Guru Ram Das', 'Guru Nanak'], answer: 3, difficulty: 1, topic: 'History'),
 
   // ---------------------------------------------------- colonial & struggle
   QuizQuestion(question: 'In which year was the Battle of Plassey fought?', options: ['1707', '1757', '1764', '1857'], answer: 1, difficulty: 3, topic: 'History'),
@@ -46,7 +46,7 @@ const List<QuizQuestion> historyQuestions = [
   QuizQuestion(question: 'The partition of Bengal was carried out in which year?', options: ['1905', '1911', '1919', '1947'], answer: 0, difficulty: 3, topic: 'History'),
   QuizQuestion(question: 'Who gave the slogan "Give me blood and I will give you freedom"?', options: ['Bal Gangadhar Tilak', 'Lala Lajpat Rai', 'Bhagat Singh', 'Subhas Chandra Bose'], answer: 3, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Who said "Swaraj is my birthright and I shall have it"?', options: ['Nehru', 'Gandhi', 'Bal Gangadhar Tilak', 'Gokhale'], answer: 2, difficulty: 2, topic: 'History'),
-  QuizQuestion(question: 'Who founded the Indian National Army, the Azad Hind Fauj?', options: ['Rash Behari Bose', 'Chandrashekhar Azad', 'Bhagat Singh', 'Subhas Chandra Bose'], answer: 3, difficulty: 2, topic: 'History'),
+  QuizQuestion(question: 'Who founded the Indian National Army, the Azad Hind Fauj?', options: ['Subhas Chandra Bose', 'Rash Behari Bose', 'Chandrashekhar Azad', 'Bhagat Singh'], answer: 0, difficulty: 2, topic: 'History'),
   QuizQuestion(question: 'Which queen led the defence of Jhansi in 1857?', options: ['Rani Chennamma', 'Rani Durgavati', 'Rani Lakshmibai', 'Begum Hazrat Mahal'], answer: 2, difficulty: 1, topic: 'History'),
   QuizQuestion(question: 'Who was hanged along with Bhagat Singh in 1931?', options: ['Rajguru and Sukhdev', 'Batukeshwar Dutt and Rajguru', 'Ram Prasad Bismil and Roshan Singh', 'Chandrashekhar Azad and Ashfaqulla'], answer: 0, difficulty: 3, topic: 'History'),
   QuizQuestion(question: 'Gandhi’s first major satyagraha in India was at which place?', options: ['Kheda', 'Bardoli', 'Ahmedabad', 'Champaran'], answer: 3, difficulty: 3, topic: 'History'),

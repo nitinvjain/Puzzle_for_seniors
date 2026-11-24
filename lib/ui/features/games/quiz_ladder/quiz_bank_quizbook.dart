@@ -30,7 +30,7 @@ const List<QuizQuestion> quizbookQuestions = [
   // ------------------------------------------------------------- India
   QuizQuestion(question: 'The Lifeline Express, which runs on India’s railways, is what?', options: ['A hospital on a train', 'A travelling bank', 'A mobile school', 'A post office on wheels'], answer: 0, difficulty: 2, topic: 'General'),
   QuizQuestion(question: 'Which company supplies the indelible ink used to mark voters in Indian elections?', options: ['Asian Paints', 'Indian Oil', 'Hindustan Inks', 'Mysore Paints and Varnishes'], answer: 3, difficulty: 3, topic: 'General'),
-  QuizQuestion(question: 'What is the southernmost point of Indian territory, on Great Nicobar, called?', options: ['Indira Point', 'Point Calimere', 'Dhanushkodi', 'Kanyakumari'], answer: 0, difficulty: 3, topic: 'Geography'),
+  QuizQuestion(question: 'What is the southernmost point of Indian territory, on Great Nicobar, called?', options: ['Dhanushkodi', 'Kanyakumari', 'Indira Point', 'Point Calimere'], answer: 2, difficulty: 3, topic: 'Geography'),
   QuizQuestion(question: 'On Indian banknotes, what does the AP in “AP Series” stand for?', options: ['Andhra Pradesh', 'Approved Print', 'Ancient Pattern', 'Ashokan Pillar'], answer: 3, difficulty: 3, topic: 'General'),
   QuizQuestion(question: 'Tussar, Muga and Endi are varieties of what?', options: ['Cotton', 'Rice', 'Silk', 'Tea'], answer: 2, difficulty: 2, topic: 'General'),
   QuizQuestion(question: 'Dussehri is a well-known variety of which fruit?', options: ['Mango', 'Banana', 'Custard apple', 'Guava'], answer: 0, difficulty: 1, topic: 'General'),

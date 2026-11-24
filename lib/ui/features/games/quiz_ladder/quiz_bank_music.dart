@@ -11,7 +11,7 @@ import 'quiz_question.dart';
 
 const List<QuizQuestion> musicQuestions = [
   // ----------------------------------------------------------- the singers
-  QuizQuestion(question: 'Which award is India’s highest honour for lifetime achievement in cinema?', options: ['National Film Award', 'Padma Shri', 'Filmfare Award', 'Dadasaheb Phalke Award'], answer: 3, difficulty: 2, topic: 'Film music'),
+  QuizQuestion(question: 'Which award is India’s highest honour for lifetime achievement in cinema?', options: ['Padma Shri', 'Filmfare Award', 'Dadasaheb Phalke Award', 'National Film Award'], answer: 2, difficulty: 2, topic: 'Film music'),
   QuizQuestion(
       question: 'Lata Mangeshkar and Asha Bhosle were related in what way?',
       options: ['Not related', 'Cousins', 'Sisters', 'Aunt and niece'],
@@ -21,8 +21,8 @@ const List<QuizQuestion> musicQuestions = [
   QuizQuestion(question: 'The film Aradhana, famous for its songs, starred which actor?', options: ['Rajesh Khanna', 'Shammi Kapoor', 'Jeetendra', 'Dev Anand'], answer: 0, difficulty: 2, topic: 'Film music'),
   QuizQuestion(
       question: 'Which singer was the usual playback voice for Raj Kapoor’s songs?',
-      options: ['Hemant Kumar', 'Mohammed Rafi', 'Mukesh', 'Talat Mahmood'],
-      answer: 2,
+      options: ['Talat Mahmood', 'Hemant Kumar', 'Mohammed Rafi', 'Mukesh'],
+      answer: 3,
       difficulty: 2,
       topic: 'Film music'),
   QuizQuestion(question: '“Ae Mere Watan Ke Logon” was written in memory of the soldiers of which war?', options: ['The 1962 war with China', 'The 1965 war with Pakistan', 'The 1971 war', 'The 1947 Kashmir war'], answer: 0, difficulty: 3, topic: 'Film music'),
