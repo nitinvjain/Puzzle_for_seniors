@@ -3,6 +3,12 @@ import '../config/senior_mode.dart';
 import '../ui/features/games/cross_math/cross_math_metadata.dart';
 import '../ui/features/games/number_connect/number_connect_metadata.dart';
 import '../ui/features/games/quiz_ladder/quiz_ladder_metadata.dart';
+import '../ui/features/games/simple_choice/song_title_metadata.dart';
+import '../ui/features/games/simple_choice/kahavat_metadata.dart';
+import '../ui/features/games/simple_choice/which_came_first_metadata.dart';
+import '../ui/features/games/simple_choice/tables_metadata.dart';
+import '../ui/features/games/simple_choice/odd_one_out_metadata.dart';
+import '../ui/features/games/visible_match/visible_match_metadata.dart';
 import '../ui/features/games/simple_sudoku/simple_sudoku_metadata.dart';
 
 import '../ui/features/games/shikaku/shikaku_metadata.dart';
@@ -354,6 +360,12 @@ List<GameMetadata> _buildGameList() {
     simpleSudokuMetadata,
     numberConnectMetadata,
     quizLadderMetadata,
+    songTitleMetadata,
+    kahavatMetadata,
+    whichCameFirstMetadata,
+    tablesMetadata,
+    oddOneOutMetadata,
+    visibleMatchMetadata,
     slitherlinkMetadata,
     futoshikiMetadata,
     kakuroMetadata,

@@ -55,6 +55,62 @@ const Map<String, GameRules> gameRules = {
     ],
     example: 'Join two 4s and you get 8. Join three 4s and that is 12, which rounds up to 16 — so longer chains are worth much more.',
   ),
+  'song_title': GameRules(
+    goal: 'Finish the name of a song you know.',
+    steps: [
+      'A song title is shown with one word missing.',
+      'The film it comes from is written underneath, to place you in the right years.',
+      'Tap the word you think belongs in the gap.',
+      'If it is wrong, the right one turns green and the game moves on. Nothing is lost.',
+    ],
+    example: '\u201cMere Sapno Ki ______\u201d, from Aradhana. The missing word is Rani.',
+  ),
+  'kahavat': GameRules(
+    goal: 'Finish the old saying.',
+    steps: [
+      'A kahavat is shown with the last word missing.',
+      'Tap the word that finishes it.',
+      'There is no clock and no way to lose.',
+    ],
+    example: '\u201cAb pachhtaye hot kya, jab chidiya chug gayi ______\u201d ends with khet.',
+  ),
+  'which_came_first': GameRules(
+    goal: 'Say which of four things happened earliest.',
+    steps: [
+      'Four films or events are listed.',
+      'Tap the one that came before the others.',
+      'They are always at least five years apart, so it is never a close-run thing.',
+    ],
+    example: 'Sholay, Lagaan, Mughal-e-Azam and the Delhi Metro: Mughal-e-Azam came first, in 1960.',
+  ),
+  'tables_drill': GameRules(
+    goal: 'Answer the multiplication.',
+    steps: [
+      'A sum such as 7 \u00d7 8 is shown.',
+      'Tap the answer.',
+      'The wrong answers are the near misses the tables invite, so a right answer counts.',
+    ],
+    example: '7 \u00d7 8 is 56. The other answers offered might be 48, 63 or 65.',
+  ),
+  'odd_one_out': GameRules(
+    goal: 'Find the one that is not like the others.',
+    steps: [
+      'Four words are shown.',
+      'Three of them are the same kind of thing.',
+      'Tap the fourth.',
+    ],
+    example: 'Mango, Banana, Guava, Bus. The odd one is Bus \u2014 the rest are fruit.',
+  ),
+  'visible_match': GameRules(
+    goal: 'Match each thing on the left to its pair on the right.',
+    steps: [
+      'Tap one on the left. It turns amber.',
+      'Then tap the one on the right that goes with it.',
+      'A correct pair turns green and stays. A wrong one simply lets go \u2014 nothing is lost and you can try again.',
+      'Nothing is ever hidden: both columns stay in view the whole time.',
+    ],
+    example: 'Rajasthan goes with Jaipur, Kerala with Thiruvananthapuram.',
+  ),
   'quiz_ladder': GameRules(
     goal: 'Answer fifteen questions in a row to climb the prize ladder to the top.',
     steps: [
