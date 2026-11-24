@@ -44,6 +44,14 @@ class DesignSystem {
   static const Color accentAmber = Color(0xFFF59E0B);
   static const Color accentTeal = Color(0xFF0D9488);
   static const Color success = Color(0xFF10B981);
+
+  /// A green dark enough to carry white text.
+  ///
+  /// [success] is a bright mint: white on it measures about 2.5:1, which is
+  /// below the 3:1 floor even for large bold type and simply hard to read.
+  /// This one measures about 5.5:1 — better than the indigo used for the
+  /// primary buttons — while still reading unmistakably as green.
+  static const Color successDeep = Color(0xFF047857);
   static const Color error = Color(0xFFEF4444);
   static const Color warning = Color(0xFFF59E0B);
 

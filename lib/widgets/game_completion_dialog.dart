@@ -52,6 +52,45 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     });
   }
 
+  /// The "play this game again" button: green, labelled, with the circular
+  /// arrow kept alongside the words rather than standing in for them.
+  ///
+  /// Green here is [DesignSystem.successDeep] rather than [DesignSystem.success]
+  /// because the label sits on top of it in white, and the brighter mint is
+  /// not dark enough to read against.
+  Widget _playAgainButton(String label) {
+    return TangibleButton(
+      onTap: widget.onPlayAgain,
+      color: DesignSystem.successDeep,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      child: Center(
+        // The label is sized from the type scale, which the senior build
+        // multiplies by 1.35, so it is allowed to shrink rather than overflow
+        // the button on a narrow dialog.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  fontFamily: 'Geist',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: DesignSystem.fontSizeMD,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -229,22 +268,16 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
               if (next != null && !isSameGame)
                 Row(
                   children: [
+                    // Replaying the same game used to be a bare circular
+                    // arrow in the same pale colour as everything else, a
+                    // quarter the width of PLAY NEXT. It is the thing he most
+                    // often wants, so it now says what it does, in green, and
+                    // takes equal space.
                     Expanded(
-                      flex: 1,
-                      child: TangibleButton(
-                        onTap: widget.onPlayAgain,
-                        color: colorScheme.surface,
-                        padding: const EdgeInsets.all(11),
-                        child: Icon(
-                          Icons.refresh_rounded,
-                          color: colorScheme.onSurface.withValues(alpha: 0.7),
-                          size: 22,
-                        ),
-                      ),
+                      child: _playAgainButton(l10n.playAgain),
                     ),
                     const SizedBox(width: DesignSystem.spaceSM),
                     Expanded(
-                      flex: 3,
                       child: TangibleButton(
                         onTap: () {
                           ref.read(gameSessionNotifierProvider.notifier).setSession(
@@ -259,16 +292,19 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                           );
                         },
                         color: DesignSystem.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         child: Center(
-                          child: Text(
-                            l10n.playNext.toUpperCase(),
-                            style: const TextStyle(
-                              fontFamily: 'Geist',
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: DesignSystem.fontSizeMD,
-                              letterSpacing: 0.5,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              l10n.playNext.toUpperCase(),
+                              style: const TextStyle(
+                                fontFamily: 'Geist',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: DesignSystem.fontSizeMD,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ),
@@ -277,23 +313,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                   ],
                 )
               else
-                TangibleButton(
-                  onTap: widget.onPlayAgain,
-                  color: DesignSystem.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                  child: Center(
-                    child: Text(
-                      l10n.playAgain.toUpperCase(),
-                      style: const TextStyle(
-                        fontFamily: 'Geist',
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: DesignSystem.fontSizeMD,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
+                // Nothing different to move on to, so play again gets the
+                // whole width — still green, so the button he is looking for
+                // is the same colour wherever it appears.
+                _playAgainButton(l10n.playAgain),
               const SizedBox(height: DesignSystem.spaceMD),
               Row(
                 children: [
@@ -394,7 +417,13 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                                                               nav.popUntil((route) => route.isFirst);
                                                             }
                                                           },
-                                                          color: DesignSystem.primary,
+                                                          // Green when it means
+                                                          // play again, so that
+                                                          // button is the same
+                                                          // colour everywhere.
+                                                          color: next != null && !isSameGame
+                                                              ? DesignSystem.primary
+                                                              : DesignSystem.successDeep,
                                                           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                                                           child: Center(
                                                             child: Text(
@@ -447,6 +476,10 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
                 ],
               ),
               const SizedBox(height: DesignSystem.spaceMD),
+              // Also hidden in the senior build, for the same reason as the
+              // review and report-issue links above: it opens an external
+              // browser, which he cannot get back from.
+              if (!SeniorMode.enabled)
               InkWell(
                 onTap: () => _launchUrl('https://ko-fi.com/sidhant947'),
                 borderRadius: BorderRadius.circular(DesignSystem.radiusXS),
