@@ -28,7 +28,6 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
   List<Point<int>> _path = [];
 
   int _merges = 0;
-  int _best = 2;
   double _cellSize = 56;
 
   @override
@@ -65,10 +64,36 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
       setState(() => _path.removeLast());
       return;
     }
-    if (_engine.canExtend(_board, _path, cell)) {
-      HapticFeedbackUtil.lightImpact();
-      setState(() => _path.add(cell));
+
+    // Walk towards the finger one tile at a time rather than only trying the
+    // tile it is on now. A quick or unsteady drag moves more than one tile
+    // between updates, and the tile it lands on is then not touching the end
+    // of the chain -- so the chain used to stop dead where the jump happened
+    // and he would have to start the drag again. Stepping through the tiles
+    // in between keeps the chain under the finger.
+    final path = [..._path];
+    while (path.last != cell) {
+      final from = path.last;
+      final step = Point(
+        from.x + (cell.x - from.x).sign,
+        from.y + (cell.y - from.y).sign,
+      );
+      if (!_engine.canExtend(_board, path, step)) break;
+      path.add(step);
     }
+
+    if (path.length != _path.length) {
+      HapticFeedbackUtil.lightImpact();
+      setState(() => _path = path);
+    }
+  }
+
+  /// A cancelled gesture discards the chain instead of playing it. Cancels
+  /// come from outside the game -- another gesture winning, a notification --
+  /// so treating one as a release would make a move he did not finish.
+  void _onPanCancel() {
+    if (_path.isEmpty) return;
+    setState(() => _path = []);
   }
 
   void _onPanEnd() {
@@ -79,10 +104,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
     final produced = _engine.applyChain(_board, _path);
     setState(() {
       _path = [];
-      if (produced > 0) {
-        _merges++;
-        if (produced > _best) _best = produced;
-      }
+      if (produced > 0) _merges++;
     });
     if (produced > 0) {
       HapticFeedbackUtil.success();
@@ -114,8 +136,8 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
           Navigator.of(context).pop();
           setState(() {
             _merges = 0;
-            _best = 2;
             _board = _engine.newBoard();
+            _path = [];
           });
         },
       ),
@@ -143,7 +165,27 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
       v ~/= 2;
       exponent++;
     }
-    return _palette[exponent % _palette.length];
+    final base = _palette[exponent % _palette.length];
+
+    // There are seven colours and play reaches 1024, so the hues come round
+    // again: without this a 256 would be exactly the colour of a 2, and the
+    // colour is the first thing he matches on -- he would keep trying to join
+    // two tiles that only look alike. Each time round the palette the colour
+    // is deepened, so the repeat is still obvious at a glance.
+    final laps = exponent ~/ _palette.length;
+    if (laps == 0) return base;
+    return Color.lerp(base, Colors.black, min(0.45, 0.2 * laps))!;
+  }
+
+  /// The largest number currently on the board.
+  int get _biggestTile {
+    var biggest = 0;
+    for (final row in _board.cells) {
+      for (final value in row) {
+        if (value > biggest) biggest = value;
+      }
+    }
+    return biggest;
   }
 
   @override
@@ -170,7 +212,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
             _cellSize = min(
               (constraints.maxWidth - 24) / _board.cols,
               (constraints.maxHeight - 140) / _board.rows,
-            ).clamp(40.0, 96.0);
+            ).clamp(28.0, 96.0);
             final boardWidth = _cellSize * _board.cols;
             final boardHeight = _cellSize * _board.rows;
 
@@ -201,7 +243,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
                       onPanStart: (d) => _onPanStart(d.localPosition),
                       onPanUpdate: (d) => _onPanUpdate(d.localPosition),
                       onPanEnd: (_) => _onPanEnd(),
-                      onPanCancel: _onPanEnd,
+                      onPanCancel: _onPanCancel,
                       child: SizedBox(
                         width: boardWidth,
                         height: boardHeight,
@@ -222,7 +264,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
                         top: DesignSystem.spaceSM,
                         bottom: DesignSystem.spaceXS),
                     child: Text(
-                      'Joins made: $_merges     Biggest tile: $_best',
+                      'Joins made: $_merges     Biggest tile: $_biggestTile',
                       style: TextStyle(
                         fontSize: DesignSystem.fontSizeSM,
                         fontWeight: FontWeight.w700,

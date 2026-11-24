@@ -102,6 +102,11 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   bool _usedFiftyFifty = false;
   Set<int> _hidden = {};
 
+  /// Bumped every time a game starts. A reveal that is still counting down
+  /// when the game restarts belongs to a game that no longer exists, so it
+  /// checks this before doing anything.
+  int _generation = 0;
+
   @override
   void initState() {
     super.initState();
@@ -119,9 +124,18 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
       _round = round;
       _rung = 0;
       _usedFiftyFifty = false;
+      _generation++;
       _prepareQuestion();
     });
   }
+
+  /// How many rungs this game has.
+  ///
+  /// The ladder is fifteen prizes long and the round is built to match. Taking
+  /// the smaller of the two means that if a bank were ever edited down to
+  /// fewer than five questions at some difficulty, the game would simply be
+  /// shorter instead of running off the end of the list.
+  int get _rungs => min(_round.length, _prizes.length);
 
   void _prepareQuestion() {
     _chosen = null;
@@ -136,7 +150,10 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   int get _guaranteed {
     var won = 0;
     for (final rung in _safeRungs) {
-      if (_rung > rung) won = _prizes[rung];
+      // Take the highest safe rung passed, not the last one looked at: a set
+      // has no promised iteration order, so comparing is what makes this
+      // right rather than luck.
+      if (_rung > rung && _prizes[rung] > won) won = _prizes[rung];
     }
     return won;
   }
@@ -158,13 +175,14 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
       _revealed = true;
     });
 
+    final generation = _generation;
     final correct = index == _question.answer;
     if (correct) {
       HapticFeedbackUtil.success();
       Future.delayed(const Duration(milliseconds: 1100), () {
-        if (!mounted) return;
-        if (_rung == _prizes.length - 1) {
-          _finish(won: _prizes.last, perfect: true);
+        if (!mounted || generation != _generation) return;
+        if (_rung >= _rungs - 1) {
+          _finish(won: _prizes[_rungs - 1], perfect: true);
         } else {
           setState(() {
             _rung++;
@@ -175,7 +193,8 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     } else {
       HapticFeedbackUtil.error();
       Future.delayed(const Duration(milliseconds: 1600), () {
-        if (mounted) _finish(won: _guaranteed, perfect: false);
+        if (!mounted || generation != _generation) return;
+        _finish(won: _guaranteed, perfect: false);
       });
     }
   }
@@ -190,7 +209,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
       builder: (_) => GameCompletionDialog(
         title: perfect ? 'YOU WON THE TOP PRIZE' : 'GOOD GAME',
         message: perfect
-            ? 'All fifteen questions right — ₹${formatIndianNumber(won)}'
+            ? 'All $_rungs questions right — ₹${formatIndianNumber(won)}'
             : (won > 0
                 ? 'You take home ₹${formatIndianNumber(won)}'
                 : 'No prize this time — have another go'),
@@ -215,10 +234,79 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     return scheme.surface;
   }
 
+  /// One answer button.
+  ///
+  /// [index] is the position in the question's own options list, which is what
+  /// decides the text and the right answer. [position] is where the button
+  /// sits on screen, which is what decides its letter: the options are shown
+  /// in a shuffled order, so taking the letter from [index] would label them
+  /// out of sequence -- C above A above D -- and after the 50:50 would leave
+  /// two letters with a gap between them.
+  Widget _buildOption(
+    int index,
+    int position,
+    QuizQuestion q,
+    ColorScheme scheme,
+  ) {
+    final highlighted =
+        _revealed && (index == _question.answer || index == _chosen);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: DesignSystem.spaceSM),
+      child: TangibleButton(
+        color: _optionColor(index, scheme),
+        radius: DesignSystem.radiusMD,
+        // Deliberately always non-null. TangibleButton paints a disabled
+        // button in a faded surface colour and ignores the colour passed to
+        // it, which would throw away the green and the red at the exact
+        // moment they matter. _answer ignores taps once the answer is shown,
+        // so leaving this live costs nothing.
+        onTap: () => _answer(index),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: DesignSystem.spaceSM,
+            horizontal: DesignSystem.spaceXS,
+          ),
+          child: Row(
+            children: [
+              Text(
+                '${String.fromCharCode(65 + position)}.  ',
+                style: TextStyle(
+                  fontSize: DesignSystem.fontSizeMD,
+                  fontWeight: FontWeight.w900,
+                  color: highlighted
+                      ? Colors.white
+                      : scheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  q.options[index],
+                  style: TextStyle(
+                    fontSize: DesignSystem.fontSizeMD,
+                    fontWeight: FontWeight.w700,
+                    color: highlighted ? Colors.white : scheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final q = _question;
+
+    // The options in the order they will be shown, with anything the 50:50
+    // removed already dropped, so the A-D labels can follow the rows.
+    final visible = [
+      for (final index in _optionOrder)
+        if (!_hidden.contains(index)) index,
+    ];
 
     return GameScaffold(
       title: 'QUIZ LADDER',
@@ -243,7 +331,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Question ${_rung + 1} of ${_prizes.length}',
+                      'Question ${_rung + 1} of $_rungs',
                       style: TextStyle(
                         fontSize: DesignSystem.fontSizeSM,
                         fontWeight: FontWeight.w700,
@@ -300,54 +388,10 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
               const SizedBox(height: DesignSystem.spaceLG),
 
               // Options, in a shuffled order so the answer is not always in
-              // the same place.
-              for (final index in _optionOrder)
-                if (!_hidden.contains(index))
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: DesignSystem.spaceSM),
-                    child: TangibleButton(
-                      color: _optionColor(index, scheme),
-                      radius: DesignSystem.radiusMD,
-                      onTap: _revealed ? null : () => _answer(index),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: DesignSystem.spaceSM,
-                          horizontal: DesignSystem.spaceXS,
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              '${String.fromCharCode(65 + index)}.  ',
-                              style: TextStyle(
-                                fontSize: DesignSystem.fontSizeMD,
-                                fontWeight: FontWeight.w900,
-                                color: _revealed &&
-                                        (index == _question.answer ||
-                                            index == _chosen)
-                                    ? Colors.white
-                                    : scheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                q.options[index],
-                                style: TextStyle(
-                                  fontSize: DesignSystem.fontSizeMD,
-                                  fontWeight: FontWeight.w700,
-                                  color: _revealed &&
-                                          (index == _question.answer ||
-                                              index == _chosen)
-                                      ? Colors.white
-                                      : scheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+              // the same place. The letters follow the rows, not the
+              // underlying order, so they always read A, B, C, D downwards.
+              for (var position = 0; position < visible.length; position++)
+                _buildOption(visible[position], position, q, scheme),
 
               const SizedBox(height: DesignSystem.spaceMD),
               // One lifeline, which is plenty: more would be more to remember.
