@@ -285,19 +285,6 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // The grid first, the number pad with what is left.
-            //
-            // The old floor of 44 was above what nine columns can fit on a
-            // phone -- (360 - 32) / 9 is 36 -- so the clamp pushed the row
-            // wider than the screen. The floor is now low enough that the
-            // width always wins, and the board gets a bigger share of the
-            // height than the 0.52 it had, because the pad below it has been
-            // made to take less.
-            final cellSize = min(
-              (constraints.maxWidth - 16) / _puzzle.cols,
-              (constraints.maxHeight * 0.62) / _puzzle.rows,
-            ).clamp(26.0, 96.0);
-
             // Pad tiles sized so five sit in a row, which keeps ten to twelve
             // entries down to two or three rows instead of three or four.
             // They were a flat 72 -- a full senior tap target each -- and at
@@ -312,23 +299,37 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
             return Column(
               children: [
                 const SizedBox(height: DesignSystem.spaceMD),
+                // The board is measured against the room it actually has,
+                // not against a fraction of the whole screen.
+                //
+                // It used to take 0.52 of the total height whatever was
+                // below it, so once the hint, the number pad and the Clear
+                // button had taken their share there was less left than the
+                // board had claimed, and the bottom rows were cut off. Asking
+                // its own box how tall it is means the grid always fits.
                 Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(
-                          _puzzle.rows,
-                          (r) => Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              _puzzle.cols,
-                              (c) => _buildCell(Point(r, c), cellSize, scheme),
+                  child: LayoutBuilder(
+                    builder: (context, board) {
+                      final cellSize = min(
+                        (board.maxWidth - 8) / _puzzle.cols,
+                        (board.maxHeight - 8) / _puzzle.rows,
+                      ).clamp(18.0, 96.0);
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(
+                            _puzzle.rows,
+                            (r) => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(
+                                _puzzle.cols,
+                                (c) => _buildCell(Point(r, c), cellSize, scheme),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
                 Padding(

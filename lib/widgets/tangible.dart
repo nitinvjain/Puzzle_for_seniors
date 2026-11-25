@@ -19,6 +19,12 @@ class TangibleContainer extends StatelessWidget {
   /// Thickness of the outline. The default matches what every existing
   /// caller already got, so raising it is opt-in per widget.
   final double borderWidth;
+
+  /// Overrides the outline colour. Null keeps the derived one, which is a
+  /// very pale grey on a surface-coloured box -- fine for a button sitting
+  /// on its own, too faint when a grid of boxes has to read as separate
+  /// objects.
+  final Color? borderColor;
   final String? semanticsLabel;
 
   const TangibleContainer({
@@ -35,6 +41,7 @@ class TangibleContainer extends StatelessWidget {
     this.onLongPress,
     this.drawBorder = true,
     this.borderWidth = 1.5,
+    this.borderColor,
     this.semanticsLabel,
   });
 
@@ -57,9 +64,10 @@ class TangibleContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         border: drawBorder
             ? Border.all(
-                color: isDefaultBg
-                    ? colorScheme.outline.withValues(alpha: 0.8)
-                    : resolvedColor, // Avoid dirty grey outline on colored boxes
+                color: borderColor ??
+                    (isDefaultBg
+                        ? colorScheme.outline.withValues(alpha: 0.8)
+                        : resolvedColor), // Avoid dirty grey outline on colored boxes
                 width: borderWidth,
               )
             : null,
@@ -103,8 +111,9 @@ class TangibleButton extends StatefulWidget {
   final double radius;
   final bool drawBorder;
 
-  /// Passed straight to the container beneath. Default unchanged.
+  /// Passed straight to the container beneath. Defaults unchanged.
   final double borderWidth;
+  final Color? borderColor;
   final String? semanticsLabel;
 
   const TangibleButton({
@@ -121,6 +130,7 @@ class TangibleButton extends StatefulWidget {
     this.radius = DesignSystem.radiusMD,
     this.drawBorder = true,
     this.borderWidth = 1.5,
+    this.borderColor,
     this.semanticsLabel,
   });
 
@@ -151,6 +161,7 @@ class _TangibleButtonState extends State<TangibleButton> {
             radius: widget.radius,
             drawBorder: widget.drawBorder,
             borderWidth: widget.borderWidth,
+            borderColor: widget.borderColor,
             width: widget.width,
             height: widget.height,
             padding: widget.padding ?? const EdgeInsets.symmetric(

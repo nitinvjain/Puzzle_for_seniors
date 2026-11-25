@@ -250,49 +250,75 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
     );
   }
 
-  /// One type size for every tile on the board.
+  /// Most lines a label may take.
+  static const int _maxLines = 3;
+
+  /// Horizontal breathing room inside a tile.
+  static const double _tileHPadding = 4.0;
+
+  /// Thicker than the app default, so each block reads as its own object.
+  static const double _tileBorder = 3.0;
+
+  /// One type size for every tile on the board -- a size at which every
+  /// label genuinely fits.
   ///
-  /// A bare FittedBox lets each tile shrink on its own, so Jaipur came out
-  /// large and Thiruvananthapuram came out tiny in the same column and
-  /// several blocks ended up too small to read. Sizing them all to the
-  /// longest label on the board keeps them even and legible.
+  /// The previous attempt set one fontSize and left a FittedBox under it,
+  /// which does not give uniform type at all: the FittedBox shrinks each
+  /// tile on its own, so a short label kept the full size and a long one was
+  /// squeezed to a fraction of it. Jaipur large, Thiruvananthapuram tiny,
+  /// in the same column.
   ///
-  /// Labels may take three lines, so what has to fit on one line is the
-  /// longest unbreakable word rather than the whole label: "The Grand Old
-  /// Man of India" is twenty-six characters but its longest word is five.
+  /// So the size is chosen by actually laying the words out: step down from
+  /// the largest size until every label on the board wraps into [_maxLines]
+  /// or fewer, with no word wider than a line. Nothing then needs shrinking
+  /// and the board is genuinely even.
   double _labelFontSize(double tileWidth, double textScale) {
     final labels = <String>[
       for (final p in _pairs) p.left,
       ..._rightColumn,
     ];
-    final needs = <double>[];
-    for (final label in labels) {
-      final words = label.split(' ');
-      double longestWord = 1;
-      for (final w in words) {
-        if (w.length > longestWord) longestWord = w.length.toDouble();
-      }
-      final overThreeLines = (label.length / 3).ceilToDouble();
-      needs.add(longestWord > overThreeLines ? longestWord : overThreeLines);
-    }
-    needs.sort((a, b) => b.compareTo(a));
-    // Size to the second longest, not the longest.
-    //
-    // One unbreakable outlier -- Thiruvananthapuram is eighteen characters
-    // with nowhere to wrap -- would otherwise drag all eight tiles down to
-    // the floor to accommodate it. Sizing to the next one down keeps seven
-    // tiles properly large and lets the FittedBox shrink the one that
-    // genuinely cannot fit.
-    final longest = needs.length > 1 ? needs[1] : needs.first;
-    final budget = tileWidth - (DesignSystem.spaceXS + _tileBorder) * 2;
+    final budget = tileWidth - (_tileHPadding + _tileBorder) * 2;
     final scale = textScale <= 0 ? 1.0 : textScale;
-    // 0.62 em per character is the widest the app's font runs at this weight.
-    return (budget / (longest * 0.62 * scale))
-        .clamp(13.0, DesignSystem.fontSizeLG);
+
+    for (double size = DesignSystem.fontSizeLG; size >= 11.0; size -= 0.5) {
+      // 0.62 em per character is the widest the app's font runs at this
+      // weight; erring high means the fit is conservative, never clipped.
+      final charWidth = size * scale * 0.62;
+      final perLine = (budget / charWidth).floor();
+      if (perLine < 1) continue;
+      var fits = true;
+      for (final label in labels) {
+        if (_linesNeeded(label, perLine) > _maxLines) {
+          fits = false;
+          break;
+        }
+      }
+      if (fits) return size;
+    }
+    return 11.0;
   }
 
-  /// Thicker than the app default, so each block reads as its own object.
-  static const double _tileBorder = 3.0;
+  /// Greedy word wrap, the way the text painter will do it.
+  ///
+  /// Returns a number larger than any cap when a single word is wider than
+  /// the line, since no amount of wrapping will place it.
+  static int _linesNeeded(String label, int perLine) {
+    var lines = 1;
+    var used = 0;
+    for (final word in label.split(' ')) {
+      if (word.isEmpty) continue;
+      if (word.length > perLine) return 1 << 20;
+      if (used == 0) {
+        used = word.length;
+      } else if (used + 1 + word.length <= perLine) {
+        used += 1 + word.length;
+      } else {
+        lines++;
+        used = word.length;
+      }
+    }
+    return lines;
+  }
 
   Widget _tile({
     required String label,
@@ -311,26 +337,29 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
         color: color,
         radius: DesignSystem.radiusMD,
         borderWidth: _tileBorder,
+        // A pale grey outline on a cream tile is barely there. These need to
+        // read as eight separate blocks, so the unmatched ones get a real
+        // edge; a filled tile keeps its own colour as the border.
+        borderColor: done || selected
+            ? null
+            : scheme.onSurface.withValues(alpha: 0.45),
         // Always live, so TangibleButton keeps the colour it is given; a
         // matched tile ignores its own taps instead of being disabled.
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: DesignSystem.spaceMD,
-            horizontal: DesignSystem.spaceXS,
+            horizontal: _tileHPadding,
           ),
           child: Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w800,
-                  color: done || selected ? Colors.white : scheme.onSurface,
-                ),
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: _maxLines,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.w800,
+                color: done || selected ? Colors.white : scheme.onSurface,
               ),
             ),
           ),

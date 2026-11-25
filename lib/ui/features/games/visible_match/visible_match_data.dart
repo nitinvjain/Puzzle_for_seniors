@@ -23,7 +23,12 @@ class MatchSet {
 const List<MatchSet> matchSets = [
   MatchSet('Match each state to its capital', [
     MatchPair('Rajasthan', 'Jaipur'),
-    MatchPair('Kerala', 'Thiruvananthapuram'),
+    // Trivandrum, not Thiruvananthapuram. Eighteen unbreakable characters
+    // will not fit a tile at any size worth reading, and it was dragging the
+    // whole states board down to eleven point. Trivandrum is also the name
+    // he will have used for most of his life -- it was the official one
+    // until 1991 -- so the short form is the familiar one here as well.
+    MatchPair('Kerala', 'Trivandrum'),
     MatchPair('Gujarat', 'Gandhinagar'),
     MatchPair('Assam', 'Dispur'),
     MatchPair('Bihar', 'Patna'),

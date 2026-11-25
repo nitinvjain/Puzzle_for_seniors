@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:puzzle/data/game_metadata.dart';
+import 'package:puzzle/data/game_registry.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
 class L10nGameHelpers {
@@ -619,12 +621,45 @@ class L10nGameHelpers {
   static String getGameTitle(BuildContext context, String gameId) {
     final l10n = AppLocalizations.of(context)!;
     final factory = _titleMap[gameId];
-    return factory != null ? factory(l10n) : gameId;
+    if (factory != null) return factory(l10n);
+
+    // No translation for this one. Every game added to this fork is in that
+    // position, and the old fallback returned the raw id, so the list read
+    // QUIZ_LADDER, SONG_TITLE, WHICH_CAME_FIRST -- identifiers, underscores
+    // and all. The name the game declares for itself is right there in the
+    // registry, so use it: that is where KBC India has been all along.
+    final game = _byId[gameId];
+    if (game != null) return game.titleGetter(context);
+
+    // Not in the registry either (a hidden game, or an id used before the
+    // list is built). Tidy the identifier rather than showing it raw.
+    return _prettify(gameId);
   }
+
+  /// The registry indexed by id, built once.
+  ///
+  /// This is called for every tile on a list of three hundred games, on
+  /// every frame of a scroll. Walking the registry each time would be tens
+  /// of thousands of comparisons a frame; a map built once is none.
+  static Map<String, GameMetadata>? _byIdCache;
+
+  static Map<String, GameMetadata> get _byId =>
+      _byIdCache ??= {for (final g in allGamesMetadata) g.id: g};
+
+  /// 'which_came_first' -> 'Which Came First'.
+  static String _prettify(String id) => id
+      .split(RegExp(r'[_\s]+'))
+      .where((w) => w.isNotEmpty)
+      .map((w) => w[0].toUpperCase() + w.substring(1))
+      .join(' ');
 
   static String getGameSubtitle(BuildContext context, String gameId) {
     final l10n = AppLocalizations.of(context)!;
     final factory = _subtitleMap[gameId];
-    return factory != null ? factory(l10n) : 'CHALLENGE AND TRAIN YOUR COGNITIVE SKILLS.';
+    if (factory != null) return factory(l10n);
+    // As with the title: the game's own line beats the house boilerplate.
+    final game = _byId[gameId];
+    if (game != null) return game.subtitleGetter(context);
+    return 'CHALLENGE AND TRAIN YOUR COGNITIVE SKILLS.';
   }
 }
