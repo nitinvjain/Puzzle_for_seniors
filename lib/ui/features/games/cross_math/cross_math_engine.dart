@@ -1,5 +1,3 @@
-import 'dart:math';
-
 /// Cross Math: a lattice of equations sharing cells, with some of the numbers
 /// lifted out into a tray for the player to put back.
 ///
@@ -31,6 +29,8 @@ import 'dart:math';
 /// finishes it. He should never be stuck in front of a puzzle whose next move
 /// can only be found by guessing.
 library;
+
+import 'dart:math';
 
 // --------------------------------------------------------------------------
 // Model
