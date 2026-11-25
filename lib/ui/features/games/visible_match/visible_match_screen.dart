@@ -186,41 +186,52 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
                 ),
               ),
               const SizedBox(height: DesignSystem.spaceLG),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        for (final pair in _pairs)
-                          _tile(
-                            label: pair.left,
-                            done: _solved.contains(pair.left),
-                            selected: _selectedLeft == pair.left,
-                            onTap: () => _tapLeft(pair.left),
-                            scheme: scheme,
-                          ),
-                      ],
+              LayoutBuilder(builder: (context, box) {
+                // Two columns with a gap between them.
+                final tileWidth =
+                    (box.maxWidth - DesignSystem.spaceMD) / 2;
+                final fontSize = _labelFontSize(
+                  tileWidth,
+                  MediaQuery.textScalerOf(context).scale(100.0) / 100.0,
+                );
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          for (final pair in _pairs)
+                            _tile(
+                              label: pair.left,
+                              done: _solved.contains(pair.left),
+                              selected: _selectedLeft == pair.left,
+                              onTap: () => _tapLeft(pair.left),
+                              scheme: scheme,
+                              fontSize: fontSize,
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: DesignSystem.spaceMD),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        for (final right in _rightColumn)
-                          _tile(
-                            label: right,
-                            done: _pairs.any((p) =>
-                                p.right == right && _solved.contains(p.left)),
-                            selected: false,
-                            onTap: () => _tapRight(right),
-                            scheme: scheme,
-                          ),
-                      ],
+                    const SizedBox(width: DesignSystem.spaceMD),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          for (final right in _rightColumn)
+                            _tile(
+                              label: right,
+                              done: _pairs.any((p) =>
+                                  p.right == right && _solved.contains(p.left)),
+                              selected: false,
+                              onTap: () => _tapRight(right),
+                              scheme: scheme,
+                              fontSize: fontSize,
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
               const SizedBox(height: DesignSystem.spaceMD),
               Text(
                 'Pairs matched: $_matches',
@@ -239,12 +250,57 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
     );
   }
 
+  /// One type size for every tile on the board.
+  ///
+  /// A bare FittedBox lets each tile shrink on its own, so Jaipur came out
+  /// large and Thiruvananthapuram came out tiny in the same column and
+  /// several blocks ended up too small to read. Sizing them all to the
+  /// longest label on the board keeps them even and legible.
+  ///
+  /// Labels may take three lines, so what has to fit on one line is the
+  /// longest unbreakable word rather than the whole label: "The Grand Old
+  /// Man of India" is twenty-six characters but its longest word is five.
+  double _labelFontSize(double tileWidth, double textScale) {
+    final labels = <String>[
+      for (final p in _pairs) p.left,
+      ..._rightColumn,
+    ];
+    final needs = <double>[];
+    for (final label in labels) {
+      final words = label.split(' ');
+      double longestWord = 1;
+      for (final w in words) {
+        if (w.length > longestWord) longestWord = w.length.toDouble();
+      }
+      final overThreeLines = (label.length / 3).ceilToDouble();
+      needs.add(longestWord > overThreeLines ? longestWord : overThreeLines);
+    }
+    needs.sort((a, b) => b.compareTo(a));
+    // Size to the second longest, not the longest.
+    //
+    // One unbreakable outlier -- Thiruvananthapuram is eighteen characters
+    // with nowhere to wrap -- would otherwise drag all eight tiles down to
+    // the floor to accommodate it. Sizing to the next one down keeps seven
+    // tiles properly large and lets the FittedBox shrink the one that
+    // genuinely cannot fit.
+    final longest = needs.length > 1 ? needs[1] : needs.first;
+    final budget = tileWidth - (DesignSystem.spaceXS + _tileBorder) * 2;
+    final scale = textScale <= 0 ? 1.0 : textScale;
+    // 0.62 em per character is the widest the app's font runs at this weight.
+    return (budget / (longest * 0.62 * scale))
+        .clamp(13.0, DesignSystem.fontSizeLG);
+  }
+
+  /// Thicker than the app default, so each block reads as its own object.
+  static const double _tileBorder = 3.0;
+
   Widget _tile({
     required String label,
     required bool done,
     required bool selected,
     required VoidCallback onTap,
     required ColorScheme scheme,
+    required double fontSize,
   }) {
     final color = done
         ? DesignSystem.successDeep
@@ -254,6 +310,7 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
       child: TangibleButton(
         color: color,
         radius: DesignSystem.radiusMD,
+        borderWidth: _tileBorder,
         // Always live, so TangibleButton keeps the colour it is given; a
         // matched tile ignores its own taps instead of being disabled.
         onTap: onTap,
@@ -268,9 +325,10 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
               child: Text(
                 label,
                 textAlign: TextAlign.center,
+                maxLines: 3,
                 style: TextStyle(
-                  fontSize: DesignSystem.fontSizeMD,
-                  fontWeight: FontWeight.w700,
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.w800,
                   color: done || selected ? Colors.white : scheme.onSurface,
                 ),
               ),

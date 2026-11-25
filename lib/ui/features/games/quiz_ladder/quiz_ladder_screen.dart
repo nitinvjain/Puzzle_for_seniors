@@ -62,13 +62,43 @@ class _QuestionPool {
       quizQuestions.where((q) => q.difficulty == difficulty).toList()
         ..shuffle(_rng);
 
-  static List<QuizQuestion> take(int difficulty, int count) {
+  /// Most questions of one topic allowed in a block of five.
+  ///
+  /// Maths is between a third and two fifths of the bank at every difficulty,
+  /// so a blind shuffle regularly dealt three, four or five maths questions
+  /// in a row and the round felt like an arithmetic test with a few other
+  /// things in it. The cap is what stops the clustering; it barely changes
+  /// how much maths comes up overall.
+  static const int _maxPerTopic = 2;
+
+  /// Two questions are "the same shape" if they open with the same few words.
+  ///
+  /// The bank has families of near-identical questions -- several "Working
+  /// strictly from left to right, what is ...", several "Which spice is
+  /// called ... in Hindi?" -- and two of a family in one round is what reads
+  /// as repetitive even when the answers differ. Comparing openings is crude
+  /// but it catches exactly those families.
+  static String _shape(QuizQuestion q) =>
+      q.question.toLowerCase().split(' ').take(5).join(' ');
+
+  /// [avoidShapes] is shared across the three blocks of a round so a family
+  /// of near-identical questions cannot slip in once either side of the seam
+  /// between difficulties. Shapes drawn are added to it.
+  static List<QuizQuestion> take(
+    int difficulty,
+    int count, {
+    Set<String>? avoidShapes,
+  }) {
     final queue = _queues.putIfAbsent(difficulty, () => _shuffledPool(difficulty));
 
-    if (queue.length < count) {
+    if (queue.length < count * 4) {
       // Refill, keeping whatever is left at the front and leaving those out of
       // the new shuffle, so the queue holds each question exactly once and a
       // single round can never draw the same question twice.
+      //
+      // Refilled early -- at four times the draw rather than at the draw --
+      // because passing over a question now leaves it in the queue, so the
+      // tail needs enough in it to choose from.
       final leftover = List<QuizQuestion>.of(queue);
       final refill = _shuffledPool(difficulty)
         ..removeWhere((q) => leftover.contains(q));
@@ -78,9 +108,51 @@ class _QuestionPool {
         ..addAll(refill);
     }
 
-    final drawn = queue.take(count).toList();
-    queue.removeRange(0, drawn.length);
+    final drawn = <QuizQuestion>[];
+    final perTopic = <String, int>{};
+    final shapes = avoidShapes ?? <String>{};
+
+    // Walk the queue taking what fits the quotas. Anything passed over stays
+    // where it is and will be taken by a later round, so the bank is still
+    // worked through evenly rather than leaving topics stranded.
+    int i = 0;
+    while (drawn.length < count && i < queue.length) {
+      final q = queue[i];
+      final topicCount = perTopic[q.topic] ?? 0;
+      if (topicCount < _maxPerTopic && shapes.add(_shape(q))) {
+        perTopic[q.topic] = topicCount + 1;
+        drawn.add(q);
+        queue.removeAt(i);
+      } else {
+        i++;
+      }
+    }
+
+    // A bank thin enough that the quotas cannot be met still has to produce a
+    // full round; variety is worth less than a game that works.
+    while (drawn.length < count && queue.isNotEmpty) {
+      drawn.add(queue.removeAt(0));
+    }
     return drawn;
+  }
+
+  /// Reorders a block so that neighbours are of different topics where it can
+  /// manage it, given what came immediately before.
+  ///
+  /// The cap above limits how many of a topic a block holds; this decides the
+  /// order they are asked in, so two maths questions in a block are not asked
+  /// back to back.
+  static List<QuizQuestion> spread(List<QuizQuestion> block, String? previous) {
+    final remaining = List<QuizQuestion>.of(block);
+    final out = <QuizQuestion>[];
+    String? last = previous;
+    while (remaining.isNotEmpty) {
+      final next = remaining.indexWhere((q) => q.topic != last);
+      final pick = remaining.removeAt(next == -1 ? 0 : next);
+      out.add(pick);
+      last = pick.topic;
+    }
+    return out;
   }
 }
 
@@ -117,8 +189,14 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     // Five easy, then five medium, then five hard: the ladder gets harder as
     // the prize money climbs, the way the television show does it.
     final round = <QuizQuestion>[];
+    final shapes = <String>{};
     for (final level in [1, 2, 3]) {
-      round.addAll(_QuestionPool.take(level, 5));
+      // Spread each block against whatever the previous block ended on, so
+      // the seam between easy and medium is not two of the same topic.
+      round.addAll(_QuestionPool.spread(
+        _QuestionPool.take(level, 5, avoidShapes: shapes),
+        round.isEmpty ? null : round.last.topic,
+      ));
     }
     setState(() {
       _round = round;
@@ -207,7 +285,9 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => GameCompletionDialog(
-        title: perfect ? 'YOU WON THE TOP PRIZE' : 'GOOD GAME',
+        // The game's own name, so the heading says where he is rather than
+        // how he did. How he did is the line underneath.
+        title: 'KBC INDIA',
         message: perfect
             ? 'All $_rungs questions right — ₹${formatIndianNumber(won)}'
             : (won > 0

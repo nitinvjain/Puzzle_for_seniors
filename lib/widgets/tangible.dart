@@ -15,6 +15,10 @@ class TangibleContainer extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool drawBorder;
+
+  /// Thickness of the outline. The default matches what every existing
+  /// caller already got, so raising it is opt-in per widget.
+  final double borderWidth;
   final String? semanticsLabel;
 
   const TangibleContainer({
@@ -30,6 +34,7 @@ class TangibleContainer extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     this.drawBorder = true,
+    this.borderWidth = 1.5,
     this.semanticsLabel,
   });
 
@@ -55,7 +60,7 @@ class TangibleContainer extends StatelessWidget {
                 color: isDefaultBg
                     ? colorScheme.outline.withValues(alpha: 0.8)
                     : resolvedColor, // Avoid dirty grey outline on colored boxes
-                width: 1.5,
+                width: borderWidth,
               )
             : null,
       ),
@@ -97,6 +102,9 @@ class TangibleButton extends StatefulWidget {
   final double depth;
   final double radius;
   final bool drawBorder;
+
+  /// Passed straight to the container beneath. Default unchanged.
+  final double borderWidth;
   final String? semanticsLabel;
 
   const TangibleButton({
@@ -112,6 +120,7 @@ class TangibleButton extends StatefulWidget {
     this.depth = 6.0,
     this.radius = DesignSystem.radiusMD,
     this.drawBorder = true,
+    this.borderWidth = 1.5,
     this.semanticsLabel,
   });
 
@@ -141,6 +150,7 @@ class _TangibleButtonState extends State<TangibleButton> {
             color: isEnabled ? resolvedColor : colorScheme.surface.withValues(alpha: 0.5),
             radius: widget.radius,
             drawBorder: widget.drawBorder,
+            borderWidth: widget.borderWidth,
             width: widget.width,
             height: widget.height,
             padding: widget.padding ?? const EdgeInsets.symmetric(
