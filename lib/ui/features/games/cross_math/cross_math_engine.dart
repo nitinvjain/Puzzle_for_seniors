@@ -1,20 +1,84 @@
 import 'dart:math';
 
-/// Cross Math: short equations laid out crossword-style, crossing at shared
-/// number cells, with a pool of tiles to drop into the gaps.
+/// Cross Math: a lattice of equations sharing cells, with some of the numbers
+/// lifted out into a tray for the player to put back.
 ///
-/// Each equation is five cells read left-to-right or top-to-bottom:
-///   number, operator, number, equals, result.
+/// Three things shape the generator.
 ///
-/// Layouts are fixed templates rather than generated, which keeps the board a
-/// predictable size on a tablet and guarantees every crossing is perpendicular
-/// with clear space either side — two equations never run on collinearly,
-/// which would leave it ambiguous where one ends and the next begins.
-/// Every template is a tree (each equation attaches to exactly one earlier
-/// one), so the puzzle can always be solved a step at a time rather than by
-/// trial and error.
+/// **Equations come in three shapes.** A plain one is `n op n = n`; a
+/// factorial is `n ! = n`; a two-sided one is `n op n = n op n`, where the
+/// equals sign has work on both sides of it. They are different lengths --
+/// five, four and seven cells -- so nothing here may assume the old fixed
+/// five.
+///
+/// **The board is built rather than chosen.** It used to pick from three
+/// hand-written templates, which meant three board shapes forever. Now a
+/// tree of equations is grown at run time: each new one crosses exactly one
+/// earlier one, at a cell that holds a number in both. Every board is
+/// different and none of them has been eyeballed by hand, so the growing
+/// code enforces what the hand-written ones were checked for -- in bounds,
+/// crossings only on numbers, no two equations lying flush alongside each
+/// other.
+///
+/// **A board must be solvable by reasoning, not only uniquely solvable.**
+/// Those are not the same thing, and the difference matters here more than
+/// anywhere. A unique board can still reach a point where the only way on is
+/// to try a tile and see; measured over the old generator, half of its boards
+/// were like that. So after the uniqueness check the board is solved a second
+/// way, by forced steps alone -- for each equation, every way of filling its
+/// gaps from the tiles still in the tray; a cell that takes the same value in
+/// all of them is forced -- and the board is thrown away unless that alone
+/// finishes it. He should never be stuck in front of a puzzle whose next move
+/// can only be found by guessing.
+library;
+
+// --------------------------------------------------------------------------
+// Model
+// --------------------------------------------------------------------------
 
 enum CellKind { empty, number, operator, equals }
+
+/// The three shapes an equation can take.
+enum EquationForm {
+  /// `n op n = n`
+  binary,
+
+  /// `n ! = n`
+  factorial,
+
+  /// `n op n = n op n`
+  twoSided,
+}
+
+extension EquationFormInfo on EquationForm {
+  /// How many cells the equation occupies along its line.
+  int get length => switch (this) {
+        EquationForm.binary => 5,
+        EquationForm.factorial => 4,
+        EquationForm.twoSided => 7,
+      };
+
+  /// Indices within the line that hold numbers.
+  List<int> get numberIndices => switch (this) {
+        EquationForm.binary => const [0, 2, 4],
+        EquationForm.factorial => const [0, 3],
+        EquationForm.twoSided => const [0, 2, 4, 6],
+      };
+
+  /// Indices that hold an operator sign.
+  List<int> get operatorIndices => switch (this) {
+        EquationForm.binary => const [1],
+        EquationForm.factorial => const [1],
+        EquationForm.twoSided => const [1, 5],
+      };
+
+  /// Index of the equals sign.
+  int get equalsIndex => switch (this) {
+        EquationForm.binary => 3,
+        EquationForm.factorial => 2,
+        EquationForm.twoSided => 3,
+      };
+}
 
 class Cell {
   final CellKind kind;
@@ -22,7 +86,7 @@ class Cell {
   /// For [CellKind.number]: the correct value.
   final int value;
 
-  /// For [CellKind.operator]: one of + - x /.
+  /// For [CellKind.operator]: one of + - x / % !
   final String op;
 
   /// True when the player must supply this number.
@@ -43,15 +107,22 @@ class Cell {
       );
 }
 
-/// One equation: the five cell positions it occupies, in reading order.
+/// One equation: the cells it occupies, in reading order, and its shape.
 class Equation {
   final List<Point<int>> cells;
-  const Equation(this.cells);
+  final EquationForm form;
 
-  Point<int> get a => cells[0];
-  Point<int> get b => cells[2];
-  Point<int> get result => cells[4];
-  Point<int> get opCell => cells[1];
+  /// The operator signs, in order. One for [EquationForm.binary] and
+  /// [EquationForm.factorial], two for [EquationForm.twoSided].
+  final List<String> ops;
+
+  const Equation(this.cells, this.form, this.ops);
+
+  /// The cells holding numbers, in reading order.
+  List<Point<int>> get numberCells =>
+      [for (final i in form.numberIndices) cells[i]];
+
+  Equation withOps(List<String> newOps) => Equation(cells, form, newOps);
 }
 
 class CrossMathPuzzle {
@@ -79,182 +150,474 @@ class CrossMathPuzzle {
 }
 
 // --------------------------------------------------------------------------
-// Templates
+// Arithmetic
 // --------------------------------------------------------------------------
 
-/// A template describes where equations sit. `true` = horizontal.
-class _Template {
-  final int rows;
-  final int cols;
-  final List<List<int>> specs; // [row, col, horizontal ? 1 : 0]
-  const _Template(this.rows, this.cols, this.specs);
+/// Factorials small enough to sit in a cell: 2 through 6, so 2 through 720.
+const Map<int, int> _factorials = {2: 2, 3: 6, 4: 24, 5: 120, 6: 720};
+
+const List<String> _binaryOps = ['+', '-', 'x', '/', '%'];
+
+/// Returns null where the operation does not produce a whole number above
+/// zero, which keeps every value on the board a positive integer -- no
+/// negatives, no zero, no fractions.
+int? applyOp(int a, String op, int b) {
+  switch (op) {
+    case '+':
+      return a + b;
+    case '-':
+      return a - b >= 1 ? a - b : null;
+    case 'x':
+      return a * b;
+    case '/':
+      if (b == 0 || a % b != 0) return null;
+      final r = a ~/ b;
+      return r >= 1 ? r : null;
+    case '%':
+      if (b < 2) return null;
+      final r = a % b;
+      return r >= 1 ? r : null;
+  }
+  return null;
 }
 
-/// Seven equations on a 9x9 board, which gives fifteen distinct number cells
-/// and so room for ten or more blanks.
-///
-/// Every one of these satisfies the rules in the header comment, and they were
-/// checked rather than eyeballed: all cells in bounds, crossings only where
-/// BOTH equations have a number (never on an operator or an equals sign), no
-/// two equations of the same direction sharing a row or column, and a tree --
-/// each equation attaches to exactly one earlier one by exactly one cell.
-/// The last part matters twice over: it is what lets the board be solved a
-/// step at a time, and [_fillEquation] relies on an equation's parent being
-/// filled before it, so the order within each template is not arbitrary.
-const List<_Template> _templates = [
-  // A five-by-five block in the top-left corner, then a staircase of
-  // equations stepping away to the bottom-right.
-  _Template(9, 9, [
-    [0, 0, 1],
-    [0, 0, 0],
-    [0, 2, 0],
-    [0, 4, 0],
-    [4, 4, 1],
-    [4, 8, 0],
-    [8, 4, 1],
-  ]),
-  // The same shape mirrored, stepping down to the bottom-left.
-  _Template(9, 9, [
-    [0, 4, 1],
-    [0, 8, 0],
-    [0, 6, 0],
-    [0, 4, 0],
-    [4, 0, 1],
-    [4, 0, 0],
-    [8, 0, 1],
-  ]),
-  // A spine down the middle with three arms off it, and a branch off the
-  // right-hand arm.
-  _Template(9, 9, [
-    [0, 4, 0],
-    [0, 0, 1],
-    [2, 4, 1],
-    [4, 0, 1],
-    [2, 8, 0],
-    [6, 4, 1],
-    [4, 0, 0],
-  ]),
-];
-
-/// The board used only if generation somehow fails: small, and solved.
-const _Template _fallbackTemplate = _Template(5, 5, [
-  [0, 0, 1],
-  [0, 2, 0],
-  [4, 0, 1],
-]);
-
-List<Equation> _buildEquations(_Template t) => t.specs.map((s) {
-      final r = s[0], c = s[1], horiz = s[2] == 1;
-      return Equation(List.generate(
-        5,
-        (i) => horiz ? Point(r, c + i) : Point(r + i, c),
-      ));
-    }).toList();
+/// The operand range for a sign. Modulo needs a bigger left operand to say
+/// anything interesting, so it gets one.
+int _maxOperand(String op, bool isLeft) =>
+    (op == '%' && isLeft) ? 40 : 9;
 
 // --------------------------------------------------------------------------
 // Generation
 // --------------------------------------------------------------------------
 
-int? _apply(int a, String op, int b) {
-  switch (op) {
-    case '+':
-      return a + b;
-    case '-':
-      return a - b;
-    case 'x':
-      return a * b;
-    case '/':
-      if (b == 0 || a % b != 0) return null;
-      return a ~/ b;
-  }
-  return null;
-}
-
 class CrossMathEngine {
   final Random _random;
   CrossMathEngine([int? seed]) : _random = Random(seed);
 
-  /// [ops] limits which signs appear; [blankCount] is how many tiles the
-  /// player places.
-  CrossMathPuzzle generate({
-    List<String> ops = const ['+', '-', 'x', '/'],
-    int blankCount = 4,
-  }) {
-    for (var attempt = 0; attempt < 4000; attempt++) {
-      final t = _templates[_random.nextInt(_templates.length)];
-      final equations = _buildEquations(t);
-      final values = <Point<int>, int>{};
-      final opFor = <int, String>{};
+  /// Board size and how many equations to grow onto it.
+  static const int _size = 9;
+  static const int _equationCount = 7;
 
+  /// [blankCount] is how many tiles the player places.
+  CrossMathPuzzle generate({int blankCount = 12}) {
+    for (var attempt = 0; attempt < 120; attempt++) {
+      final equations = _buildTemplate();
+      if (equations == null) continue;
+
+      final values = <Point<int>, int>{};
+      final filled = <Equation>[];
       var ok = true;
-      for (var i = 0; i < equations.length && ok; i++) {
-        ok = _fillEquation(equations[i], values, opFor, i, ops);
+      for (final e in equations) {
+        final done = _fillEquation(e, values);
+        if (done == null) {
+          ok = false;
+          break;
+        }
+        filled.add(done);
       }
       if (!ok) continue;
 
-      // Build the grid.
-      final grid = List.generate(
-        t.rows,
-        (_) => List.filled(t.cols, const Cell(kind: CellKind.empty)),
-      );
-      for (var i = 0; i < equations.length; i++) {
-        final e = equations[i];
-        grid[e.cells[0].x][e.cells[0].y] =
-            Cell(kind: CellKind.number, value: values[e.cells[0]]!);
-        grid[e.cells[1].x][e.cells[1].y] =
-            Cell(kind: CellKind.operator, op: opFor[i]!);
-        grid[e.cells[2].x][e.cells[2].y] =
-            Cell(kind: CellKind.number, value: values[e.cells[2]]!);
-        grid[e.cells[3].x][e.cells[3].y] = const Cell(kind: CellKind.equals);
-        grid[e.cells[4].x][e.cells[4].y] =
-            Cell(kind: CellKind.number, value: values[e.cells[4]]!);
-      }
-
-      // Choose blanks and check the answer is the only one that fits.
       final numberCells = <Point<int>>[];
-      for (final e in equations) {
-        for (final i in [0, 2, 4]) {
-          if (!numberCells.contains(e.cells[i])) numberCells.add(e.cells[i]);
+      for (final e in filled) {
+        for (final c in e.numberCells) {
+          if (!numberCells.contains(c)) numberCells.add(c);
         }
       }
       if (numberCells.length < blankCount + 1) continue;
 
-      for (var tries = 0; tries < 24; tries++) {
+      for (var tries = 0; tries < 30; tries++) {
         final shuffled = [...numberCells]..shuffle(_random);
         final blanks =
-            _orderForPruning(shuffled.take(blankCount).toList(), equations);
+            _orderForPruning(shuffled.take(blankCount).toList(), filled);
         final pool = blanks.map((p) => values[p]!).toList()..sort();
-        if (_countSolutions(grid, equations, blanks, pool, 2) != 1) continue;
 
-        for (final p in blanks) {
-          grid[p.x][p.y] = grid[p.x][p.y].copyWith(isBlank: true);
-        }
-        return CrossMathPuzzle(
-          rows: t.rows,
-          cols: t.cols,
-          grid: grid,
-          equations: equations,
-          pool: pool,
-          blanks: blanks,
-        );
+        if (_countSolutions(filled, values, blanks, pool, 2) != 1) continue;
+        // Unique is not enough: it must also be reasonable.
+        if (!_solvableByReasoning(filled, values, blanks, pool)) continue;
+
+        return _assemble(filled, values, blanks, pool);
       }
     }
-    // Templates are small and the constraints loose, so this is effectively
-    // unreachable; fall back to the simplest possible board rather than throw.
     return _fallback();
   }
 
-  /// Orders the blanks so that each equation is completed as early as possible
-  /// in the uniqueness search.
+  // ------------------------------------------------------------- the board
+
+  /// Grows a tree of equations, each crossing exactly one earlier one.
+  List<Equation>? _buildTemplate() {
+    // cell -> role, so a crossing can be checked to be a number in both.
+    final role = <Point<int>, CellKind>{};
+    final out = <Equation>[];
+
+    List<Point<int>> lineCells(int r, int c, bool horiz, EquationForm f) => [
+          for (var i = 0; i < f.length; i++)
+            horiz ? Point(r, c + i) : Point(r + i, c),
+        ];
+
+    CellKind roleAt(EquationForm f, int i) {
+      if (f.numberIndices.contains(i)) return CellKind.number;
+      if (i == f.equalsIndex) return CellKind.equals;
+      return CellKind.operator;
+    }
+
+    /// Returns the cells if the equation can go here, else null.
+    List<Point<int>>? tryPlace(
+      int r,
+      int c,
+      bool horiz,
+      EquationForm f, {
+      Point<int>? mustCross,
+    }) {
+      final cs = lineCells(r, c, horiz, f);
+      for (final p in cs) {
+        if (p.x < 0 || p.x >= _size || p.y < 0 || p.y >= _size) return null;
+      }
+      var crossings = 0;
+      for (var i = 0; i < cs.length; i++) {
+        final existing = role[cs[i]];
+        if (existing == null) continue;
+        // Only ever cross on a cell that is a number in both equations.
+        if (existing != CellKind.number ||
+            roleAt(f, i) != CellKind.number) {
+          return null;
+        }
+        crossings++;
+      }
+      if (mustCross == null) {
+        if (crossings != 0) return null;
+      } else {
+        if (crossings != 1 || !cs.contains(mustCross)) return null;
+      }
+      // Two equations lying flush alongside each other read as one long line,
+      // so a new cell may not touch a cell of another equation.
+      for (final p in cs) {
+        if (role.containsKey(p)) continue;
+        for (final d in const [Point(1, 0), Point(-1, 0), Point(0, 1), Point(0, -1)]) {
+          final nb = Point(p.x + d.x, p.y + d.y);
+          if (role.containsKey(nb) && !cs.contains(nb)) return null;
+        }
+      }
+      return cs;
+    }
+
+    void commit(List<Point<int>> cs, EquationForm f, bool horiz) {
+      for (var i = 0; i < cs.length; i++) {
+        role.putIfAbsent(cs[i], () => roleAt(f, i));
+      }
+      out.add(Equation(cs, f, const []));
+    }
+
+    // The first equation, placed anywhere it fits.
+    var seeded = false;
+    for (var attempt = 0; attempt < 200 && !seeded; attempt++) {
+      final f = EquationForm.values[_random.nextInt(EquationForm.values.length)];
+      final horiz = _random.nextBool();
+      final r = _random.nextInt(horiz ? _size : _size - f.length + 1);
+      final c = _random.nextInt(horiz ? _size - f.length + 1 : _size);
+      final cs = tryPlace(r, c, horiz, f);
+      if (cs != null) {
+        commit(cs, f, horiz);
+        seeded = true;
+      }
+    }
+    if (!seeded) return null;
+
+    final horizontals = <bool>[
+      out.first.cells.length > 1 &&
+          out.first.cells[0].x == out.first.cells[1].x,
+    ];
+
+    var guard = 0;
+    while (out.length < _equationCount && guard < 4000) {
+      guard++;
+      final parentIndex = _random.nextInt(out.length);
+      final parent = out[parentIndex];
+      final parentNums = parent.numberCells;
+      final cross = parentNums[_random.nextInt(parentNums.length)];
+
+      final f = EquationForm.values[_random.nextInt(EquationForm.values.length)];
+      final horiz = !horizontals[parentIndex];
+      final nums = f.numberIndices;
+      final idx = nums[_random.nextInt(nums.length)];
+
+      final r = horiz ? cross.x : cross.x - idx;
+      final c = horiz ? cross.y - idx : cross.y;
+
+      final cs = tryPlace(r, c, horiz, f, mustCross: cross);
+      if (cs == null) continue;
+      commit(cs, f, horiz);
+      horizontals.add(horiz);
+    }
+    return out.length == _equationCount ? out : null;
+  }
+
+  // ------------------------------------------------------------ the values
+
+  /// Fills one equation, honouring any cell already fixed by a crossing.
   ///
-  /// This is about generation speed, not about the puzzle. [_countSolutions]
-  /// can only reject a guess once all three numbers of some equation are
-  /// known, so reading the blanks top-left to bottom-right -- which is what
-  /// this used to do -- can leave one equation's cells scattered across the
-  /// whole search, and nothing gets rejected until the very end. Filling
-  /// equation by equation instead lets a wrong tile be thrown out at once.
-  /// On a nine-by-nine board with twelve blanks that is the difference
-  /// between roughly 51,000 search steps and roughly 2,200.
+  /// The sign is picked first, from a shuffled list, and only then are values
+  /// searched for it. Pooling every candidate of every sign and choosing at
+  /// random instead would hand the board to whichever sign has the most
+  /// combinations -- modulo, by a wide margin, which took two of every five
+  /// slots before this was changed.
+  Equation? _fillEquation(Equation e, Map<Point<int>, int> values) {
+    final slots = e.numberCells;
+    final known = [for (final s in slots) values[s]];
+
+    final order = [..._binaryOps]..shuffle(_random);
+
+    switch (e.form) {
+      case EquationForm.factorial:
+        final options = <List<int>>[];
+        _factorials.forEach((n, r) {
+          if (known[0] != null && known[0] != n) return;
+          if (known[1] != null && known[1] != r) return;
+          options.add([n, r]);
+        });
+        if (options.isEmpty) return null;
+        final pick = options[_random.nextInt(options.length)];
+        values[slots[0]] = pick[0];
+        values[slots[1]] = pick[1];
+        return e.withOps(const ['!']);
+
+      case EquationForm.binary:
+        for (final op in order) {
+          final found = _searchBinary(op, known[0], known[1], known[2]);
+          if (found == null) continue;
+          for (var i = 0; i < 3; i++) {
+            values[slots[i]] = found[i];
+          }
+          return e.withOps([op]);
+        }
+        return null;
+
+      case EquationForm.twoSided:
+        for (final left in order) {
+          for (final right in order) {
+            final found = _searchTwoSided(
+                left, right, known[0], known[1], known[2], known[3]);
+            if (found == null) continue;
+            for (var i = 0; i < 4; i++) {
+              values[slots[i]] = found[i];
+            }
+            return e.withOps([left, right]);
+          }
+        }
+        return null;
+    }
+  }
+
+  /// A random (a, b, r) with `a op b == r`, respecting whatever is known.
+  List<int>? _searchBinary(String op, int? ka, int? kb, int? kr) {
+    final hits = <List<int>>[];
+    final maxA = _maxOperand(op, true);
+    final loA = op == '%' ? 2 : 1;
+    for (var a = ka ?? loA; a <= (ka ?? maxA); a++) {
+      if (a < loA || a > maxA) break;
+      for (var b = kb ?? 1; b <= (kb ?? 9); b++) {
+        if (b < 1 || b > 9) break;
+        final r = applyOp(a, op, b);
+        if (r == null) continue;
+        if (kr != null && r != kr) continue;
+        hits.add([a, b, r]);
+        if (hits.length >= 400) break;
+      }
+    }
+    if (hits.isEmpty) return null;
+    return hits[_random.nextInt(hits.length)];
+  }
+
+  /// A random (a, b, c, d) with `a left b == c right d`.
+  List<int>? _searchTwoSided(
+      String left, String right, int? ka, int? kb, int? kc, int? kd) {
+    // Left-hand values, indexed by what they come to.
+    final byValue = <int, List<List<int>>>{};
+    final maxA = _maxOperand(left, true);
+    final loA = left == '%' ? 2 : 1;
+    for (var a = ka ?? loA; a <= (ka ?? maxA); a++) {
+      if (a < loA || a > maxA) break;
+      for (var b = kb ?? 1; b <= (kb ?? 9); b++) {
+        if (b < 1 || b > 9) break;
+        final v = applyOp(a, left, b);
+        if (v == null) continue;
+        (byValue[v] ??= []).add([a, b]);
+      }
+    }
+    if (byValue.isEmpty) return null;
+
+    final hits = <List<int>>[];
+    final maxC = _maxOperand(right, true);
+    final loC = right == '%' ? 2 : 1;
+    for (var c = kc ?? loC; c <= (kc ?? maxC); c++) {
+      if (c < loC || c > maxC) break;
+      for (var d = kd ?? 1; d <= (kd ?? 9); d++) {
+        if (d < 1 || d > 9) break;
+        final v = applyOp(c, right, d);
+        if (v == null) continue;
+        final lefts = byValue[v];
+        if (lefts == null) continue;
+        final l = lefts[_random.nextInt(lefts.length)];
+        hits.add([l[0], l[1], c, d]);
+        if (hits.length >= 400) break;
+      }
+    }
+    if (hits.isEmpty) return null;
+    return hits[_random.nextInt(hits.length)];
+  }
+
+  // ------------------------------------------------------------- checking
+
+  /// True when every number of [e] is known and the equation holds.
+  bool _holds(Equation e, int? Function(Point<int>) get) {
+    final v = [for (final c in e.numberCells) get(c)];
+    if (v.any((x) => x == null)) return true; // not yet judgeable
+    switch (e.form) {
+      case EquationForm.binary:
+        return applyOp(v[0]!, e.ops[0], v[1]!) == v[2];
+      case EquationForm.factorial:
+        return _factorials[v[0]!] == v[1];
+      case EquationForm.twoSided:
+        final l = applyOp(v[0]!, e.ops[0], v[1]!);
+        final r = applyOp(v[2]!, e.ops[1], v[3]!);
+        return l != null && r != null && l == r;
+    }
+  }
+
+  /// How many ways the tray fills the blanks, stopping at [cap].
+  int _countSolutions(
+    List<Equation> equations,
+    Map<Point<int>, int> values,
+    List<Point<int>> blanks,
+    List<int> pool,
+    int cap,
+  ) {
+    final blankSet = blanks.toSet();
+    final assign = <Point<int>, int>{};
+    final used = List<bool>.filled(pool.length, false);
+    var found = 0;
+
+    int? get(Point<int> c) =>
+        blankSet.contains(c) ? assign[c] : values[c];
+
+    void rec(int i) {
+      if (found >= cap) return;
+      if (i == blanks.length) {
+        found++;
+        return;
+      }
+      final cell = blanks[i];
+      final tried = <int>{};
+      for (var j = 0; j < pool.length; j++) {
+        if (used[j] || !tried.add(pool[j])) continue;
+        used[j] = true;
+        assign[cell] = pool[j];
+        var good = true;
+        for (final e in equations) {
+          if (!_holds(e, get)) {
+            good = false;
+            break;
+          }
+        }
+        if (good) rec(i + 1);
+        used[j] = false;
+        assign.remove(cell);
+        if (found >= cap) return;
+      }
+    }
+
+    rec(0);
+    return found;
+  }
+
+  /// Can the board be finished by forced steps alone?
+  ///
+  /// For each equation, every way of filling its gaps from the tiles still in
+  /// the tray is enumerated; a cell taking the same value in all of them is
+  /// forced and gets placed. Repeat until nothing more gives. If that empties
+  /// the tray, nothing in the board ever required a guess.
+  bool _solvableByReasoning(
+    List<Equation> equations,
+    Map<Point<int>, int> values,
+    List<Point<int>> blanks,
+    List<int> pool,
+  ) {
+    final unknown = blanks.toSet();
+    final assign = <Point<int>, int>{};
+    final tray = [...pool];
+
+    int? get(Point<int> c) =>
+        unknown.contains(c) ? assign[c] : values[c];
+
+    var progress = true;
+    while (unknown.isNotEmpty && progress) {
+      progress = false;
+      for (final e in equations) {
+        final slots = e.numberCells;
+        final current = [for (final c in slots) get(c)];
+        final missing = <int>[
+          for (var i = 0; i < current.length; i++)
+            if (current[i] == null) i,
+        ];
+        if (missing.isEmpty || missing.length > 3) continue;
+
+        // Every arrangement of tray tiles that satisfies this equation.
+        final solutions = <List<int>>[];
+        void place(int k, List<int> candidate, List<bool> taken) {
+          if (solutions.length > 60) return;
+          if (k == missing.length) {
+            final trial = [...candidate];
+            if (_holdsValues(e, trial)) {
+              solutions.add([for (final i in missing) trial[i]]);
+            }
+            return;
+          }
+          final seen = <int>{};
+          for (var j = 0; j < tray.length; j++) {
+            if (taken[j] || !seen.add(tray[j])) continue;
+            taken[j] = true;
+            candidate[missing[k]] = tray[j];
+            place(k + 1, candidate, taken);
+            taken[j] = false;
+            candidate[missing[k]] = -1;
+          }
+        }
+
+        place(0, [for (final v in current) v ?? -1],
+            List<bool>.filled(tray.length, false));
+        if (solutions.isEmpty) continue;
+
+        for (var pos = 0; pos < missing.length; pos++) {
+          final distinct = {for (final s in solutions) s[pos]};
+          if (distinct.length != 1) continue;
+          final v = distinct.first;
+          final cell = slots[missing[pos]];
+          if (!unknown.contains(cell) || !tray.remove(v)) continue;
+          assign[cell] = v;
+          unknown.remove(cell);
+          progress = true;
+        }
+      }
+    }
+    return unknown.isEmpty;
+  }
+
+  /// [_holds] for a list of values already gathered, with no unknowns.
+  bool _holdsValues(Equation e, List<int> v) {
+    if (v.any((x) => x < 0)) return false;
+    switch (e.form) {
+      case EquationForm.binary:
+        return applyOp(v[0], e.ops[0], v[1]) == v[2];
+      case EquationForm.factorial:
+        return _factorials[v[0]] == v[1];
+      case EquationForm.twoSided:
+        final l = applyOp(v[0], e.ops[0], v[1]);
+        final r = applyOp(v[2], e.ops[1], v[3]);
+        return l != null && r != null && l == r;
+    }
+  }
+
+  /// Orders the blanks so each equation is completed as early as possible in
+  /// the uniqueness search, which is what makes that search quick.
   static List<Point<int>> _orderForPruning(
     List<Point<int>> blanks,
     List<Equation> equations,
@@ -262,134 +625,88 @@ class CrossMathEngine {
     final remaining = {...blanks};
     final ordered = <Point<int>>[];
     for (final e in equations) {
-      for (final i in [0, 2, 4]) {
-        if (remaining.remove(e.cells[i])) ordered.add(e.cells[i]);
+      for (final c in e.numberCells) {
+        if (remaining.remove(c)) ordered.add(c);
       }
     }
-    // Anything not covered above (there should be nothing) keeps a stable
-    // order rather than being dropped.
     final leftover = remaining.toList()
       ..sort((p, q) => p.x != q.x ? p.x - q.x : p.y - q.y);
     return [...ordered, ...leftover];
   }
 
-  /// Fills one equation, honouring any cell already fixed by a crossing.
-  bool _fillEquation(
-    Equation e,
-    Map<Point<int>, int> values,
-    Map<int, String> opFor,
-    int index,
-    List<String> ops,
-  ) {
-    for (var attempt = 0; attempt < 300; attempt++) {
-      final op = ops[_random.nextInt(ops.length)];
-      final knownA = values[e.a];
-      final knownB = values[e.b];
-      final knownR = values[e.result];
+  // ------------------------------------------------------------- assembly
 
-      int? a = knownA, b = knownB, r = knownR;
-
-      if (r != null && (a == null || b == null)) {
-        // The result is fixed by a crossing: search for a pair that gives it.
-        final candidates = <List<int>>[];
-        for (var x = a ?? 1; x <= (a ?? 9); x++) {
-          for (var y = b ?? 1; y <= (b ?? 9); y++) {
-            if (_apply(x, op, y) == r) candidates.add([x, y]);
-          }
-        }
-        if (candidates.isEmpty) continue;
-        final pick = candidates[_random.nextInt(candidates.length)];
-        a = pick[0];
-        b = pick[1];
-      } else {
-        a ??= 1 + _random.nextInt(9);
-        b ??= 1 + _random.nextInt(9);
-        final computed = _apply(a, op, b);
-        if (computed == null || computed < 1 || computed > 99) continue;
-        if (r != null && r != computed) continue;
-        r = computed;
-      }
-
-      if (a! < 1 || a > 99 || b! < 1 || b > 99 || r! < 1 || r > 99) continue;
-      if (_apply(a, op, b) != r) continue;
-
-      values[e.a] = a;
-      values[e.b] = b;
-      values[e.result] = r;
-      opFor[index] = op;
-      return true;
-    }
-    return false;
-  }
-
-  /// Counts the ways [pool] can be placed into [blanks] so every equation
-  /// holds, stopping once [cap] is reached.
-  int _countSolutions(
-    List<List<Cell>> grid,
+  CrossMathPuzzle _assemble(
     List<Equation> equations,
+    Map<Point<int>, int> values,
     List<Point<int>> blanks,
     List<int> pool,
-    int cap,
   ) {
-    final assign = <Point<int>, int>{};
-    final used = List<bool>.filled(pool.length, false);
-    var count = 0;
-
-    int? valueAt(Point<int> p) =>
-        assign[p] ?? (blanks.contains(p) ? null : grid[p.x][p.y].value);
-
-    bool consistent(Point<int> justSet) {
-      for (var i = 0; i < equations.length; i++) {
-        final e = equations[i];
-        if (!e.cells.contains(justSet)) continue;
-        final a = valueAt(e.a), b = valueAt(e.b), r = valueAt(e.result);
-        if (a == null || b == null || r == null) continue;
-        if (_apply(a, grid[e.opCell.x][e.opCell.y].op, b) != r) return false;
-      }
-      return true;
-    }
-
-    void rec(int i) {
-      if (count >= cap) return;
-      if (i == blanks.length) {
-        count++;
-        return;
-      }
-      final tried = <int>{};
-      for (var k = 0; k < pool.length; k++) {
-        if (used[k] || tried.contains(pool[k])) continue;
-        tried.add(pool[k]);
-        assign[blanks[i]] = pool[k];
-        used[k] = true;
-        if (consistent(blanks[i])) rec(i + 1);
-        assign.remove(blanks[i]);
-        used[k] = false;
-        if (count >= cap) return;
+    final grid = List.generate(
+      _size,
+      (_) => List.filled(_size, const Cell(kind: CellKind.empty)),
+    );
+    for (final e in equations) {
+      final f = e.form;
+      var opSeen = 0;
+      for (var i = 0; i < e.cells.length; i++) {
+        final p = e.cells[i];
+        if (f.numberIndices.contains(i)) {
+          grid[p.x][p.y] = Cell(kind: CellKind.number, value: values[p]!);
+        } else if (i == f.equalsIndex) {
+          grid[p.x][p.y] = const Cell(kind: CellKind.equals);
+        } else {
+          grid[p.x][p.y] =
+              Cell(kind: CellKind.operator, op: e.ops[opSeen++]);
+        }
       }
     }
-
-    rec(0);
-    return count;
+    for (final p in blanks) {
+      grid[p.x][p.y] = grid[p.x][p.y].copyWith(isBlank: true);
+    }
+    return CrossMathPuzzle(
+      rows: _size,
+      cols: _size,
+      grid: grid,
+      equations: equations,
+      pool: pool,
+      blanks: blanks,
+    );
   }
 
+  /// Used only if generation somehow fails: small, and certainly solvable.
   CrossMathPuzzle _fallback() {
-    final equations = _buildEquations(_fallbackTemplate);
+    final equations = <Equation>[
+      Equation(const [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3), Point(0, 4)],
+          EquationForm.binary, const ['+']),
+      Equation(const [Point(0, 2), Point(1, 2), Point(2, 2), Point(3, 2), Point(4, 2)],
+          EquationForm.binary, const ['x']),
+    ];
+    final values = <Point<int>, int>{
+      const Point(0, 0): 3,
+      const Point(0, 2): 4,
+      const Point(0, 4): 7,
+      const Point(2, 2): 2,
+      const Point(4, 2): 8,
+    };
+    final blanks = <Point<int>>[const Point(0, 0), const Point(2, 2)];
     final grid = List.generate(
       5,
       (_) => List.filled(5, const Cell(kind: CellKind.empty)),
     );
-    void put(Equation e, int a, String op, int b, int r) {
-      grid[e.cells[0].x][e.cells[0].y] = Cell(kind: CellKind.number, value: a);
-      grid[e.cells[1].x][e.cells[1].y] = Cell(kind: CellKind.operator, op: op);
-      grid[e.cells[2].x][e.cells[2].y] = Cell(kind: CellKind.number, value: b);
-      grid[e.cells[3].x][e.cells[3].y] = const Cell(kind: CellKind.equals);
-      grid[e.cells[4].x][e.cells[4].y] = Cell(kind: CellKind.number, value: r);
+    for (final e in equations) {
+      var opSeen = 0;
+      for (var i = 0; i < e.cells.length; i++) {
+        final p = e.cells[i];
+        if (e.form.numberIndices.contains(i)) {
+          grid[p.x][p.y] = Cell(kind: CellKind.number, value: values[p]!);
+        } else if (i == e.form.equalsIndex) {
+          grid[p.x][p.y] = const Cell(kind: CellKind.equals);
+        } else {
+          grid[p.x][p.y] = Cell(kind: CellKind.operator, op: e.ops[opSeen++]);
+        }
+      }
     }
-
-    put(equations[0], 3, '+', 4, 7);
-    put(equations[1], 4, '+', 2, 6);
-    put(equations[2], 5, '+', 6, 11);
-    final blanks = [equations[0].a, equations[1].b];
     for (final p in blanks) {
       grid[p.x][p.y] = grid[p.x][p.y].copyWith(isBlank: true);
     }
@@ -398,7 +715,7 @@ class CrossMathEngine {
       cols: 5,
       grid: grid,
       equations: equations,
-      pool: [2, 3],
+      pool: [3, 2]..sort(),
       blanks: blanks,
     );
   }

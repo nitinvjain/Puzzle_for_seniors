@@ -44,9 +44,10 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
 
   void _newPuzzle() {
     setState(() {
-      // Ten tiles to place on a nine-by-nine board, rather than four on a
-      // five-by-five one.
-      _puzzle = _engine.generate(blankCount: 10);
+      // Twelve tiles rather than ten. The generator now also insists every
+      // board can be finished by reasoning alone, so more blanks does not
+      // mean more guessing -- it means more to work out.
+      _puzzle = _engine.generate(blankCount: 12);
       _placed.clear();
       _tileAt.clear();
       _selectedTile = null;
@@ -64,31 +65,33 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     return cell.isBlank ? _placed[p] : cell.value;
   }
 
-  int? _evaluate(Equation e) {
-    final a = _valueAt(e.a), b = _valueAt(e.b);
-    if (a == null || b == null) return null;
-    final op = _puzzle.grid[e.opCell.x][e.opCell.y].op;
-    switch (op) {
-      case '+':
-        return a + b;
-      case '-':
-        return a - b;
-      case 'x':
-        return a * b;
-      case '/':
-        if (b == 0 || a % b != 0) return null;
-        return a ~/ b;
+  /// null while the equation is incomplete, otherwise whether it holds.
+  ///
+  /// Works for all three shapes rather than assuming `a op b = r`: the
+  /// numbers are read in reading order and judged by the equation's form,
+  /// which is the only thing that knows how many there are.
+  bool? _equationState(Equation e) {
+    final values = [for (final c in e.numberCells) _valueAt(c)];
+    if (values.any((v) => v == null)) return null;
+    switch (e.form) {
+      case EquationForm.binary:
+        return applyOp(values[0]!, e.ops[0], values[1]!) == values[2];
+      case EquationForm.factorial:
+        return _factorialOf(values[0]!) == values[1];
+      case EquationForm.twoSided:
+        final left = applyOp(values[0]!, e.ops[0], values[1]!);
+        final right = applyOp(values[2]!, e.ops[1], values[3]!);
+        return left != null && right != null && left == right;
     }
-    return null;
   }
 
-  /// null while the equation is incomplete, otherwise whether it holds.
-  bool? _equationState(Equation e) {
-    final r = _valueAt(e.result);
-    if (r == null) return null;
-    final got = _evaluate(e);
-    if (got == null) return null;
-    return got == r;
+  static int? _factorialOf(int n) {
+    if (n < 2 || n > 6) return null;
+    var r = 1;
+    for (var i = 2; i <= n; i++) {
+      r *= i;
+    }
+    return r;
   }
 
   bool get _isSolved =>
@@ -132,8 +135,28 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
   void _place() {
     final tile = _selectedTile, cell = _selectedCell;
     if (tile == null || cell == null) return;
+    _placeTile(tile, cell);
+  }
+
+  /// Puts pool tile [tile] into [cell]. Both ways of playing end up here:
+  /// tapping a number and then a box, and dragging the number onto the box.
+  ///
+  /// Dropping onto a box that already holds a number swaps the old one back
+  /// to the tray rather than refusing, so a tile can be corrected by dragging
+  /// another one on top of it.
+  void _placeTile(int tile, Point<int> cell) {
+    if (!_isBlank(cell)) return;
+    if (_tileAt.containsKey(tile)) return; // already on the board
+    int? occupant;
+    for (final entry in _tileAt.entries) {
+      if (entry.value == cell) {
+        occupant = entry.key;
+        break;
+      }
+    }
     HapticFeedbackUtil.lightImpact();
     setState(() {
+      if (occupant != null) _tileAt.remove(occupant);
       _placed[cell] = _puzzle.pool[tile];
       _tileAt[tile] = cell;
       _selectedTile = null;
@@ -190,6 +213,10 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     '-': '–',
     'x': '×',
     '/': '÷',
+    // 'mod' spelled out would not fit a cell, and the sign is the one he
+    // taught; '!' is its own symbol.
+    '%': 'mod',
+    '!': '!',
   };
 
   /// Tints a filled-in blank by whether every equation through it works out.
@@ -212,14 +239,22 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
         width: size,
         height: size,
         child: Center(
-          child: Text(
-            cell.kind == CellKind.equals
-                ? '='
-                : (_symbols[cell.op] ?? cell.op),
-            style: TextStyle(
-              fontSize: size * 0.46,
-              fontWeight: FontWeight.w700,
-              color: scheme.onSurface.withValues(alpha: 0.75),
+          // 'mod' is three characters in a cell built for one, so the sign
+          // shrinks to fit rather than spilling over its neighbours.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: Text(
+                cell.kind == CellKind.equals
+                    ? '='
+                    : (_symbols[cell.op] ?? cell.op),
+                style: TextStyle(
+                  fontSize: size * (cell.op == '%' ? 0.34 : 0.46),
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurface.withValues(alpha: 0.8),
+                ),
+              ),
             ),
           ),
         ),
@@ -231,7 +266,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     final selected = _selectedCell == p;
     final feedback = isBlank && value != null ? _feedbackColor(p, scheme) : null;
 
-    return Padding(
+    final body = Padding(
       padding: const EdgeInsets.all(2),
       child: GestureDetector(
         onTap: isBlank ? () => _tapCell(p) : null,
@@ -254,17 +289,35 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
             ),
           ),
           child: Center(
-            child: Text(
-              value?.toString() ?? '',
-              style: TextStyle(
-                fontSize: size * (((value ?? 0) >= 100) ? 0.34 : 0.44),
-                fontWeight: FontWeight.w900,
-                color: feedback ?? scheme.onSurface,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value?.toString() ?? '',
+                style: TextStyle(
+                  fontSize: size * (((value ?? 0) >= 100) ? 0.34 : 0.44),
+                  fontWeight: FontWeight.w900,
+                  color: feedback ?? scheme.onSurface,
+                ),
               ),
             ),
           ),
         ),
       ),
+    );
+
+    if (!isBlank) return body;
+
+    // Carrying the number to the box is the point of the drag: it is one
+    // continuous action rather than two taps that have to be held together
+    // in mind. Tapping still works, for when dragging is the harder motion.
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (_) => true,
+      onAcceptWithDetails: (details) => _placeTile(details.data, p),
+      builder: (context, candidate, rejected) {
+        if (candidate.isEmpty) return body;
+        // Something is hovering: show where it would land.
+        return Transform.scale(scale: 1.08, child: body);
+      },
     );
   }
 
@@ -285,16 +338,20 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Pad tiles sized so five sit in a row, which keeps ten to twelve
-            // entries down to two or three rows instead of three or four.
-            // They were a flat 72 -- a full senior tap target each -- and at
-            // twelve entries that was most of the lower half of the screen,
-            // which is what made the pad overshadow the puzzle.
+            // Six tray tiles to a row, and smaller ones: twelve numbers then
+            // take two rows of modest height instead of three tall ones. The
+            // tray is the smaller half of this screen now, which is the way
+            // round it should have been -- the puzzle is the thing being
+            // looked at.
+            // The 4 is slack: six tiles plus five gaps worked out to exactly
+            // the width available, and a rounding error either way would wrap
+            // the row and make the tray three rows deep instead of two.
             final padTile = ((constraints.maxWidth -
                         DesignSystem.spaceMD * 2 -
-                        DesignSystem.spaceSM * 4) /
-                    5)
-                .clamp(48.0, SeniorMode.minTapTarget);
+                        DesignSystem.spaceXS * 5 -
+                        4) /
+                    6)
+                .clamp(40.0, 54.0);
 
             return Column(
               children: [
@@ -311,11 +368,25 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                   child: LayoutBuilder(
                     builder: (context, board) {
                       final cellSize = min(
-                        (board.maxWidth - 8) / _puzzle.cols,
-                        (board.maxHeight - 8) / _puzzle.rows,
+                        (board.maxWidth - 24) / _puzzle.cols,
+                        (board.maxHeight - 24) / _puzzle.rows,
                       ).clamp(18.0, 96.0);
                       return Center(
-                        child: Column(
+                        // The puzzle on its own lit panel, so the board reads
+                        // as the thing being worked on and the tray below as
+                        // the things to work with.
+                        child: Container(
+                          padding: const EdgeInsets.all(DesignSystem.spaceXS),
+                          decoration: BoxDecoration(
+                            color: scheme.onSurface.withValues(alpha: 0.04),
+                            borderRadius:
+                                BorderRadius.circular(DesignSystem.radiusMD),
+                            border: Border.all(
+                              color: scheme.onSurface.withValues(alpha: 0.18),
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: List.generate(
                             _puzzle.rows,
@@ -326,6 +397,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                                 (c) => _buildCell(Point(r, c), cellSize, scheme),
                               ),
                             ),
+                          ),
                           ),
                         ),
                       );
@@ -338,7 +410,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                     vertical: DesignSystem.spaceSM,
                   ),
                   child: Text(
-                    'Tap a number below, then tap a grey box',
+                    'Drag a number onto a grey box, or tap one then the other',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: DesignSystem.fontSizeSM,
@@ -349,12 +421,12 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                 ),
                 Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: DesignSystem.spaceSM,
-                  runSpacing: DesignSystem.spaceSM,
+                  spacing: DesignSystem.spaceXS,
+                  runSpacing: DesignSystem.spaceXS,
                   children: List.generate(_puzzle.pool.length, (i) {
                     final used = _tileAt.containsKey(i);
                     final selected = _selectedTile == i;
-                    return Opacity(
+                    final tile = Opacity(
                       opacity: used ? 0.25 : 1.0,
                       child: TangibleButton(
                         color: selected
@@ -382,26 +454,76 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                         ),
                       ),
                     );
-                  }),
-                ),
-                const SizedBox(height: DesignSystem.spaceMD),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
-                  child: TangibleButton(
-                    color: scheme.surface,
-                    width: double.infinity,
-                    onTap: _clear,
-                    child: const Center(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4),
-                        child: Text(
-                          'CLEAR',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
+                    if (used) return tile;
+                    return Draggable<int>(
+                      data: i,
+                      dragAnchorStrategy: pointerDragAnchorStrategy,
+                      // Carried a little larger than it sits in the tray, and
+                      // offset above the finger, so the number stays visible
+                      // instead of hiding under his hand on the way across.
+                      feedback: Transform.translate(
+                        offset: Offset(-padTile * 0.6, -padTile * 1.1),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Container(
+                            width: padTile * 1.2,
+                            height: padTile * 1.2,
+                            decoration: BoxDecoration(
+                              color: DesignSystem.accentAmber,
+                              borderRadius: BorderRadius.circular(
+                                  DesignSystem.radiusSM),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x33000000),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '${_puzzle.pool[i]}',
+                                  style: TextStyle(
+                                    fontSize: padTile * 0.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
+                      ),
+                      childWhenDragging: Opacity(opacity: 0.3, child: tile),
+                      onDragStarted: () {
+                        HapticFeedbackUtil.selectionClick();
+                        setState(() => _selectedTile = i);
+                      },
+                      child: tile,
+                    );
+                  }),
+                ),
+                const SizedBox(height: DesignSystem.spaceSM),
+                // Clear is a way out, not a thing to aim for, so it no longer
+                // runs the width of the screen: it sits in the middle at the
+                // size of a button rather than a banner.
+                Center(
+                  child: TangibleButton(
+                    color: scheme.surface,
+                    radius: DesignSystem.radiusSM,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: DesignSystem.spaceLG,
+                      vertical: DesignSystem.spaceXS,
+                    ),
+                    onTap: _clear,
+                    child: const Text(
+                      'CLEAR',
+                      style: TextStyle(
+                        fontSize: DesignSystem.fontSizeSM,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
                       ),
                     ),
                   ),
