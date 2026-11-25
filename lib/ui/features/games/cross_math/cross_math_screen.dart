@@ -44,10 +44,9 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
 
   void _newPuzzle() {
     setState(() {
-      // Twelve tiles rather than ten. The generator now also insists every
-      // board can be finished by reasoning alone, so more blanks does not
-      // mean more guessing -- it means more to work out.
-      _puzzle = _engine.generate(blankCount: 12);
+      // Ten tiles to place on a board carrying about twenty-four numbers:
+      // more of the puzzle already filled in, fewer gaps to close.
+      _puzzle = _engine.generate(blankCount: 10);
       _placed.clear();
       _tileAt.clear();
       _selectedTile = null;
@@ -76,22 +75,11 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     switch (e.form) {
       case EquationForm.binary:
         return applyOp(values[0]!, e.ops[0], values[1]!) == values[2];
-      case EquationForm.factorial:
-        return _factorialOf(values[0]!) == values[1];
       case EquationForm.twoSided:
         final left = applyOp(values[0]!, e.ops[0], values[1]!);
         final right = applyOp(values[2]!, e.ops[1], values[3]!);
         return left != null && right != null && left == right;
     }
-  }
-
-  static int? _factorialOf(int n) {
-    if (n < 2 || n > 6) return null;
-    var r = 1;
-    for (var i = 2; i <= n; i++) {
-      r *= i;
-    }
-    return r;
   }
 
   bool get _isSolved =>
@@ -213,10 +201,6 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     '-': '–',
     'x': '×',
     '/': '÷',
-    // 'mod' spelled out would not fit a cell, and the sign is the one he
-    // taught; '!' is its own symbol.
-    '%': 'mod',
-    '!': '!',
   };
 
   /// Tints a filled-in blank by whether every equation through it works out.
@@ -239,8 +223,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
         width: size,
         height: size,
         child: Center(
-          // 'mod' is three characters in a cell built for one, so the sign
-          // shrinks to fit rather than spilling over its neighbours.
+          // Scales down rather than spilling over its neighbours.
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Padding(
@@ -250,7 +233,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                     ? '='
                     : (_symbols[cell.op] ?? cell.op),
                 style: TextStyle(
-                  fontSize: size * (cell.op == '%' ? 0.34 : 0.46),
+                  fontSize: size * 0.46,
                   fontWeight: FontWeight.w700,
                   color: scheme.onSurface.withValues(alpha: 0.8),
                 ),

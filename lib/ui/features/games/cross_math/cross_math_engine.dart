@@ -3,11 +3,14 @@
 ///
 /// Three things shape the generator.
 ///
-/// **Equations come in three shapes.** A plain one is `n op n = n`; a
-/// factorial is `n ! = n`; a two-sided one is `n op n = n op n`, where the
-/// equals sign has work on both sides of it. They are different lengths --
-/// five, four and seven cells -- so nothing here may assume the old fixed
-/// five.
+/// **Equations come in two shapes.** A plain one is `n op n = n`; a two-sided
+/// one is `n op n = n op n`, where the equals sign has work on both sides of
+/// it. Five cells and seven, so nothing here may assume a fixed length.
+///
+/// Factorial and modulo were tried and taken out again: they read as
+/// confusing rather than interesting, and factorial in particular dragged
+/// values up to 720, which forced the cells wider than the board could
+/// afford. Without them nothing on the board exceeds 81.
 ///
 /// **The board is built rather than chosen.** It used to pick from three
 /// hand-written templates, which meant three board shapes forever. Now a
@@ -43,9 +46,6 @@ enum EquationForm {
   /// `n op n = n`
   binary,
 
-  /// `n ! = n`
-  factorial,
-
   /// `n op n = n op n`
   twoSided,
 }
@@ -54,28 +54,24 @@ extension EquationFormInfo on EquationForm {
   /// How many cells the equation occupies along its line.
   int get length => switch (this) {
         EquationForm.binary => 5,
-        EquationForm.factorial => 4,
         EquationForm.twoSided => 7,
       };
 
   /// Indices within the line that hold numbers.
   List<int> get numberIndices => switch (this) {
         EquationForm.binary => const [0, 2, 4],
-        EquationForm.factorial => const [0, 3],
         EquationForm.twoSided => const [0, 2, 4, 6],
       };
 
   /// Indices that hold an operator sign.
   List<int> get operatorIndices => switch (this) {
         EquationForm.binary => const [1],
-        EquationForm.factorial => const [1],
         EquationForm.twoSided => const [1, 5],
       };
 
   /// Index of the equals sign.
   int get equalsIndex => switch (this) {
         EquationForm.binary => 3,
-        EquationForm.factorial => 2,
         EquationForm.twoSided => 3,
       };
 }
@@ -112,8 +108,8 @@ class Equation {
   final List<Point<int>> cells;
   final EquationForm form;
 
-  /// The operator signs, in order. One for [EquationForm.binary] and
-  /// [EquationForm.factorial], two for [EquationForm.twoSided].
+  /// The operator signs, in order. One for [EquationForm.binary], two for
+  /// [EquationForm.twoSided].
   final List<String> ops;
 
   const Equation(this.cells, this.form, this.ops);
@@ -153,10 +149,7 @@ class CrossMathPuzzle {
 // Arithmetic
 // --------------------------------------------------------------------------
 
-/// Factorials small enough to sit in a cell: 2 through 6, so 2 through 720.
-const Map<int, int> _factorials = {2: 2, 3: 6, 4: 24, 5: 120, 6: 720};
-
-const List<String> _binaryOps = ['+', '-', 'x', '/', '%'];
+const List<String> _binaryOps = ['+', '-', 'x', '/'];
 
 /// Returns null where the operation does not produce a whole number above
 /// zero, which keeps every value on the board a positive integer -- no
@@ -173,18 +166,9 @@ int? applyOp(int a, String op, int b) {
       if (b == 0 || a % b != 0) return null;
       final r = a ~/ b;
       return r >= 1 ? r : null;
-    case '%':
-      if (b < 2) return null;
-      final r = a % b;
-      return r >= 1 ? r : null;
   }
   return null;
 }
-
-/// The operand range for a sign. Modulo needs a bigger left operand to say
-/// anything interesting, so it gets one.
-int _maxOperand(String op, bool isLeft) =>
-    (op == '%' && isLeft) ? 40 : 9;
 
 // --------------------------------------------------------------------------
 // Generation
@@ -195,8 +179,14 @@ class CrossMathEngine {
   CrossMathEngine([int? seed]) : _random = Random(seed);
 
   /// Board size and how many equations to grow onto it.
-  static const int _size = 9;
-  static const int _equationCount = 7;
+  ///
+  /// Eleven across with ten equations rather than nine with seven: about
+  /// twenty-four numbers on the board where there used to be seventeen. The
+  /// cells come out smaller for it, which is the trade NJ asked for -- more
+  /// of the puzzle visible, each piece of it a little smaller -- and is only
+  /// affordable because no value now runs past two digits.
+  static const int _size = 11;
+  static const int _equationCount = 10;
 
   /// [blankCount] is how many tiles the player places.
   CrossMathPuzzle generate({int blankCount = 12}) {
@@ -367,19 +357,6 @@ class CrossMathEngine {
     final order = [..._binaryOps]..shuffle(_random);
 
     switch (e.form) {
-      case EquationForm.factorial:
-        final options = <List<int>>[];
-        _factorials.forEach((n, r) {
-          if (known[0] != null && known[0] != n) return;
-          if (known[1] != null && known[1] != r) return;
-          options.add([n, r]);
-        });
-        if (options.isEmpty) return null;
-        final pick = options[_random.nextInt(options.length)];
-        values[slots[0]] = pick[0];
-        values[slots[1]] = pick[1];
-        return e.withOps(const ['!']);
-
       case EquationForm.binary:
         for (final op in order) {
           final found = _searchBinary(op, known[0], known[1], known[2]);
@@ -410,10 +387,8 @@ class CrossMathEngine {
   /// A random (a, b, r) with `a op b == r`, respecting whatever is known.
   List<int>? _searchBinary(String op, int? ka, int? kb, int? kr) {
     final hits = <List<int>>[];
-    final maxA = _maxOperand(op, true);
-    final loA = op == '%' ? 2 : 1;
-    for (var a = ka ?? loA; a <= (ka ?? maxA); a++) {
-      if (a < loA || a > maxA) break;
+    for (var a = ka ?? 1; a <= (ka ?? 9); a++) {
+      if (a < 1 || a > 9) break;
       for (var b = kb ?? 1; b <= (kb ?? 9); b++) {
         if (b < 1 || b > 9) break;
         final r = applyOp(a, op, b);
@@ -432,10 +407,8 @@ class CrossMathEngine {
       String left, String right, int? ka, int? kb, int? kc, int? kd) {
     // Left-hand values, indexed by what they come to.
     final byValue = <int, List<List<int>>>{};
-    final maxA = _maxOperand(left, true);
-    final loA = left == '%' ? 2 : 1;
-    for (var a = ka ?? loA; a <= (ka ?? maxA); a++) {
-      if (a < loA || a > maxA) break;
+    for (var a = ka ?? 1; a <= (ka ?? 9); a++) {
+      if (a < 1 || a > 9) break;
       for (var b = kb ?? 1; b <= (kb ?? 9); b++) {
         if (b < 1 || b > 9) break;
         final v = applyOp(a, left, b);
@@ -446,10 +419,8 @@ class CrossMathEngine {
     if (byValue.isEmpty) return null;
 
     final hits = <List<int>>[];
-    final maxC = _maxOperand(right, true);
-    final loC = right == '%' ? 2 : 1;
-    for (var c = kc ?? loC; c <= (kc ?? maxC); c++) {
-      if (c < loC || c > maxC) break;
+    for (var c = kc ?? 1; c <= (kc ?? 9); c++) {
+      if (c < 1 || c > 9) break;
       for (var d = kd ?? 1; d <= (kd ?? 9); d++) {
         if (d < 1 || d > 9) break;
         final v = applyOp(c, right, d);
@@ -474,8 +445,6 @@ class CrossMathEngine {
     switch (e.form) {
       case EquationForm.binary:
         return applyOp(v[0]!, e.ops[0], v[1]!) == v[2];
-      case EquationForm.factorial:
-        return _factorials[v[0]!] == v[1];
       case EquationForm.twoSided:
         final l = applyOp(v[0]!, e.ops[0], v[1]!);
         final r = applyOp(v[2]!, e.ops[1], v[3]!);
@@ -607,8 +576,6 @@ class CrossMathEngine {
     switch (e.form) {
       case EquationForm.binary:
         return applyOp(v[0], e.ops[0], v[1]) == v[2];
-      case EquationForm.factorial:
-        return _factorials[v[0]] == v[1];
       case EquationForm.twoSided:
         final l = applyOp(v[0], e.ops[0], v[1]);
         final r = applyOp(v[2], e.ops[1], v[3]);
