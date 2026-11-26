@@ -6,44 +6,67 @@ import '../config/senior_mode.dart';
 
 /// Short sounds that confirm something happened, alongside the haptics.
 ///
-/// Built on [SystemSound], which is part of Flutter itself, rather than on an
-/// audio package. That is a deliberate choice: every audio plugin carries
-/// native Android code, and this build sits on a particular Gradle and AGP
-/// combination that took a while to settle. A click is enough to say "that
-/// worked", and it is not worth risking the build for.
+/// This used to call [SystemSound.play], which is part of Flutter and needed
+/// nothing added to the build. It never made a noise on NJ's father's phone,
+/// and the reason is in Android rather than in the code: on Android that call
+/// plays the system *touch* sound, which follows Settings > Sound > Touch
+/// sounds and comes out at the system's own volume. With touch sounds off --
+/// the default on a good many builds -- the app was silent, and no amount of
+/// tuning on this side could have changed that.
 ///
-/// **What this costs.** Two things, and both matter.
+/// So the sounds now come from [GameSound] on the Android side, which
+/// synthesises them and plays them through AudioTrack on the media volume.
+/// That is native code, but it is native code written here: no audio plugin,
+/// nothing added to pubspec.yaml, and nothing for Gradle to resolve.
 ///
-/// The sounds are the platform's own, not chosen ones. There is no chime and
-/// no tune; there is a click.
+/// [SystemSound] stays as the fallback. If the channel is missing -- a desktop
+/// or iOS build, or an Android build from before this change -- the platform
+/// click is still better than nothing, and the app behaves exactly as it did.
 ///
-/// And on Android the click is the system touch sound, so it follows the
-/// device's own setting for that. If the game is silent, that setting is off:
-/// Settings > Sound and vibration > (Advanced) > Touch sounds, on most
-/// builds. Nothing here throws if the platform has no sound to play, so a
-/// device with it switched off simply plays nothing.
+/// Two rules shape which events make a noise, and both still hold.
+///
+/// Nothing that marks a mistake sounds. A wrong move costs nothing in this
+/// build, and a noise for it would say otherwise.
+///
+/// A burst of haptics is one sound. Success is two taps 50ms apart and victory
+/// is three; the hand reads those as one event and the ear should too.
 class SoundFeedbackUtil {
   const SoundFeedbackUtil._();
 
+  static const MethodChannel _channel =
+      MethodChannel('puzzle_for_seniors/sound');
+
   static bool get _on => SeniorMode.enabled ? SeniorMode.soundFeedback : true;
 
-  /// Clicks come from the haptics, which fire in bursts -- a success is two
-  /// taps 50ms apart, a victory three. The hand feels those as one event and
-  /// the ear should too, so clicks closer together than this are dropped.
-  static const int _throttleMs = 90;
+  /// Whether the native channel answered. Null until the first attempt, false
+  /// once it is known to be absent -- after which nothing tries it again.
+  static bool? _hasChannel;
+
+  /// Known once the sound test has run; reported by [describe].
+  static String? _lastReport;
+
+  /// Minimum gap between tap sounds.
+  ///
+  /// Longer than the old 90ms, because a real note is longer than a click. The
+  /// native side holds a tap for 114ms -- 75ms of sound plus a margin -- and
+  /// drops anything that arrives while it is still sounding. So this has to be
+  /// the larger of the two numbers, or a fast hand would lose every other note
+  /// to that drop. 150ms is still about six taps a second, well clear of
+  /// anything he does, and it is the one place these two files have to agree.
+  static const int _throttleMs = 150;
   static int _lastPlayed = 0;
 
-  static void _click() {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (now - _lastPlayed < _throttleMs) return;
-    _lastPlayed = now;
+  static void _fallbackClick() {
     unawaited(SystemSound.play(SystemSoundType.click));
   }
 
   /// Something was tapped, dragged, placed or matched.
   static void tap() {
     if (!_on) return;
-    _click();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (now - _lastPlayed < _throttleMs) return;
+    _lastPlayed = now;
+    unawaited(_play('tap'));
   }
 
   /// Tiles have just joined into a new one.
@@ -52,21 +75,63 @@ class SoundFeedbackUtil {
   /// A tap that did something, but did not complete a move.
   static void tick() => tap();
 
-  /// The game is finished.
+  /// The game is finished: a three-note rise, C-E-G.
   ///
-  /// Three clicks rather than one, spaced far enough apart to be heard as a
-  /// little flourish rather than a stutter. It used to be
-  /// [SystemSoundType.alert], which does nothing at all here: Flutter
-  /// documents that as desktop-only, so the end of a game has been silent on
-  /// his tablet since the sound was added. Clicks are thin, but a thin sound
-  /// that plays beats a better one that does not.
+  /// The throttle is set rather than cleared, since the chime is one sound of
+  /// its own and a tap arriving on top of it would muddy it.
   static void complete() {
     if (!_on) return;
-    // Clear the throttle first: the move that finished the game has usually
-    // just clicked, and the flourish should not lose its opening note to it.
-    _lastPlayed = 0;
-    _click();
-    Timer(const Duration(milliseconds: 140), _click);
-    Timer(const Duration(milliseconds: 280), _click);
+    _lastPlayed = DateTime.now().millisecondsSinceEpoch;
+    unawaited(_play('complete'));
+  }
+
+  static Future<void> _play(String method) async {
+    if (_hasChannel == false) {
+      _clickFallbackFor(method);
+      return;
+    }
+    try {
+      await _channel.invokeMethod<void>(method);
+      _hasChannel = true;
+    } on MissingPluginException {
+      // No native side on this build. Fall back from here on without retrying.
+      _hasChannel = false;
+      _clickFallbackFor(method);
+    } catch (error) {
+      _lastReport = 'the sound channel failed: $error';
+      _clickFallbackFor(method);
+    }
+  }
+
+  static void _clickFallbackFor(String method) {
+    _fallbackClick();
+    if (method == 'complete') {
+      // Three clicks, spaced to read as a little flourish rather than a
+      // stutter. Thin, but a thin sound that plays beats a better one that
+      // does not.
+      Timer(const Duration(milliseconds: 140), _fallbackClick);
+      Timer(const Duration(milliseconds: 280), _fallbackClick);
+    }
+  }
+
+  /// What the device says about its own sound, in plain language.
+  ///
+  /// Used by the sound test on the home screen. The point is to end the
+  /// guessing: if the chime cannot be heard, this says whether the phone is
+  /// muted, which stream the sound went out on, and whether the audio call
+  /// itself failed.
+  static Future<String> describe() async {
+    try {
+      final report = await _channel.invokeMethod<String>('describe');
+      _hasChannel = true;
+      if (report != null && report.isNotEmpty) return report;
+      return 'the sound channel answered but said nothing';
+    } on MissingPluginException {
+      _hasChannel = false;
+      return 'this build has no sound channel, so it is using the system '
+          'click, which follows Settings > Sound > Touch sounds';
+    } catch (error) {
+      return _lastReport ?? 'the sound channel failed: $error';
+    }
   }
 }
