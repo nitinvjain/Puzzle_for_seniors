@@ -196,6 +196,28 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
 
   // --- rendering -----------------------------------------------------------
 
+  // ------------------------------------------------------------- palette
+  //
+  // Taken from the board NJ pointed to. It is deliberately fixed rather than
+  // drawn from the theme: the board is a self-contained object, like a
+  // physical puzzle laid on the table, and white cells with dark numbers are
+  // the most legible arrangement there is for an ageing eye. The senior build
+  // pins the app to the light theme anyway.
+  //
+  // The one place it departs from the reference is the line around a cell.
+  // There the cells are picked out only by being white on a lavender page,
+  // which measures 1.2:1 -- fine for a younger eye reading a phone at
+  // arm's length, not enough to carry a lattice for him. The outline here is
+  // 4:1 against the cell and 3.3:1 against the page.
+  static const Color _boardBg = Color(0xFFEDE9FE);
+  static const Color _cellFill = Color(0xFFFFFFFF);
+  static const Color _cellBlank = Color(0xFFF5F2FF);
+  static const Color _cellLine = Color(0xFF8B72C4);
+  static const Color _boardInk = Color(0xFF1A1A2E);
+  static const Color _operatorInk = Color(0xFF6D28D9);
+  static const Color _trayFill = Color(0xFFC9BCF2);
+  static const Color _trayLine = Color(0xFF8B72C4);
+
   static const Map<String, String> _symbols = {
     '+': '+',
     '-': '–',
@@ -214,31 +236,52 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     return null;
   }
 
+  /// One square of the lattice.
+  ///
+  /// Exactly [size] across with no padding, so neighbouring cells share an
+  /// edge and the equations read as joined-up rows rather than loose boxes.
+  Widget _cell({
+    required double size,
+    required Color fill,
+    required Widget child,
+    Color line = _cellLine,
+    double lineWidth = 1.5,
+  }) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: fill,
+        border: Border.all(color: line, width: lineWidth),
+        borderRadius: BorderRadius.circular(DesignSystem.radiusXS),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 1),
+          child: FittedBox(fit: BoxFit.scaleDown, child: child),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCell(Point<int> p, double size, ColorScheme scheme) {
     final cell = _puzzle.grid[p.x][p.y];
     if (cell.kind == CellKind.empty) return SizedBox(width: size, height: size);
 
-    if (cell.kind == CellKind.operator || cell.kind == CellKind.equals) {
-      return SizedBox(
-        width: size,
-        height: size,
-        child: Center(
-          // Scales down rather than spilling over its neighbours.
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 1),
-              child: Text(
-                cell.kind == CellKind.equals
-                    ? '='
-                    : (_symbols[cell.op] ?? cell.op),
-                style: TextStyle(
-                  fontSize: size * 0.46,
-                  fontWeight: FontWeight.w700,
-                  color: scheme.onSurface.withValues(alpha: 0.8),
-                ),
-              ),
-            ),
+    final isEquals = cell.kind == CellKind.equals;
+    if (cell.kind == CellKind.operator || isEquals) {
+      // The signs sit in cells of their own, so the lattice runs unbroken
+      // from one end of an equation to the other rather than being a row of
+      // boxes with gaps where the arithmetic is.
+      return _cell(
+        size: size,
+        fill: _cellFill,
+        child: Text(
+          isEquals ? '=' : (_symbols[cell.op] ?? cell.op),
+          style: TextStyle(
+            fontSize: size * 0.46,
+            fontWeight: FontWeight.w800,
+            color: isEquals ? _boardInk : _operatorInk,
           ),
         ),
       );
@@ -249,40 +292,23 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     final selected = _selectedCell == p;
     final feedback = isBlank && value != null ? _feedbackColor(p, scheme) : null;
 
-    final body = Padding(
-      padding: const EdgeInsets.all(2),
-      child: GestureDetector(
-        onTap: isBlank ? () => _tapCell(p) : null,
-        child: Container(
-          width: size - 4,
-          height: size - 4,
-          decoration: BoxDecoration(
-            color: selected
-                ? DesignSystem.accentAmber.withValues(alpha: 0.35)
-                : (isBlank && value == null
-                    ? scheme.onSurface.withValues(alpha: 0.06)
-                    : scheme.surface),
-            borderRadius: BorderRadius.circular(DesignSystem.radiusXS),
-            border: Border.all(
-              color: feedback ??
-                  (selected
-                      ? DesignSystem.accentAmber
-                      : scheme.onSurface.withValues(alpha: 0.45)),
-              width: feedback != null || selected ? 3.0 : 2.0,
-            ),
-          ),
-          child: Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                value?.toString() ?? '',
-                style: TextStyle(
-                  fontSize: size * (((value ?? 0) >= 100) ? 0.34 : 0.44),
-                  fontWeight: FontWeight.w900,
-                  color: feedback ?? scheme.onSurface,
-                ),
-              ),
-            ),
+    final Color fill = selected
+        ? DesignSystem.accentAmber.withValues(alpha: 0.45)
+        : (isBlank && value == null ? _cellBlank : _cellFill);
+
+    final body = GestureDetector(
+      onTap: isBlank ? () => _tapCell(p) : null,
+      child: _cell(
+        size: size,
+        fill: fill,
+        line: feedback ?? (selected ? DesignSystem.accentAmber : _cellLine),
+        lineWidth: feedback != null || selected ? 2.5 : 1.5,
+        child: Text(
+          value?.toString() ?? '',
+          style: TextStyle(
+            fontSize: size * (((value ?? 0) >= 100) ? 0.34 : 0.44),
+            fontWeight: FontWeight.w900,
+            color: feedback ?? _boardInk,
           ),
         ),
       ),
@@ -298,8 +324,23 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
       onAcceptWithDetails: (details) => _placeTile(details.data, p),
       builder: (context, candidate, rejected) {
         if (candidate.isEmpty) return body;
-        // Something is hovering: show where it would land.
-        return Transform.scale(scale: 1.08, child: body);
+        // Something is hovering overhead. The cells are flush against each
+        // other now, so this lights the cell rather than growing it, which
+        // would only climb over its neighbours.
+        return _cell(
+          size: size,
+          fill: DesignSystem.accentAmber.withValues(alpha: 0.55),
+          line: DesignSystem.accentAmber,
+          lineWidth: 3.0,
+          child: Text(
+            value?.toString() ?? '',
+            style: TextStyle(
+              fontSize: size * 0.44,
+              fontWeight: FontWeight.w900,
+              color: _boardInk,
+            ),
+          ),
+        );
       },
     );
   }
@@ -359,15 +400,11 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                         // as the thing being worked on and the tray below as
                         // the things to work with.
                         child: Container(
-                          padding: const EdgeInsets.all(DesignSystem.spaceXS),
+                          padding: const EdgeInsets.all(DesignSystem.spaceSM),
                           decoration: BoxDecoration(
-                            color: scheme.onSurface.withValues(alpha: 0.04),
+                            color: _boardBg,
                             borderRadius:
                                 BorderRadius.circular(DesignSystem.radiusMD),
-                            border: Border.all(
-                              color: scheme.onSurface.withValues(alpha: 0.18),
-                              width: 2,
-                            ),
                           ),
                           child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -393,7 +430,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                     vertical: DesignSystem.spaceSM,
                   ),
                   child: Text(
-                    'Drag a number onto a grey box, or tap one then the other',
+                    'Drag a number onto an empty box, or tap one then the other',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: DesignSystem.fontSizeSM,
@@ -414,7 +451,8 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                       child: TangibleButton(
                         color: selected
                             ? DesignSystem.accentAmber
-                            : scheme.surface,
+                            : _trayFill,
+                        shadowColor: _trayLine,
                         radius: DesignSystem.radiusSM,
                         padding: EdgeInsets.zero,
                         onTap: used ? null : () => _tapTile(i),
@@ -426,10 +464,10 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                               fit: BoxFit.scaleDown,
                               child: Text(
                                 '${_puzzle.pool[i]}',
-                                style: TextStyle(
-                                  fontSize: padTile * 0.42,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w900,
-                                  color: scheme.onSurface,
+                                  color: _boardInk,
+                                  fontSize: 22,
                                 ),
                               ),
                             ),
@@ -452,7 +490,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                             width: padTile * 1.2,
                             height: padTile * 1.2,
                             decoration: BoxDecoration(
-                              color: DesignSystem.accentAmber,
+                              color: _trayFill,
                               borderRadius: BorderRadius.circular(
                                   DesignSystem.radiusSM),
                               boxShadow: const [
@@ -471,7 +509,7 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
                                   style: TextStyle(
                                     fontSize: padTile * 0.5,
                                     fontWeight: FontWeight.w900,
-                                    color: Colors.white,
+                                    color: _boardInk,
                                   ),
                                 ),
                               ),
