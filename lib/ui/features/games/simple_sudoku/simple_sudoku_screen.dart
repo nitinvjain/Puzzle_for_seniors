@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
+import '../../../../config/rewards.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
@@ -28,6 +29,17 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
   Point<int>? _selected;
   int _completed = 0;
 
+  /// The 3x3 boxes that have already earned their stage points.
+  ///
+  /// A finished box is the one sub-goal sudoku really has: nine of them, each
+  /// visibly bounded on the board, each small enough to finish in a sitting.
+  /// Waiting for the whole grid would mean one reward for eighty-one cells.
+  ///
+  /// Held as a set rather than a count so that emptying a cell and refilling
+  /// it cannot pay twice, and so that a box dealt already complete can be
+  /// marked paid at the start and never earn anything he did not do.
+  final Set<int> _boxesPaid = {};
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +52,36 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
       _puzzle = p;
       _entries = [for (final row in p.puzzle) [...row]];
       _selected = null;
+      _boxesPaid.clear();
+      // Anything dealt already finished is marked paid before he touches it.
+      for (var box = 0; box < 9; box++) {
+        if (_boxIsDone(box)) _boxesPaid.add(box);
+      }
     });
+  }
+
+  /// Is every cell of this 3x3 box filled in correctly?
+  bool _boxIsDone(int box) {
+    final first = (box ~/ 3) * 3;
+    final second = (box % 3) * 3;
+    for (var a = first; a < first + 3; a++) {
+      for (var b = second; b < second + 3; b++) {
+        if (_entries[a][b] != _puzzle.solution[a][b]) return false;
+      }
+    }
+    return true;
+  }
+
+  /// Pay for any box finished since the last entry.
+  void _payFinishedBoxes() {
+    for (var box = 0; box < 9; box++) {
+      if (_boxesPaid.contains(box)) continue;
+      if (!_boxIsDone(box)) continue;
+      _boxesPaid.add(box);
+      ref
+          .read(gameStreakNotifierProvider.notifier)
+          .awardStage('simple_sudoku', xpAmount: Rewards.pointsPerStage);
+    }
   }
 
   bool get _isSolved {
@@ -63,6 +104,7 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
       return;
     }
     HapticFeedbackUtil.lightImpact();
+    _payFinishedBoxes();
     if (_isSolved) _onSolved();
   }
 

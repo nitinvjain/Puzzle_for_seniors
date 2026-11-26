@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
+import '../../../../config/rewards.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
@@ -28,6 +29,21 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
   List<Point<int>> _path = [];
 
   int _merges = 0;
+
+  /// Joins per stage. He plays all ten board games, so this one has to pay
+  /// its way like the others rather than holding everything back until the
+  /// round target lands -- at a target of fifty, a round is a long walk for a
+  /// single reward at the end.
+  ///
+  /// Ten is a tenth of a 2048-style board's working life and a visible
+  /// landmark in the counter at the bottom of the screen, so the points
+  /// arrive at a moment that already looks like getting somewhere.
+  static const int _joinsPerStage = 10;
+
+  /// Stages already paid for, so a stage cannot be earned twice. Reset only
+  /// where [_merges] is -- the New board button deliberately keeps the count,
+  /// since he is still working towards the same target.
+  int _stagesPaid = 0;
   double _cellSize = 56;
 
   /// Which cell the last merge produced, and which cells were refilled behind
@@ -127,7 +143,17 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
       }
       final target =
           SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 30;
-      if (_merges >= target) _onComplete();
+      if (_merges >= target) {
+        _onComplete();
+      } else {
+        final due = _merges ~/ _joinsPerStage;
+        if (due > _stagesPaid) {
+          _stagesPaid = due;
+          ref
+              .read(gameStreakNotifierProvider.notifier)
+              .awardStage('number_connect', xpAmount: Rewards.pointsPerStage);
+        }
+      }
     }
   }
 
@@ -149,6 +175,7 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
           Navigator.of(context).pop();
           setState(() {
             _merges = 0;
+            _stagesPaid = 0;
             _board = _engine.newBoard();
             _path = [];
             _mergedAt = null;

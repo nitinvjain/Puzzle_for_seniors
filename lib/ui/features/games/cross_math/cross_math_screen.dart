@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 
+import '../../../../config/rewards.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
@@ -168,6 +169,13 @@ class _CrossMathScreenState extends ConsumerState<CrossMathScreen> {
     final target =
         SeniorMode.overrideRoundLimits ? SeniorMode.roundTarget : 10;
     if (_solved < target) {
+      // One filled board is the stage here. It is the obvious unit -- the
+      // counter on screen already counts them -- and the round target is high
+      // enough that waiting for it would mean a long stretch of solving for
+      // nothing.
+      ref
+          .read(gameStreakNotifierProvider.notifier)
+          .awardStage('cross_math', xpAmount: Rewards.pointsPerStage);
       Future.delayed(const Duration(milliseconds: 900), () {
         if (mounted) _newPuzzle();
       });

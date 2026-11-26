@@ -56,6 +56,42 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
   static Color _colourFor(int index) =>
       _wordColours[index % _wordColours.length];
 
+  /// Light sky blue, as NJ asked for, in two tints of the one hue.
+  ///
+  /// Two rather than one because a single colour would make the word list and
+  /// the board read as one continuous surface, and the whole layout depends on
+  /// their being two things: the list is what you read, the board is what you
+  /// work on. The board takes the paler tint, since that is where the letters
+  /// have to be legible at arm's length; the list takes the deeper one and
+  /// sits back.
+  ///
+  /// Both are fixed rather than drawn from the ColorScheme. These are the
+  /// background the eight word colours are painted on, and those were chosen
+  /// against a known backdrop -- letting the theme move it would quietly break
+  /// the contrast the pills depend on.
+  static const Color _skyPanel = Color(0xFFCFE6F8);
+  static const Color _skyBoard = Color(0xFFE4F2FD);
+
+  /// Outline for both, deep enough to hold its own at 3:1 against either
+  /// tint. The app's usual grey outline (#E2E8F0) is invisible on blue -- it
+  /// measures 1.7:1 against the panel, which is no edge at all.
+  static const Color _skyLine = Color(0xFF4A7FA8);
+
+  /// The "n of 8" counter once every word is found.
+  ///
+  /// A shade deeper than DesignSystem.successDeep, which only reaches 4.2:1
+  /// on the panel. This one clears 5.9:1 and still reads as the same green.
+  static const Color _countDone = Color(0xFF065F46);
+
+  /// The pill under the fingertip mid-drag.
+  ///
+  /// Slate rather than the app's indigo. Indigo on pale blue was weak -- at
+  /// 75% alpha it gave white letters only 3.1:1 -- and a blue-on-blue
+  /// highlight also reads as one of the eight word colours, which is exactly
+  /// the wrong message for a word not yet found. Slate says "being chosen",
+  /// not "done".
+  static const Color _skySelect = Color(0xFF334155);
+
   @override
   void initState() {
     super.initState();
@@ -125,15 +161,9 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(DesignSystem.spaceMD),
       decoration: BoxDecoration(
-        // A wash of the ink colour rather than surfaceContainerHighest: this
-        // ColorScheme never sets that role, so Material would supply its own
-        // purple-tinted default and the panel would not match the app.
-        color: colorScheme.onSurface.withValues(alpha: 0.05),
+        color: _skyPanel,
         borderRadius: BorderRadius.circular(DesignSystem.radiusLG),
-        border: Border.all(
-          color: colorScheme.outline.withValues(alpha: 0.5),
-          width: 1.5,
-        ),
+        border: Border.all(color: _skyLine, width: 2.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +176,10 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
-                  color: colorScheme.onSurface.withValues(alpha: 0.75),
+                  // Solid ink, not the old 75% wash. Faded grey text was
+                  // already the weakest thing on the screen, and on a blue
+                  // panel it loses what little separation it had.
+                  color: colorScheme.onSurface,
                   fontSize: DesignSystem.fontSizeXS,
                 ),
               ),
@@ -157,8 +190,8 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   color: foundCount == words.length
-                      ? DesignSystem.successDeep
-                      : colorScheme.onSurface.withValues(alpha: 0.75),
+                      ? _countDone
+                      : colorScheme.onSurface,
                   fontSize: DesignSystem.fontSizeXS,
                 ),
               ),
@@ -224,7 +257,21 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
   static const double _boardInset = 4.5;
 
   static const double _chipHPadding = DesignSystem.spaceXS;
-  static const double _chipBorder = 1.5;
+  static const double _chipBorder = 2.0;
+
+  /// Ceiling for the word-list type.
+  ///
+  /// NJ asked for smaller text in the list, and the reason it is worth doing
+  /// is not the list: it is the board. The chips were capped at fontSizeLG,
+  /// which the app's 1.25 text-scale floor paints at around 24pt, and the
+  /// panel's height follows its type. Dropping the cap to fontSizeSM -- about
+  /// 19pt once scaled -- shortens every chip and hands the difference to the
+  /// grid below, which is where the game actually is.
+  ///
+  /// The list can take it. It is reference material he glances at, eight short
+  /// words he already knows how to read; the grid is the part he has to scan
+  /// letter by letter.
+  static const double _chipFontCeiling = DesignSystem.fontSizeSM;
 
   /// One type size for every chip, chosen so the longest word in this board
   /// fits without being shrunk.
@@ -244,7 +291,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
     double panelWidth,
     double textScale,
   ) {
-    if (words.isEmpty) return DesignSystem.fontSizeLG;
+    if (words.isEmpty) return _chipFontCeiling;
     final double chipWidth =
         (panelWidth - DesignSystem.spaceXS * (_columns - 1)) / _columns;
     final double textBudget = chipWidth - (_chipHPadding + _chipBorder) * 2;
@@ -252,7 +299,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
     for (final w in words) {
       if (w.word.length > longest) longest = w.word.length;
     }
-    if (longest == 0) return DesignSystem.fontSizeLG;
+    if (longest == 0) return _chipFontCeiling;
     final double scale = textScale <= 0 ? 1.0 : textScale;
     // Solve for the size that, once the app's text scale has been applied to
     // it, still fits the chip.
@@ -260,7 +307,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
     // words of four to eight letters it never binds; it only guards against a
     // freakishly narrow screen, where the FittedBox trims the overflow.
     return (textBudget / (longest * 0.78 * scale))
-        .clamp(12.0, DesignSystem.fontSizeLG);
+        .clamp(11.0, _chipFontCeiling);
   }
 
   Widget _wordChip(WordSearchWord word, int index, double fontSize) {
@@ -281,7 +328,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
         color: isFound ? colour : Colors.transparent,
         borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
         border: Border.all(
-          color: isFound ? colour : colorScheme.outline.withValues(alpha: 0.6),
+          color: isFound ? colour : _skyLine,
           width: _chipBorder,
         ),
       ),
@@ -357,7 +404,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
             padding: const EdgeInsets.all(3.0),
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: _skyBoard,
                 borderRadius: BorderRadius.circular(DesignSystem.radiusMD - 4),
               ),
               child: ClipRRect(
@@ -365,7 +412,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: Container(
-                    color: colorScheme.surface,
+                    color: _skyBoard,
                     child: Stack(
                       children: [
                         _buildFoundLines(state, cellSize),
@@ -443,11 +490,7 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
 
   Widget _buildSelectionLine(WordSearchState state, double cellSize) {
     if (state.selection.isEmpty) return const SizedBox.shrink();
-    return _buildLine(
-      state.selection,
-      cellSize,
-      DesignSystem.primary.withValues(alpha: 0.75),
-    );
+    return _buildLine(state.selection, cellSize, _skySelect);
   }
 
   Widget _buildLine(List<Point<int>> positions, double cellSize, Color color) {
