@@ -8,7 +8,6 @@ import 'package:puzzle/l10n/app_localizations.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
-import '../../../../utils/sound_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
 import '../../../core/juice/game_scaffold.dart';
 import 'number_connect_engine.dart';
@@ -122,7 +121,6 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
     });
     if (produced > 0) {
       HapticFeedbackUtil.success();
-      SoundFeedbackUtil.merge();
       if (!_engine.hasMove(_board)) {
         // Effectively unreachable, but better than leaving him stuck.
         setState(() => _engine.reshuffle(_board));
@@ -135,7 +133,6 @@ class _NumberConnectScreenState extends ConsumerState<NumberConnectScreen> {
 
   void _onComplete() {
     HapticFeedbackUtil.victory();
-    SoundFeedbackUtil.complete();
     ref.read(gameStreakNotifierProvider.notifier).completeGame('number_connect');
     final l10n = AppLocalizations.of(context)!;
     showDialog(

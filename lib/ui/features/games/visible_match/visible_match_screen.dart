@@ -7,7 +7,6 @@ import '../../../../providers/user_providers.dart';
 import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
-import '../../../../utils/sound_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../core/juice/game_scaffold.dart';
@@ -103,7 +102,6 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
     }
 
     HapticFeedbackUtil.success();
-    SoundFeedbackUtil.merge();
     setState(() {
       _solved.add(left);
       _selectedLeft = null;
@@ -131,7 +129,6 @@ class _VisibleMatchScreenState extends ConsumerState<VisibleMatchScreen> {
 
   void _finish() {
     HapticFeedbackUtil.victory();
-    SoundFeedbackUtil.complete();
     ref.read(gameStreakNotifierProvider.notifier).completeGame('visible_match');
     showDialog(
       context: context,

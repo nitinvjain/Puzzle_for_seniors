@@ -8,7 +8,6 @@ import '../../../../providers/user_providers.dart';
 import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
-import '../../../../utils/sound_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../core/juice/game_scaffold.dart';
@@ -107,7 +106,6 @@ class _ChoiceGameScreenState extends ConsumerState<ChoiceGameScreen> {
 
     if (correct) {
       HapticFeedbackUtil.success();
-      SoundFeedbackUtil.merge();
       ref
           .read(gameStreakNotifierProvider.notifier)
           .awardStage(widget.gameId, xpAmount: Rewards.pointsPerStage);
@@ -131,7 +129,6 @@ class _ChoiceGameScreenState extends ConsumerState<ChoiceGameScreen> {
 
   void _finish() {
     HapticFeedbackUtil.victory();
-    SoundFeedbackUtil.complete();
     ref.read(gameStreakNotifierProvider.notifier).completeGame(widget.gameId);
     showDialog(
       context: context,

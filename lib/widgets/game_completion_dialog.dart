@@ -10,6 +10,7 @@ import '../data/game_registry.dart';
 import '../data/models/game_streak.dart';
 import '../utils/design_system.dart';
 import '../utils/haptic_feedback.dart';
+import '../utils/sound_feedback.dart';
 import '../utils/navigation_utils.dart';
 import '../providers/game_providers.dart';
 import '../providers/game_session_provider.dart';
@@ -52,6 +53,11 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
       } else {
         HapticFeedbackUtil.vibrate();
       }
+      // Every one of the 310 games ends on this dialog, so the finishing
+      // sound belongs here rather than in each of them. It plays either way:
+      // reaching the end of a game is worth marking even when he did not get
+      // everything right, and this build has nothing to say about that.
+      SoundFeedbackUtil.complete();
     });
   }
 
