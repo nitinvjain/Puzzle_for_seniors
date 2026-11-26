@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">
+<style>
+@font-face { font-family:'Bebas'; src:url('../../assets/fonts/Bebas_Neue/BebasNeue-Regular.ttf') format('truetype'); }
+@font-face { font-family:'Geist'; src:url('../../assets/fonts/Geist/static/Geist-Medium.ttf') format('truetype'); }
+
+  .big  { font-family:'Bebas'; fill:#FFFFFF; }
+  .name { font-family:'Bebas'; fill:#FCD34D; }
+  .sml  { font-family:'Geist'; fill:#E0E7FF; }
+</style>
+<text class="big"  x="216" y="190" text-anchor="middle" font-size="62" letter-spacing="3">PUZZLES</text>
+<text class="sml"  x="216" y="222" text-anchor="middle" font-size="26">for</text>
+<text class="name" x="216" y="306" text-anchor="middle" font-size="92" letter-spacing="2">NCJ</text>
+</svg>
