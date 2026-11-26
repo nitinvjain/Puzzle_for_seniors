@@ -23,6 +23,20 @@
 ///     underneath it.
 library;
 
+/// What a finished game was worth.
+class RewardTally {
+  final int points;
+
+  /// Whether the count of games finished went up for this finish.
+  ///
+  /// Not the same as "he finished a game": a game already finished today is
+  /// counted once, so a replay earns its points without moving the count.
+  /// Milestones hang off this and nothing else.
+  final bool countedNewGame;
+
+  const RewardTally(this.points, this.countedNewGame);
+}
+
 /// Where points earned during a game are collected until the completion
 /// screen can show them.
 ///
@@ -32,29 +46,41 @@ library;
 /// rather than on disk: the running totals are already saved, and this is
 /// only the "you just earned 45" line, which is worth nothing once it has
 /// been read.
-///
-/// Reading clears it. If a game is abandoned halfway, its points stay on the
-/// pile and are shown at the end of the next one, which is harmless -- he did
-/// earn them, and the total they were added to was saved at the time.
 class RewardLog {
   const RewardLog._();
 
   static int _pending = 0;
+  static bool _countedNewGame = false;
 
-  static void add(int points) {
+  /// Points for a stage finished inside a game still in progress.
+  static void addStage(int points) {
     if (points > 0) _pending += points;
   }
 
-  /// The points earned since this was last read, and clears the pile.
-  static int take() {
-    final p = _pending;
-    _pending = 0;
-    return p;
+  /// Points for finishing a game, and whether that moved the games count.
+  static void addCompletion(int points, {required bool countedNewGame}) {
+    if (points > 0) _pending += points;
+    if (countedNewGame) _countedNewGame = true;
   }
 
-  /// Reads without clearing, so a rebuild of the same screen shows the same
-  /// figure instead of dropping to zero.
-  static int peek() => _pending;
+  /// Called as a game is opened.
+  ///
+  /// Without this, points earned in a game he walked away from sat on the
+  /// pile and were added to the next game's total -- finishing Word Search,
+  /// worth twenty, could read "+65 points" because of nine right answers
+  /// abandoned in KBC India half an hour earlier.
+  static void startGame() {
+    _pending = 0;
+    _countedNewGame = false;
+  }
+
+  /// What the finish was worth, and clears the pile.
+  static RewardTally take() {
+    final tally = RewardTally(_pending, _countedNewGame);
+    _pending = 0;
+    _countedNewGame = false;
+    return tally;
+  }
 }
 
 /// What to show on the completion screen.
@@ -71,13 +97,6 @@ class RewardSnapshot {
   /// Games finished today.
   final int gamesToday;
 
-  /// Whether this particular finish added to the total.
-  ///
-  /// False when he has already finished this game once today -- the app
-  /// counts a game once a day, so replaying it does not add another. The
-  /// banner then simply leaves out the "+1" rather than inventing one.
-  final bool earnedStar;
-
   /// Set when this finish crossed a milestone, otherwise null.
   final String? milestone;
 
@@ -86,7 +105,6 @@ class RewardSnapshot {
     required this.totalPoints,
     required this.totalGames,
     required this.gamesToday,
-    required this.earnedStar,
     this.milestone,
   });
 }
@@ -96,12 +114,6 @@ class Rewards {
 
   /// Whether the reward banner is shown at all.
   static const bool enabled = true;
-
-  /// A finish counts as "just now" if the game's record was written within
-  /// this long. Used to tell a fresh completion from a replay of something
-  /// already finished earlier today, without changing all 300 call sites to
-  /// pass a flag down.
-  static const Duration justNow = Duration(seconds: 5);
 
   /// The milestones, in order.
   ///
@@ -195,16 +207,6 @@ class Rewards {
     return out.toString();
   }
 
-  /// The quiet line under the star.
-  ///
-  /// Deliberately not a score and not a rate: just a count of a thing he did,
-  /// phrased the way a person would say it.
-  static String totalLine(int totalGames) {
-    if (totalGames <= 0) return 'Well played';
-    if (totalGames == 1) return '1 game finished';
-    return '$totalGames games finished';
-  }
-
   /// The "today" line, or null when there is nothing worth saying.
   ///
   /// Left out entirely for the first game of the day: "1 today" invites the
@@ -215,16 +217,13 @@ class Rewards {
     return '$gamesToday today';
   }
 
-  /// How many stars to draw in the row, given the running total.
+  /// The two running totals on one quiet line.
   ///
-  /// Capped, because a row of three hundred stars is a smear rather than a
-  /// reward. It fills up to [maxStarsShown] and stays full after that; the
-  /// exact count is carried by the line of text underneath.
-  static const int maxStarsShown = 5;
-
-  static int starsToDraw(int totalGames) {
-    if (totalGames <= 0) return 0;
-    if (totalGames >= maxStarsShown) return maxStarsShown;
-    return totalGames;
+  /// They used to be two lines, under a third saying what he had just earned
+  /// and above a fourth for a milestone. Four numbers stacked up is a report,
+  /// not a reward; the thing that just happened should be the only loud part.
+  static String summaryLine(int totalPoints, int totalGames) {
+    final games = totalGames == 1 ? '1 game' : '$totalGames games';
+    return '${_grouped(totalPoints)} points  \u00b7  $games finished';
   }
 }

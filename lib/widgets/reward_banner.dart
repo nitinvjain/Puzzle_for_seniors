@@ -72,27 +72,23 @@ class _RewardBannerState extends State<RewardBanner>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // The stars. The newly earned one is the last in the row and is the
-          // one that animates.
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (int i = 0; i < Rewards.starsToDraw(snap.totalGames); i++)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    child: _star(
-                      animate: snap.earnedStar &&
-                          i == Rewards.starsToDraw(snap.totalGames) - 1,
-                    ),
-                  ),
-              ],
+          // One star, not a row of them.
+          //
+          // The row drew one per game finished, capped at five, which meant
+          // that from his fifth game onward every completion screen showed an
+          // identical five gold stars. A thing that never changes stops being
+          // a reward and becomes wallpaper. One star, arriving each time, is
+          // the emblem; the numbers underneath carry what actually changed.
+          ScaleTransition(
+            scale: _pop,
+            child: const Icon(
+              Icons.star_rounded,
+              color: DesignSystem.accentAmber,
+              size: 52,
             ),
           ),
           const SizedBox(height: DesignSystem.spaceSM),
-          // The loud line: what he just earned. This is the part that lands,
-          // so it is the biggest thing in the panel after the star itself.
+          // The loud line: what he just earned.
           if (snap.pointsEarned > 0)
             FittedBox(
               fit: BoxFit.scaleDown,
@@ -109,26 +105,18 @@ class _RewardBannerState extends State<RewardBanner>
               ),
             ),
           const SizedBox(height: 2),
-          // The running totals, quiet.
-          Text(
-            Rewards.pointsLine(snap.totalPoints),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Geist',
-              fontSize: DesignSystem.fontSizeMD,
-              fontWeight: FontWeight.w800,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            Rewards.totalLine(snap.totalGames),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Geist',
-              fontSize: DesignSystem.fontSizeSM,
-              fontWeight: FontWeight.w700,
-              color: colorScheme.onSurface.withValues(alpha: 0.8),
+          // Both running totals on one quiet line.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              Rewards.summaryLine(snap.totalPoints, snap.totalGames),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Geist',
+                fontSize: DesignSystem.fontSizeSM,
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface.withValues(alpha: 0.8),
+              ),
             ),
           ),
           if (today != null) ...[
@@ -140,7 +128,7 @@ class _RewardBannerState extends State<RewardBanner>
                 fontFamily: 'Geist',
                 fontSize: DesignSystem.fontSizeSM,
                 fontWeight: FontWeight.w700,
-                color: colorScheme.onSurface.withValues(alpha: 0.8),
+                color: colorScheme.onSurface.withValues(alpha: 0.65),
               ),
             ),
           ],
@@ -176,13 +164,4 @@ class _RewardBannerState extends State<RewardBanner>
     );
   }
 
-  Widget _star({required bool animate}) {
-    const icon = Icon(
-      Icons.star_rounded,
-      color: DesignSystem.accentAmber,
-      size: 40,
-    );
-    if (!animate) return icon;
-    return ScaleTransition(scale: _pop, child: icon);
-  }
 }

@@ -94,24 +94,19 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     );
   }
 
-  /// The points earned in the game just finished, stages included.
-  ///
-  /// `late final` so it is taken from the log exactly once, on the first
-  /// build. Taking it inside build would show the figure the first time the
-  /// dialog painted and zero on every rebuild after it.
-  late final int _pointsEarned = RewardLog.take();
+  /// What the game just finished was worth, taken from the log exactly once
+  /// on the first build. Taking it inside build would show the figure the
+  /// first time the dialog painted and zero on every rebuild after it.
+  late final RewardTally _tally = RewardLog.take();
 
   /// What the reward banner should show.
   ///
   /// Everything here is derived from counters the app already keeps, so the
   /// reward needs no storage of its own and his existing history counts.
   ///
-  /// Whether this finish earned a star is worked out from how recently the
-  /// game's record was written rather than from a flag threaded down through
-  /// every game screen: `completeGame` counts a game once a day and returns
-  /// early on a replay without touching the record, so a record written in
-  /// the last few seconds means this finish was a new one. The alternative
-  /// was changing three hundred call sites.
+  /// What the finish was worth comes from RewardLog, which the award calls
+  /// write to as they happen, rather than from a flag threaded down through
+  /// three hundred game screens.
   RewardSnapshot _rewardSnapshot(
     Map<String, GameStreak> streaks,
     String? lastGameId,
@@ -120,19 +115,15 @@ class _GameCompletionDialogState extends ConsumerState<GameCompletionDialog> {
     final total = userData.totalSolved ?? 0;
     final gamesToday = streaks.values.where((s) => s.solvedToday).length;
 
-    final lastStreak = lastGameId == null ? null : streaks[lastGameId];
-    final earned = lastStreak != null &&
-        DateTime.now().difference(lastStreak.lastSolvedDate) <= Rewards.justNow;
-
     return RewardSnapshot(
-      pointsEarned: _pointsEarned,
+      pointsEarned: _tally.points,
       totalPoints: userData.xp,
       totalGames: total,
       gamesToday: gamesToday,
-      earnedStar: earned,
-      // Only when this finish crossed it. Without the guard a replay would
-      // re-announce the same milestone every time, which empties it out.
-      milestone: earned ? Rewards.milestoneLabel(total) : null,
+      // Only when the count of games finished actually moved. Hanging this
+      // off "a game was just finished" instead meant a replay re-announced
+      // the same milestone every time, which empties it of all meaning.
+      milestone: _tally.countedNewGame ? Rewards.milestoneLabel(total) : null,
     );
   }
 

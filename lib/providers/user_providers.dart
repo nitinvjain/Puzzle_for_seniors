@@ -192,7 +192,7 @@ class GameStreakNotifier extends _$GameStreakNotifier {
   /// nothing; it simply does not pay.
   Future<void> awardStage(String gameId, {int xpAmount = 5}) async {
     if (xpAmount <= 0) return;
-    RewardLog.add(xpAmount);
+    RewardLog.addStage(xpAmount);
     await ref.read(userDataNotifierProvider.notifier).addXp(xpAmount);
   }
 
@@ -244,8 +244,11 @@ class GameStreakNotifier extends _$GameStreakNotifier {
           (alreadyToday ? 0 : 1),
     );
 
-    // Remember what this finish was worth, for the banner on the way out.
-    RewardLog.add(xpAmount);
+    // Remember what this finish was worth, and whether it moved the count of
+    // games finished. The banner needs the second part to decide about a
+    // milestone: a replay earns its points but reaches no new total, and
+    // without this it re-announced the same milestone every single time.
+    RewardLog.addCompletion(xpAmount, countedNewGame: !alreadyToday);
 
     state = {...state, gameId: newStreak};
 
