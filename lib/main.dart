@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
+import 'config/app_settings.dart';
 import 'config/senior_mode.dart';
 import 'data/models/user_data.dart';
 import 'data/models/game_streak.dart';
 import 'data/repositories/user_repository.dart';
 import 'providers/user_providers.dart';
+import 'providers/settings_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'ui/features/main_shell/main_shell.dart';
@@ -50,6 +52,10 @@ void main() async {
 
   Hive.registerAdapter(UserDataAdapter());
   Hive.registerAdapter(GameStreakAdapter());
+
+  // Before the first frame, so AppSettings can be read synchronously from the
+  // tap handlers that cannot await anything.
+  await AppSettings.init();
 
   final userRepository = UserRepository();
   await userRepository.init();
@@ -120,10 +126,23 @@ class MyApp extends ConsumerWidget {
       // his tablet still wins. The ceiling is there because these screens were
       // laid out against unscaled text: past about 1.6 the tighter ones start
       // to overflow, and a clipped board is worse than slightly smaller type.
-      builder: (context, child) => MediaQuery.withClampedTextScaling(
-        minScaleFactor: SeniorMode.enabled ? SeniorMode.uiTextScale : 1.0,
-        maxScaleFactor: SeniorMode.enabled ? SeniorMode.uiTextScaleCeiling : double.infinity,
-        child: child ?? const SizedBox.shrink(),
+      //
+      // The floor is now a setting rather than a constant. It is watched
+      // inside a Consumer here rather than at the top of build, because
+      // rebuilding MaterialApp itself on a settings change would drop the
+      // navigation stack -- changing the text size would bounce whoever did
+      // it back to the home screen.
+      builder: (context, child) => Consumer(
+        builder: (context, ref, _) {
+          final scale = ref.watch(settingsProvider.select((s) => s.textScale));
+          return MediaQuery.withClampedTextScaling(
+            minScaleFactor: SeniorMode.enabled ? scale : 1.0,
+            maxScaleFactor: SeniorMode.enabled
+                ? SeniorMode.uiTextScaleCeiling
+                : double.infinity,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
       ),
       localizationsDelegates: [
         AppLocalizations.delegate,

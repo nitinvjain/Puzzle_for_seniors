@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/rewards.dart';
+import '../../../../providers/settings_provider.dart';
 import '../../../../providers/player_name_provider.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
@@ -26,6 +27,7 @@ class PlayerGreeting extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final name = ref.watch(playerNameProvider);
     final points = ref.watch(userDataNotifierProvider.select((d) => d.xp));
+    final showPoints = ref.watch(settingsProvider.select((s) => s.showPoints));
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -64,7 +66,7 @@ class PlayerGreeting extends ConsumerWidget {
                           : colorScheme.onSurface,
                     ),
                   ),
-                  if (points > 0) ...[
+                  if (showPoints && points > 0) ...[
                     const SizedBox(height: 2),
                     Row(
                       children: [

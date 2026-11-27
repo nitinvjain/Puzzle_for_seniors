@@ -151,15 +151,19 @@ class SeniorMode {
   /// Set to false to go back to a silent game.
   static const bool soundFeedback = true;
 
-  /// A speaker button on the home screen that plays the finishing chime and
-  /// reports what the phone says about its own volume.
+  /// A gear on the home screen opening the settings page: sound, vibration,
+  /// text size, the player's name, and the sound test that used to be its own
+  /// speaker button.
   ///
-  /// This is a diagnostic, not a feature, and it does sit against the rule
-  /// that there is nothing on screen to get lost in. It is here because sound
-  /// has now failed twice with nothing to go on but "still no sound", and one
-  /// tap that answers "muted, or broken?" is worth more than another round
-  /// trip. Set it to false once the chime is confirmed, and the button goes.
-  static const bool soundTest = true;
+  /// This does sit against the rule that there is nothing on screen to get
+  /// lost in, and the screen behind it is built accordingly -- toggles and
+  /// three labelled sizes, nothing to type but a name, nothing destructive.
+  /// The worst his father can do by wandering in is turn the sound off, which
+  /// is one tap to undo.
+  ///
+  /// Set to false to take the gear away entirely; the settings keep whatever
+  /// values were last chosen.
+  static const bool showSettings = true;
 
   /// Always generate the easiest variant and hide any difficulty selector.
   static const bool lockEasiestDifficulty = true;

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import '../config/app_settings.dart';
 import 'sound_feedback.dart';
 
 /// Centralized haptic feedback utility for consistent haptic patterns across
@@ -23,7 +24,14 @@ class HapticFeedbackUtil {
   static int _lastHapticTime = 0;
   static const int _throttleMs = 30; // Min time between haptics
 
+  /// Throttled, and switched off entirely when settings say so.
+  ///
+  /// The check sits here rather than in each named method because every
+  /// vibration in the app passes through one of the three raw calls below,
+  /// so one gate covers the lot -- including [vibrate] and [error], which
+  /// deliberately make no sound and would otherwise ignore the setting.
   static bool _shouldThrottle() {
+    if (!AppSettings.vibration) return true;
     final now = DateTime.now().millisecondsSinceEpoch;
     if (now - _lastHapticTime < _throttleMs) return true;
     _lastHapticTime = now;
@@ -72,12 +80,17 @@ class HapticFeedbackUtil {
     SoundFeedbackUtil.tap();
   }
 
+  /// Is vibration switched on? Used by the settings screen to decide whether
+  /// a demonstration buzz is worth firing.
+  static bool get vibrationEnabled => AppSettings.vibration;
+
   static void selection() => selectionClick();
 
   static void light() => lightImpact();
 
   /// Vibrate for errors or warnings. Silent, like [error].
   static void vibrate() {
+    if (!AppSettings.vibration) return;
     HapticFeedback.vibrate();
   }
 

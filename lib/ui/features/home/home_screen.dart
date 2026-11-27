@@ -15,7 +15,7 @@ import 'package:puzzle/widgets/tangible.dart';
 import 'package:puzzle/utils/design_system.dart';
 import 'package:puzzle/utils/haptic_feedback.dart';
 import 'package:puzzle/utils/navigation_utils.dart';
-import 'package:puzzle/utils/sound_feedback.dart';
+import 'package:puzzle/ui/features/settings/settings_screen.dart';
 
 import 'widgets/player_greeting.dart';
 import 'widgets/favorites_section.dart';
@@ -100,16 +100,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               actions: [
-                if (SeniorMode.soundTest)
+                if (SeniorMode.showSettings)
                   Padding(
                     padding: const EdgeInsets.only(right: 4.0),
                     child: TangibleButton(
                       color: Colors.transparent,
                       drawBorder: false,
                       padding: const EdgeInsets.all(12),
-                      onTap: _testSound,
+                      semanticsLabel: 'Settings',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      ),
                       child: Icon(
-                        Icons.volume_up_rounded,
+                        Icons.settings_rounded,
                         color: colorScheme.onSurface,
                         size: 30,
                       ),
@@ -262,26 +267,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.push(
       context,
       CustomPageRoute(page: randomGame.builder(context)),
-    );
-  }
-
-  /// Play the finishing chime and say what the phone makes of it.
-  ///
-  /// Two things go wrong with sound on a phone that is not yours to hold, and
-  /// they look identical from here: the app may not be making a noise, or the
-  /// phone may be muted. This tells them apart in one tap.
-  Future<void> _testSound() async {
-    SoundFeedbackUtil.complete();
-    final report = await SoundFeedbackUtil.describe();
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 10),
-        content: Text(
-          'Sound test: $report',
-          style: const TextStyle(fontSize: 15, height: 1.3),
-        ),
-      ),
     );
   }
 

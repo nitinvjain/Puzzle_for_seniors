@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import '../config/senior_mode.dart';
+import '../config/app_settings.dart';
 
 /// Short sounds that confirm something happened, alongside the haptics.
 ///
@@ -36,7 +36,10 @@ class SoundFeedbackUtil {
   static const MethodChannel _channel =
       MethodChannel('puzzle_for_seniors/sound');
 
-  static bool get _on => SeniorMode.enabled ? SeniorMode.soundFeedback : true;
+  /// Settings now decides, not the build. [AppSettings.sound] falls back to
+  /// the SeniorMode constant when nothing has been chosen, so a fresh install
+  /// behaves exactly as before.
+  static bool get _on => AppSettings.sound;
 
   /// Whether the native channel answered. Null until the first attempt, false
   /// once it is known to be absent -- after which nothing tries it again.
@@ -112,6 +115,17 @@ class SoundFeedbackUtil {
       Timer(const Duration(milliseconds: 140), _fallbackClick);
       Timer(const Duration(milliseconds: 280), _fallbackClick);
     }
+  }
+
+  /// Play the finishing chime whatever the sound setting says.
+  ///
+  /// For the test button only. Every other entry point here respects [_on],
+  /// which is right -- but a button labelled "Test the sound" that stays
+  /// silent because sound is switched off tells you nothing about the thing
+  /// you came to test.
+  static void playTest() {
+    _lastPlayed = DateTime.now().millisecondsSinceEpoch;
+    unawaited(_play('complete'));
   }
 
   /// What the device says about its own sound, in plain language.
