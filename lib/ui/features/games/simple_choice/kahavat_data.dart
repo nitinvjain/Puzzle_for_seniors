@@ -72,4 +72,55 @@ const List<ChoiceQuestion> kahavatQuestions = [
   ChoiceQuestion(prompt: 'Jal bin machhli, jeevan bin ______', options: ['praan', 'maan', 'gyaan', 'dhyaan'], answer: 0),
   ChoiceQuestion(prompt: 'Teli ka bail, ghar ka na ghaat ______', options: ['ka', 'par', 'mein', 'se'], answer: 0),
   ChoiceQuestion(prompt: 'Gud diye mare to zahar kyon ______', options: ['dena', 'khana', 'lena', 'rakhna'], answer: 0),
+
+  // ---------------------------------------------------------------------
+  // Added from a public collection of lokoktiyan NJ pointed me at. Same
+  // rule as the rest of the file: the sayings themselves are folk property
+  // and carry their real words, while the three wrong options are written
+  // here -- they have to rhyme or scan closely enough to be a real choice,
+  // which no source provides.
+  //
+  // Only full proverbs were taken. The collection is mostly muhavare --
+  // "aag babula hona", "kaan bharna" -- which are phrases rather than
+  // sayings with an ending to supply, and make a poor question.
+  //
+  // The second source NJ gave is a scanned idiom list whose OCR has eaten
+  // the Devanagari ("एक हाथ सेताली नहींबजती"), so nothing was taken from it
+  // rather than guess at broken words.
+  ChoiceQuestion(prompt: 'Doobte ko tinke ka ______', options: ['sahara', 'kinara', 'ishara', 'nazara'], answer: 0),
+  ChoiceQuestion(prompt: 'Naam bade, darshan ______', options: ['chote', 'bade', 'achhe', 'saste'], answer: 0),
+  ChoiceQuestion(prompt: 'Ek aur ek ______', options: ['gyarah', 'do', 'barah', 'teen'], answer: 0),
+  ChoiceQuestion(prompt: 'Daane daane par likha hai khaane wale ka ______', options: ['naam', 'kaam', 'daam', 'gaon'], answer: 0),
+  ChoiceQuestion(prompt: 'Karela, oopar se neem ______', options: ['chadha', 'gira', 'khada', 'pada'], answer: 0),
+  ChoiceQuestion(prompt: 'Naya nau din, purana sau ______', options: ['din', 'saal', 'baar', 'pal'], answer: 0),
+  ChoiceQuestion(prompt: 'Sir mundaate hi ole ______', options: ['pade', 'gire', 'ude', 'ruke'], answer: 0),
+  ChoiceQuestion(prompt: 'Aa bail mujhe ______', options: ['maar', 'haar', 'pukaar', 'dulaar'], answer: 0),
+  ChoiceQuestion(prompt: 'Neem hakeem khatra ______', options: ['jaan', 'kaan', 'shaan', 'makaan'], answer: 0),
+  ChoiceQuestion(prompt: 'Bhookhe bhajan na hoye ______', options: ['Gopala', 'Nandlala', 'Murari', 'Banwari'], answer: 0),
+  ChoiceQuestion(prompt: 'Loha lohe ko ______', options: ['kaatta hai', 'jodta hai', 'chhodta hai', 'dhota hai'], answer: 0),
+  ChoiceQuestion(prompt: 'Muft ka chandan, ghis mere ______', options: ['Nandan', 'Sajan', 'Madan', 'Vandan'], answer: 0),
+  ChoiceQuestion(prompt: 'Jin khoja tin ______', options: ['paaiyan', 'khoyin', 'soyin', 'boyin'], answer: 0),
+  ChoiceQuestion(prompt: 'Ek panth do ______', options: ['kaaj', 'raaj', 'saaj', 'aaj'], answer: 0),
+  ChoiceQuestion(prompt: 'Saat pushton ki ______', options: ['kamai', 'padhai', 'ladai', 'sagai'], answer: 0),
+  ChoiceQuestion(prompt: 'Na rahega baans, na bajegi ______', options: ['bansuri', 'chudi', 'ghanti', 'sitar'], answer: 0),
+  ChoiceQuestion(prompt: 'Man ka haara haar hai, man ka jeeta ______', options: ['jeet', 'haar', 'khel', 'daanv'], answer: 0),
+  ChoiceQuestion(prompt: 'Haathi chale bazaar, kutte bhaunke ______', options: ['hazaar', 'bekaar', 'do chaar', 'lagaatar'], answer: 0),
+  ChoiceQuestion(prompt: 'Samay bada ______', options: ['balwan', 'dhanwan', 'gunwan', 'pehelwan'], answer: 0),
+  ChoiceQuestion(prompt: 'Munh mein Ram, bagal mein ______', options: ['chhuri', 'puri', 'nagri', 'bansuri'], answer: 0),
+  ChoiceQuestion(prompt: 'Doodh ka doodh, paani ka ______', options: ['paani', 'daana', 'khaana', 'maana'], answer: 0),
+  ChoiceQuestion(prompt: 'Raai ka ______ banana', options: ['pahaad', 'mahal', 'kinara', 'basera'], answer: 0),
+  ChoiceQuestion(prompt: 'Kaath ki haandi baar baar nahin ______', options: ['chadhti', 'tootti', 'bikti', 'banti'], answer: 0),
+  ChoiceQuestion(prompt: 'Aasteen ka ______', options: ['saanp', 'chor', 'dost', 'raaja'], answer: 0),
+  ChoiceQuestion(prompt: 'Zameen aasmaan ka ______', options: ['farak', 'rishta', 'naata', 'sapna'], answer: 0),
+  ChoiceQuestion(prompt: 'Saanp nikal gaya, ab ______ peetna', options: ['lakeer', 'zameen', 'chhaati', 'dhol'], answer: 0),
+  ChoiceQuestion(prompt: 'Ek teer se do ______', options: ['shikaar', 'vaar', 'prahaar', 'hathiyaar'], answer: 0),
+  ChoiceQuestion(prompt: 'Ghar phoonk tamasha ______', options: ['dekhna', 'karna', 'banana', 'sunana'], answer: 0),
+  ChoiceQuestion(prompt: 'Andhe ke haath ______ lagna', options: ['bater', 'moti', 'khazana', 'laathi'], answer: 0),
+  ChoiceQuestion(prompt: 'Kachcha ghada jaldi ______', options: ['toota hai', 'bharta hai', 'sookhta hai', 'bikta hai'], answer: 0),
+  ChoiceQuestion(prompt: 'Jaisa booge waisa ______', options: ['kaatoge', 'paoge', 'khaoge', 'laoge'], answer: 0),
+  ChoiceQuestion(prompt: 'Oont ke munh mein ______', options: ['jeera', 'kheera', 'laddoo', 'chaara'], answer: 0),
+  ChoiceQuestion(prompt: 'Khisiyani billi khamba ______', options: ['noche', 'chadhe', 'tode', 'dekhe'], answer: 0),
+  ChoiceQuestion(prompt: 'Thotha chana baaje ______', options: ['ghana', 'purana', 'sunehra', 'anjana'], answer: 0),
+  ChoiceQuestion(prompt: 'Adhjal gagri chhalakat ______', options: ['jaaye', 'rahe', 'gire', 'bahe'], answer: 0),
+  ChoiceQuestion(prompt: 'Daal mein kuchh ______', options: ['kaala', 'meetha', 'gila', 'sookha'], answer: 0),
 ];
