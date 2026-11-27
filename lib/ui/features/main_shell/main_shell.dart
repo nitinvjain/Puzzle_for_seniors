@@ -83,9 +83,20 @@ class _MainShellState extends ConsumerState<MainShell>
     // Senior build: the games list is the whole app. No tab bar, no side rail,
     // no stats or settings destinations to wander into and get stuck in.
     if (SeniorMode.simplifiedNavigation) {
-      return Scaffold(
+      final games = Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         body: _getScreen(1),
+      );
+      if (!SeniorMode.blockBackAtHome) return games;
+      // Back inside a game returns to this list, which is wanted. Back AT
+      // the list closes the app, which is not -- it is one press, it looks
+      // identical to the press that left a game, and on a tablet it is
+      // reached by a hand resting at the bottom of the screen. Here it does
+      // nothing. Home still leaves, for whoever means to.
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {},
+        child: games,
       );
     }
 

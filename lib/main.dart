@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
@@ -17,6 +18,28 @@ import 'providers/locale_provider.dart';
 import 'ui/features/main_shell/main_shell.dart';
 import 'utils/design_system.dart';
 import 'widgets/error_boundary.dart';
+
+/// Held for the life of the process so the listener is not collected.
+AppLifecycleListener? _immersiveWatcher;
+
+/// Hide the system bars, if this build wants them hidden.
+///
+/// Re-applied on resume as well as at startup: coming back from another app,
+/// or from the launcher, can leave the bars showing again, and the whole
+/// point is that they are not there while he plays.
+Future<void> _applyImmersiveMode() async {
+  if (kIsWeb) return;
+  if (defaultTargetPlatform != TargetPlatform.android &&
+      defaultTargetPlatform != TargetPlatform.iOS) {
+    return;
+  }
+  if (!SeniorMode.enabled || !SeniorMode.immersiveFullScreen) return;
+  try {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  } catch (_) {
+    // A platform that will not hide its bars still runs the games.
+  }
+}
 
 void main() async {
   final stopwatch = Stopwatch()..start();
@@ -47,6 +70,9 @@ void main() async {
       debugPrint('Stack: ${details.stack}');
     };
   }
+
+  await _applyImmersiveMode();
+  _immersiveWatcher = AppLifecycleListener(onResume: _applyImmersiveMode);
 
   await Hive.initFlutter();
 
@@ -135,12 +161,33 @@ class MyApp extends ConsumerWidget {
       builder: (context, child) => Consumer(
         builder: (context, ref, _) {
           final scale = ref.watch(settingsProvider.select((s) => s.textScale));
-          return MediaQuery.withClampedTextScaling(
+          final Widget scaled = MediaQuery.withClampedTextScaling(
             minScaleFactor: SeniorMode.enabled ? scale : 1.0,
             maxScaleFactor: SeniorMode.enabled
                 ? SeniorMode.uiTextScaleCeiling
                 : double.infinity,
             child: child ?? const SizedBox.shrink(),
+          );
+
+          // A dead strip along the bottom edge. With the system bars hidden,
+          // the app runs right to the edge -- which is where the swipe that
+          // brings them back lives, and where a bottom row of keypad buttons
+          // ends up. Shortening the whole app by a few pixels means a
+          // mis-aimed tap there hits nothing at all.
+          //
+          // Done here rather than in each Scaffold because not every screen
+          // wraps itself in a SafeArea, and the ones that most need the gap
+          // are the ones with a keypad at the bottom. Painted in the scaffold
+          // colour so the strip is invisible.
+          if (!SeniorMode.enabled || SeniorMode.bottomKeepOut <= 0) {
+            return scaled;
+          }
+          return ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: SeniorMode.bottomKeepOut),
+              child: scaled,
+            ),
           );
         },
       ),

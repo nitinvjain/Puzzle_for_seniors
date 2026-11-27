@@ -165,6 +165,39 @@ class SeniorMode {
   /// values were last chosen.
   static const bool showSettings = true;
 
+  /// Hide Android's status bar and navigation bar while the app is open.
+  ///
+  /// On an 11-inch tablet the system bar sits right under the game, and a
+  /// hand resting at the bottom of the screen lands on Back, Home or Recents
+  /// -- which closes the game, leaves the app, or drags it into split screen.
+  /// On a large-screen Android there is a taskbar down there as well, so a
+  /// stray touch can launch something else entirely. None of that is
+  /// recoverable by an 84-year-old on his own.
+  ///
+  /// immersiveSticky hides both bars. A deliberate swipe from the edge brings
+  /// them back for a few seconds and then they go again, so NJ can still
+  /// reach Home while his father cannot do it by accident. Every screen in
+  /// the app has its own Back arrow, so nothing depends on the system one.
+  ///
+  /// This does not stop a determined swipe. For that, see the note on screen
+  /// pinning in the patch that added this.
+  static const bool immersiveFullScreen = true;
+
+  /// A dead strip along the bottom of the app, in logical pixels.
+  ///
+  /// With the bars hidden, the app runs to the very bottom edge -- which is
+  /// exactly where the swipe that brings them back lives. Keeping every
+  /// widget a little clear of it means a mis-aimed tap at the bottom row of
+  /// a keypad hits nothing rather than summoning the navigation bar.
+  static const double bottomKeepOut = 20.0;
+
+  /// Swallow the system Back press at the games list.
+  ///
+  /// Back inside a game goes back to the list, which is wanted. Back AT the
+  /// list closes the app, which is not: it is the single press that ends the
+  /// session, and it is indistinguishable from the press that left a game.
+  static const bool blockBackAtHome = true;
+
   /// Always generate the easiest variant and hide any difficulty selector.
   static const bool lockEasiestDifficulty = true;
 
