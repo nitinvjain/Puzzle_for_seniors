@@ -123,4 +123,49 @@ const List<ChoiceQuestion> kahavatQuestions = [
   ChoiceQuestion(prompt: 'Thotha chana baaje ______', options: ['ghana', 'purana', 'sunehra', 'anjana'], answer: 0),
   ChoiceQuestion(prompt: 'Adhjal gagri chhalakat ______', options: ['jaaye', 'rahe', 'gire', 'bahe'], answer: 0),
   ChoiceQuestion(prompt: 'Daal mein kuchh ______', options: ['kaala', 'meetha', 'gila', 'sookha'], answer: 0),
+
+  // ---------------------------------------------------------------------
+  // From a second collection NJ pointed me at, an English-proverb list
+  // with the Hindi kahavat beside each one. Only the Hindi was taken.
+  //
+  // Left out of it:
+  //
+  //   * "bandar kya jaane cocacola ka swaad" -- a modern rewrite of the
+  //     adrak original, which is already in this file.
+  //   * "nazar hati, durghatna ghati" -- a road-safety slogan, not a
+  //     kahavat.
+  //   * "bhaagte bhutni ke baal" -- a garbling of "bhaagte bhoot ki
+  //     langoti hi sahi".
+  //   * "garib ki joru sabki bhabhi" -- unkind, and not something to put
+  //     in front of him.
+  //   * a dozen more that only reworded sayings already here.
+  //
+  // The 150-proverb page at njitm.com could not be read: it returned a
+  // server error twice. Nothing from it is in this file.
+  ChoiceQuestion(prompt: 'Jaisa karoge, waisa ______', options: ['bharoge', 'paoge', 'khaoge', 'laoge'], answer: 0),
+  ChoiceQuestion(prompt: 'Karat karat abhyas ke, jadmati hot ______', options: ['sujan', 'pavan', 'magan', 'gagan'], answer: 0),
+  ChoiceQuestion(prompt: 'Chhota munh, badi ______', options: ['baat', 'raat', 'ghaat', 'saath'], answer: 0),
+  ChoiceQuestion(prompt: 'Aamdani atthanni, kharcha ______', options: ['rupaiya', 'sawaiya', 'bhaiya', 'kanhaiya'], answer: 0),
+  ChoiceQuestion(prompt: 'Sukh ke sab saathi, dukh mein na ______', options: ['koi', 'doi', 'soi', 'roi'], answer: 0),
+  ChoiceQuestion(prompt: 'Jungle mein mor nacha, kisne ______', options: ['dekha', 'sikha', 'likha', 'rakha'], answer: 0),
+  ChoiceQuestion(prompt: 'Bagal mein chhora, shehar mein ______', options: ['dhindhora', 'sapera', 'basera', 'savera'], answer: 0),
+  ChoiceQuestion(prompt: 'Lalach buri ______', options: ['bala', 'kala', 'shaala', 'maala'], answer: 0),
+  ChoiceQuestion(prompt: 'Andha kya chahe, do ______', options: ['aankhen', 'baahein', 'raahein', 'chaahein'], answer: 0),
+  ChoiceQuestion(prompt: 'Aadmi apne ______ se pehchana jata hai', options: ['karmon', 'kapdon', 'shabdon', 'naamon'], answer: 0),
+  ChoiceQuestion(prompt: 'Apna haath ______', options: ['Jagannath', 'Raghunath', 'Vishwanath', 'Somnath'], answer: 0),
+  ChoiceQuestion(prompt: '______ ka kutta, na ghar ka na ghaat ka', options: ['Dhobi', 'Maali', 'Baniye', 'Panditji'], answer: 0),
+  ChoiceQuestion(prompt: 'Kahan Raja Bhoj, kahan Gangu ______', options: ['teli', 'maali', 'dhobi', 'baniya'], answer: 0),
+  ChoiceQuestion(prompt: 'Ghoda ghaas se dosti karega to khayega ______', options: ['kya', 'kahan', 'kaise', 'kab'], answer: 0),
+  ChoiceQuestion(prompt: 'Jhooth ke paanv ______', options: ['nahin hote', 'lambe hote', 'chhote hote', 'bade hote'], answer: 0),
+  ChoiceQuestion(prompt: 'Laaton ke bhoot ______ se nahin maante', options: ['baaton', 'haathon', 'aankhon', 'pairon'], answer: 0),
+  ChoiceQuestion(prompt: 'Laut ke buddhu ghar ko ______', options: ['aaye', 'jaaye', 'gaaye', 'laaye'], answer: 0),
+  ChoiceQuestion(prompt: 'Akal badi ya ______', options: ['bhains', 'gaay', 'ghoda', 'haathi'], answer: 0),
+  ChoiceQuestion(prompt: 'Billi ke gale mein ghanti kaun ______', options: ['baandhe', 'khole', 'dekhe', 'sune'], answer: 0),
+  ChoiceQuestion(prompt: 'Kaante se kaanta ______', options: ['nikalta hai', 'tootta hai', 'chubhta hai', 'jhukta hai'], answer: 0),
+  ChoiceQuestion(prompt: 'Angoor ______ hain', options: ['khatte', 'meethe', 'sookhe', 'kachche'], answer: 0),
+  ChoiceQuestion(prompt: 'Jaisa raja waisi ______', options: ['praja', 'saja', 'laaj', 'raah'], answer: 0),
+  ChoiceQuestion(prompt: 'Hatheli par sarson ______', options: ['jamana', 'ugana', 'bichhana', 'sukhana'], answer: 0),
+  ChoiceQuestion(prompt: 'Andher nagari, chaupat ______', options: ['raja', 'praja', 'nagri', 'sajja'], answer: 0),
+  ChoiceQuestion(prompt: 'Jhooth bole kauwa ______', options: ['kaate', 'gaaye', 'ude', 'aaye'], answer: 0),
+  ChoiceQuestion(prompt: 'Bandar ke haath mein ______', options: ['talwar', 'tasveer', 'kitaab', 'chaabi'], answer: 0),
 ];
