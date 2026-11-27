@@ -173,7 +173,12 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   int? _chosen;
   bool _revealed = false;
   bool _usedFiftyFifty = false;
+  bool _usedPoll = false;
+  bool _usedSwap = false;
   Set<int> _hidden = {};
+
+  /// What the audience said, as a percentage per option. Null until asked.
+  Map<int, int>? _poll;
 
   /// Bumped every time a game starts. A reveal that is still counting down
   /// when the game restarts belongs to a game that no longer exists, so it
@@ -203,6 +208,8 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
       _round = round;
       _rung = 0;
       _usedFiftyFifty = false;
+      _usedPoll = false;
+      _usedSwap = false;
       _generation++;
       _prepareQuestion();
     });
@@ -220,6 +227,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     _chosen = null;
     _revealed = false;
     _hidden = {};
+    _poll = null;
     _optionOrder = [0, 1, 2, 3]..shuffle(_random);
   }
 
@@ -244,6 +252,74 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     setState(() {
       _usedFiftyFifty = true;
       _hidden = wrong.take(2).toSet();
+    });
+  }
+
+  /// Ask the audience.
+  ///
+  /// The audience is mostly right, and deliberately so. On the television
+  /// show the poll is a clue to weigh up; here it is help, and a poll that
+  /// pointed the wrong way would be a trap dressed as a kindness.
+  ///
+  /// The share given to the right answer always starts above half, and
+  /// everything left over is divided among the others -- so no wrong answer
+  /// can come out with the tallest bar, whatever the dice do. That is the
+  /// property worth having, and it falls out of the arithmetic rather than
+  /// being checked for afterwards.
+  void _usePoll() {
+    if (_usedPoll || _revealed) return;
+    final visible = [for (var i = 0; i < 4; i++) if (!_hidden.contains(i)) i];
+    final correct = _question.answer;
+
+    // Higher when the 50:50 has already narrowed it to two: a near-even
+    // split between two options says nothing at all.
+    final top = visible.length <= 2
+        ? 64 + _random.nextInt(17)
+        : 52 + _random.nextInt(23);
+
+    final share = <int, int>{correct: top};
+    var left = 100 - top;
+    final others = [for (final i in visible) if (i != correct) i]
+      ..shuffle(_random);
+    for (var k = 0; k < others.length; k++) {
+      final give = k == others.length - 1 ? left : _random.nextInt(left + 1);
+      share[others[k]] = give;
+      left -= give;
+    }
+    setState(() {
+      _usedPoll = true;
+      _poll = share;
+    });
+  }
+
+  /// Put this question back and take another of the same level.
+  ///
+  /// If the 50:50 has already been spent, it is spent again on the new
+  /// question rather than lost. He cannot un-use a lifeline, and taking one
+  /// away for using another would be a penalty -- which this build does not
+  /// do.
+  void _useSwap() {
+    if (_usedSwap || _revealed) return;
+    final inPlay = {for (final q in _round) q.question};
+    final candidates = _QuestionPool.take(_question.difficulty, 8);
+    QuizQuestion? fresh;
+    for (final candidate in candidates) {
+      if (!inPlay.contains(candidate.question)) {
+        fresh = candidate;
+        break;
+      }
+    }
+    if (fresh == null) return; // nothing new to offer; the button does nothing
+    setState(() {
+      _usedSwap = true;
+      _round[_rung] = fresh!;
+      _prepareQuestion();
+      if (_usedFiftyFifty) {
+        final wrong = [
+          for (var i = 0; i < 4; i++) if (i != _round[_rung].answer) i
+        ]..shuffle(_random);
+        _hidden = wrong.take(2).toSet();
+      }
     });
   }
 
@@ -335,6 +411,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   ) {
     final highlighted =
         _revealed && (index == _question.answer || index == _chosen);
+    final share = _poll?[index];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: DesignSystem.spaceSM),
@@ -365,17 +442,111 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                 ),
               ),
               Expanded(
-                child: Text(
-                  q.options[index],
-                  style: TextStyle(
-                    fontSize: DesignSystem.fontSizeMD,
-                    fontWeight: FontWeight.w700,
-                    color: highlighted ? Colors.white : scheme.onSurface,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      q.options[index],
+                      style: TextStyle(
+                        fontSize: DesignSystem.fontSizeMD,
+                        fontWeight: FontWeight.w700,
+                        color: highlighted ? Colors.white : scheme.onSurface,
+                      ),
+                    ),
+                    if (share != null) ...[
+                      const SizedBox(height: 6),
+                      // The bar and the number together. The number alone is
+                      // a thing to read and compare; the bar is a thing to
+                      // see, and seeing which is longest is the whole point
+                      // of asking the audience.
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: share / 100.0,
+                                minHeight: 10,
+                                backgroundColor: (highlighted
+                                        ? Colors.white
+                                        : scheme.onSurface)
+                                    .withValues(alpha: 0.15),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  highlighted
+                                      ? Colors.white
+                                      : DesignSystem.gamePurple,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: DesignSystem.spaceSM),
+                          Text(
+                            '$share%',
+                            style: TextStyle(
+                              fontSize: DesignSystem.fontSizeSM,
+                              fontWeight: FontWeight.w900,
+                              color: highlighted
+                                  ? Colors.white
+                                  : scheme.onSurface.withValues(alpha: 0.75),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// One lifeline button.
+  ///
+  /// A spent lifeline fades to the surface colour and keeps its icon. It is
+  /// not crossed out and it does not say "no lifelines left": nothing is
+  /// lost by using one, there is no penalty anywhere in this build, and a
+  /// red cross would say otherwise.
+  Widget _lifeline({
+    required ColorScheme scheme,
+    required IconData icon,
+    required String label,
+    required bool used,
+    required Color colour,
+    required VoidCallback onTap,
+  }) {
+    final live = !used && !_revealed;
+    return TangibleButton(
+      color: live ? colour : scheme.surface,
+      radius: DesignSystem.radiusMD,
+      semanticsLabel: label,
+      onTap: live ? onTap : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: DesignSystem.spaceSM),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon,
+                size: 26,
+                color: live
+                    ? Colors.white
+                    : scheme.onSurface.withValues(alpha: 0.45)),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: DesignSystem.fontSize2XS,
+                fontWeight: FontWeight.w900,
+                color: live
+                    ? Colors.white
+                    : scheme.onSurface.withValues(alpha: 0.45),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -479,31 +650,46 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                 _buildOption(visible[position], position, q, scheme),
 
               const SizedBox(height: DesignSystem.spaceMD),
-              // One lifeline, which is plenty: more would be more to remember.
-              TangibleButton(
-                color: _usedFiftyFifty
-                    ? scheme.surface
-                    : DesignSystem.gamePurple,
-                radius: DesignSystem.radiusMD,
-                onTap: _usedFiftyFifty || _revealed ? null : _useFiftyFifty,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: DesignSystem.spaceSM),
-                  child: Center(
-                    child: Text(
-                      _usedFiftyFifty
-                          ? '50 : 50  already used'
-                          : 'USE 50 : 50  (removes two wrong answers)',
-                      style: TextStyle(
-                        fontSize: DesignSystem.fontSizeSM,
-                        fontWeight: FontWeight.w900,
-                        color: _usedFiftyFifty
-                            ? scheme.onSurface.withValues(alpha: 0.5)
-                            : Colors.white,
-                      ),
+              // Three lifelines, side by side and labelled with one word
+              // each. They were one wide button carrying a sentence; three
+              // sentences would be three things to read before he can
+              // answer, and an icon with a single word is less to hold at
+              // once than a line of explanation.
+              Row(
+                children: [
+                  Expanded(
+                    child: _lifeline(
+                      scheme: scheme,
+                      icon: Icons.call_split_rounded,
+                      label: '50 : 50',
+                      used: _usedFiftyFifty,
+                      colour: DesignSystem.gamePurple,
+                      onTap: _useFiftyFifty,
                     ),
                   ),
-                ),
+                  const SizedBox(width: DesignSystem.spaceSM),
+                  Expanded(
+                    child: _lifeline(
+                      scheme: scheme,
+                      icon: Icons.groups_rounded,
+                      label: 'Audience',
+                      used: _usedPoll,
+                      colour: DesignSystem.gameTeal,
+                      onTap: _usePoll,
+                    ),
+                  ),
+                  const SizedBox(width: DesignSystem.spaceSM),
+                  Expanded(
+                    child: _lifeline(
+                      scheme: scheme,
+                      icon: Icons.autorenew_rounded,
+                      label: 'New one',
+                      used: _usedSwap,
+                      colour: DesignSystem.gameOrange,
+                      onTap: _useSwap,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: DesignSystem.spaceLG),
             ],
