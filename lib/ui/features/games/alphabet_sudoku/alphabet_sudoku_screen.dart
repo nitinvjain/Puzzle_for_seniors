@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../providers/picked_value_provider.dart';
 import 'alphabet_sudoku_provider.dart';
 import 'alphabet_sudoku_engine.dart';
 import '../../../../widgets/game_completion_dialog.dart';
@@ -119,7 +121,80 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
     );
   }
 
+  /// Touching a key on the pad.
+  ///
+  /// Both orders work, as they do in Cross Math: pick the value and then
+  /// touch squares, or touch a square and then pick the value. [value] 0 is
+  /// the eraser.
+  void _tapPadKey(AlphabetSudokuState state, AlphabetSudokuNotifier notifier, int value) {
+    HapticFeedbackUtil.lightImpact();
+    final selR = state.selectedRow;
+    final selC = state.selectedCol;
+    ref.read(pickedValueProvider.notifier).toggle(value);
+    final picked = ref.read(pickedValueProvider);
+    // A square was already waiting, so fill it rather than make him touch
+    // it a second time.
+    if (picked != null && selR != null && selC != null) {
+      _applyTo(state, notifier, selR, selC, value);
+    }
+  }
+
+  /// Put [value] into the square at [r],[c]. 0 clears it.
+  ///
+  /// setNumber works on whatever square is selected and toggles, so the
+  /// square is selected first and the eraser passes the digit already
+  /// there, which is how the pad's backspace key has always cleared a cell.
+  void _applyTo(AlphabetSudokuState state, AlphabetSudokuNotifier notifier, int r, int c, int value) {
+    notifier.selectCell(r, c);
+    if (value == 0) {
+      final current = state.currentBoard[r][c];
+      if (current != 0) notifier.setNumber(current);
+      return;
+    }
+    notifier.setNumber(value);
+  }
+
+  /// The tile that follows the finger while a value is being carried.
+  ///
+  /// Lifted up and left so the value is not hidden under the hand carrying
+  /// it, the same way Cross Math does it.
+  static Widget _dragFeedback(int value) {
+    return Transform.translate(
+      offset: const Offset(-32, -52),
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            color: DesignSystem.primary,
+            borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
+            border: Border.all(color: Colors.white, width: 2.0),
+          ),
+          child: Center(
+            child: value == 0
+                ? const Icon(Icons.backspace_rounded,
+                    size: 28, color: Colors.white)
+                : Text(
+                    '$value',
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNumberPad(AlphabetSudokuState state, AlphabetSudokuNotifier notifier) {
+    // Which value is being carried, so the pad can show it. Without
+    // this there is nothing on screen to say what a touch will put down,
+    // and a technique you cannot see the state of is not one you can
+    // learn.
+    final picked = ref.watch(pickedValueProvider);
     final counts = {for (int i = 1; i <= 9; i++) i: 0};
     for (var row in state.currentBoard) {
       for (var val in row) {
@@ -138,19 +213,28 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
             final num = i + 1;
             final isCompleted = (counts[num] ?? 0) >= 9;
 
-            return SizedBox(
+            return Draggable<int>(
+              data: num,
+              dragAnchorStrategy: pointerDragAnchorStrategy,
+              feedback: _dragFeedback(num),
+              onDragStarted: () {
+                HapticFeedbackUtil.selectionClick();
+                ref.read(pickedValueProvider.notifier).pick(num);
+              },
+              child: SizedBox(
               width: 44,
               height: 44,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   TangibleButton(
-                    color: isCompleted ? DesignSystem.success : Theme.of(context).colorScheme.surface,
+                    color: picked == num
+                        ? DesignSystem.primary
+                        : (isCompleted
+                            ? DesignSystem.success
+                            : Theme.of(context).colorScheme.surface),
                     shadowColor: isCompleted ? const Color(0xFF047857) : Theme.of(context).colorScheme.outline,
-                    onTap: () {
-                      HapticFeedbackUtil.lightImpact();
-                      notifier.setNumber(num);
-                    },
+                    onTap: () => _tapPadKey(state, notifier, num),
                     padding: EdgeInsets.zero,
                     child: Center(
                       child: FittedBox(
@@ -159,7 +243,9 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
                           style: TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 18,
-                            color: isCompleted ? Colors.white : DesignSystem.primary,
+                            color: (isCompleted || picked == num)
+                                ? Colors.white
+                                : DesignSystem.primary,
                           ),
                         ),
                       ),
@@ -190,34 +276,41 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
                     ),
                 ],
               ),
+              ),
             );
           }),
-          SizedBox(
+          Draggable<int>(
+            data: 0,
+            dragAnchorStrategy: pointerDragAnchorStrategy,
+            feedback: _dragFeedback(0),
+            onDragStarted: () {
+              HapticFeedbackUtil.selectionClick();
+              ref.read(pickedValueProvider.notifier).pick(0);
+            },
+            child: SizedBox(
             width: 44,
             height: 44,
             child: TangibleButton(
-              color: Theme.of(context).colorScheme.surface,
+              color: picked == 0
+                  ? DesignSystem.primary
+                  : Theme.of(context).colorScheme.surface,
               shadowColor: Theme.of(context).colorScheme.outline,
-              onTap: () {
-                HapticFeedbackUtil.mediumImpact();
-                final selR = state.selectedRow;
-                final selC = state.selectedCol;
-                if (selR != null && selC != null) {
-                  final currentVal = state.currentBoard[selR][selC];
-                  if (currentVal != 0) {
-                    notifier.setNumber(currentVal);
-                  }
-                }
-              },
+              onTap: () => _tapPadKey(state, notifier, 0),
               padding: EdgeInsets.zero,
               child: Center(
                 child: Icon(
                   Icons.backspace_rounded,
                   size: 16,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: picked == 0
+                      ? Colors.white
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                 ),
               ),
             ),
+          ),
           ),
         ],
       ),
@@ -268,9 +361,31 @@ class AlphabetSudokuCell extends ConsumerWidget {
     final bool borderRight = (col + 1) % 3 == 0 && col < 8;
     final bool borderBottom = (row + 1) % 3 == 0 && row < 8;
 
-    return GestureDetector(
+    // Cross Math's technique, here too. If a value has been picked up, a
+    // touch puts it down in this square; if nothing has, the touch selects
+    // the square and the value comes second, which is how it always worked.
+    void place(int picked) {
+      if (isInitial) return;
+      notifier.selectCell(row, col);
+      if (picked == 0) {
+        // setNumber toggles, so clearing means passing back what is there.
+        if (value != 0) notifier.setNumber(value);
+        return;
+      }
+      notifier.setNumber(picked);
+    }
+
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (_) => !isInitial,
+      onAcceptWithDetails: (details) => place(details.data),
+      builder: (context, candidate, _) => GestureDetector(
       onTap: () {
         HapticFeedbackUtil.selectionClick();
+        final picked = ref.read(pickedValueProvider);
+        if (picked != null && !isInitial) {
+          place(picked);
+          return;
+        }
         notifier.selectCell(row, col);
       },
       child: AnimatedContainer(
@@ -308,6 +423,7 @@ class AlphabetSudokuCell extends ConsumerWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }

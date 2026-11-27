@@ -27,6 +27,20 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
   late SimpleSudokuPuzzle _puzzle;
   late List<List<int>> _entries; // 0 = still empty
   Point<int>? _selected;
+
+  /// The digit chosen from the pad, 0 for the eraser.
+  ///
+  /// Cross Math works by picking a value and then touching the square it
+  /// goes in, and NJ wants that one technique everywhere, so his father
+  /// learns it once. Both orders work here, exactly as they do there: pick a
+  /// digit then tap squares, or tap a square then pick a digit.
+  ///
+  /// One difference from Cross Math, on purpose. There a tray tile is used
+  /// up when placed, so the selection clears. A sudoku digit is not used up
+  /// -- a 5 goes in several squares -- so the chosen digit stays chosen and
+  /// only the square clears. Picking it again for every square would be the
+  /// same technique made tedious.
+  int? _selectedValue;
   int _completed = 0;
 
   /// The 3x3 boxes that have already earned their stage points.
@@ -93,11 +107,39 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
     return true;
   }
 
-  void _enter(int value) {
-    final sel = _selected;
-    if (sel == null || _puzzle.isGiven(sel.x, sel.y)) return;
-    setState(() => _entries[sel.x][sel.y] = value);
-    if (value != 0 && value != _puzzle.solution[sel.x][sel.y]) {
+  /// A digit on the pad was touched.
+  void _tapPad(int value) {
+    HapticFeedbackUtil.selectionClick();
+    final waiting = _selected;
+    setState(() {
+      _selectedValue = _selectedValue == value ? null : value;
+      if (_selectedValue != null) _selected = null;
+    });
+    // The other order round: a square was already waiting, so fill it.
+    if (waiting != null && _selectedValue != null) _place(waiting, value);
+  }
+
+  /// A square was touched.
+  void _tapCell(int r, int c) {
+    if (_puzzle.isGiven(r, c)) return;
+    final value = _selectedValue;
+    if (value != null) {
+      _place(Point(r, c), value);
+      return;
+    }
+    HapticFeedbackUtil.selectionClick();
+    setState(() => _selected = Point(r, c));
+  }
+
+  /// Put [value] in [at], however it got there -- tapped, or dropped.
+  void _place(Point<int> at, int value) {
+    if (_puzzle.isGiven(at.x, at.y)) return;
+    setState(() {
+      _entries[at.x][at.y] = value;
+      // The digit stays chosen for the next square; the square does not.
+      _selected = null;
+    });
+    if (value != 0 && value != _puzzle.solution[at.x][at.y]) {
       // Wrong answers simply do not advance: the digit sits there in red
       // until it is changed. Nothing is lost and nothing ends.
       HapticFeedbackUtil.error();
@@ -132,9 +174,22 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
   }
 
   Widget _buildCell(int r, int c, double size, ColorScheme scheme) {
+    if (_puzzle.isGiven(r, c)) return _cellBody(r, c, size, scheme, false);
+    return DragTarget<int>(
+      onAcceptWithDetails: (details) => _place(Point(r, c), details.data),
+      builder: (context, candidate, _) =>
+          _cellBody(r, c, size, scheme, candidate.isNotEmpty),
+    );
+  }
+
+  /// [hovered] is true while a dragged digit is over this square, which
+  /// lights it the same amber a chosen square gets -- so the drop lands
+  /// where the colour says it will.
+  Widget _cellBody(
+      int r, int c, double size, ColorScheme scheme, bool hovered) {
     final given = _puzzle.isGiven(r, c);
     final value = _entries[r][c];
-    final selected = _selected == Point(r, c);
+    final selected = _selected == Point(r, c) || hovered;
     final wrong = !given && value != 0 && value != _puzzle.solution[r][c];
 
     // Shade alternate 3x3 boxes so the box boundaries are obvious without
@@ -142,7 +197,7 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
     final box = (r ~/ 3 + c ~/ 3) % 2 == 0;
 
     return GestureDetector(
-      onTap: given ? null : () => setState(() => _selected = Point(r, c)),
+      onTap: given ? null : () => _tapCell(r, c),
       child: Container(
         width: size,
         height: size,
@@ -186,6 +241,88 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  /// One key of the number pad: 1 to 9, or 0 for the eraser.
+  ///
+  /// Tappable and draggable, the two ways Cross Math offers. The drag is
+  /// what NJ asked for there and it carries over unchanged -- a digit picked
+  /// up and carried to a square is a gesture that says what it does, which
+  /// is worth more than a tap for someone who has to work out what a screen
+  /// means each time.
+  Widget _padKey(int value, ColorScheme scheme) {
+    final chosen = _selectedValue == value;
+    final label = value == 0
+        ? Icon(Icons.backspace_outlined,
+            size: 26, color: chosen ? Colors.white : scheme.onSurface)
+        : Text(
+            '$value',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: chosen ? Colors.white : scheme.onSurface,
+            ),
+          );
+
+    final key = TangibleButton(
+      color: chosen ? DesignSystem.primary : scheme.surface,
+      radius: DesignSystem.radiusSM,
+      padding: EdgeInsets.zero,
+      borderWidth: 2.0,
+      borderColor: chosen ? null : scheme.onSurface.withValues(alpha: 0.35),
+      onTap: () => _tapPad(value),
+      child: SizedBox(
+        width: SeniorMode.minTapTarget,
+        height: SeniorMode.minTapTarget,
+        child: Center(child: label),
+      ),
+    );
+
+    return Draggable<int>(
+      data: value,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      // Lifted up and to the left of the fingertip, so the digit being
+      // carried is not under the hand carrying it.
+      feedback: Transform.translate(
+        offset: const Offset(-34, -54),
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 68,
+            height: 68,
+            decoration: BoxDecoration(
+              color: DesignSystem.primary,
+              borderRadius: BorderRadius.circular(DesignSystem.radiusSM),
+              border: Border.all(color: Colors.white, width: 2.0),
+            ),
+            child: Center(
+              child: value == 0
+                  ? const Icon(Icons.backspace_outlined,
+                      size: 30, color: Colors.white)
+                  : Text(
+                      '$value',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.35, child: key),
+      // Picking a digit up chooses it too, so letting go over nothing still
+      // leaves it ready to tap a square with.
+      onDragStarted: () {
+        HapticFeedbackUtil.selectionClick();
+        setState(() {
+          _selectedValue = value;
+          _selected = null;
+        });
+      },
+      child: key,
     );
   }
 
@@ -244,44 +381,8 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
                     spacing: DesignSystem.spaceXS,
                     runSpacing: DesignSystem.spaceXS,
                     children: [
-                      for (var v = 1; v <= 9; v++)
-                        TangibleButton(
-                          color: scheme.surface,
-                          radius: DesignSystem.radiusSM,
-                          padding: EdgeInsets.zero,
-                          onTap: () => _enter(v),
-                          child: SizedBox(
-                            width: SeniorMode.minTapTarget,
-                            height: SeniorMode.minTapTarget,
-                            child: Center(
-                              child: Text(
-                                '$v',
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w900,
-                                  color: scheme.onSurface,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      TangibleButton(
-                        color: scheme.surface,
-                        radius: DesignSystem.radiusSM,
-                        padding: EdgeInsets.zero,
-                        onTap: () => _enter(0),
-                        child: SizedBox(
-                          width: SeniorMode.minTapTarget,
-                          height: SeniorMode.minTapTarget,
-                          child: Center(
-                            child: Icon(
-                              Icons.backspace_outlined,
-                              size: 26,
-                              color: scheme.onSurface,
-                            ),
-                          ),
-                        ),
-                      ),
+                      for (var v = 1; v <= 9; v++) _padKey(v, scheme),
+                      _padKey(0, scheme),
                     ],
                   ),
                 ),
