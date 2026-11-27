@@ -116,4 +116,47 @@ const List<MatchSet> matchSets = [
     MatchPair('Eid-ul-Fitr', 'The end of Ramadan'),
     MatchPair('Makar Sankranti', 'Kites and the turning sun'),
   ]),
+  MatchSet('Match each kahavat to how it ends', [
+    MatchPair('Ab pachhtaye hot kya', 'chidiya chug gayi khet'),
+    MatchPair('Naach na jaane', 'aangan tedha'),
+    MatchPair('Khoda pahaad', 'nikla chooha'),
+    MatchPair('Aam ke aam', 'guthliyon ke daam'),
+    MatchPair('Oonchi dukaan', 'pheeka pakwan'),
+    MatchPair('Jal mein rehkar', 'magar se bair'),
+    MatchPair('Ek haath se', 'taali nahin bajti'),
+    MatchPair('Bandar kya jaane', 'adrak ka swaad'),
+    MatchPair('Jaisi karni', 'waisi bharni'),
+    MatchPair('Ghar ka bhedi', 'lanka dhaye'),
+  ]),
+  // Song to singer, which is a fact about a record rather than anything out
+  // of the song. NJ asked for "gaana pura karo"; finishing a line means
+  // reproducing a lyric, which is somebody's work. Who sang it is not.
+  MatchSet('Match each song to who sang it', [
+    MatchPair('Mere Sapno Ki Rani', 'Kishore Kumar'),
+    MatchPair('Lag Ja Gale', 'Lata Mangeshkar'),
+    MatchPair('Chaudhvin Ka Chand', 'Mohammed Rafi'),
+    MatchPair('Awaara Hoon', 'Mukesh'),
+    MatchPair('Piya Tu Ab To Aaja', 'Asha Bhosle'),
+    MatchPair('Babuji Dheere Chalna', 'Geeta Dutt'),
+    MatchPair('Yeh Raat Yeh Chandni', 'Hemant Kumar'),
+    MatchPair('Zindagi Kaisi Hai Paheli', 'Manna Dey'),
+    MatchPair('Jalte Hain Jiske Liye', 'Talat Mahmood'),
+    MatchPair('Neele Gagan Ke Tale', 'Mahendra Kapoor'),
+  ]),
+  // Things that were ordinary when he was young and have since disappeared.
+  // Recognition, which survives when recall does not -- and the kind of
+  // board that tends to start him talking, which is worth as much as the
+  // puzzle to whoever is sitting with him.
+  MatchSet('Match each thing to what it was for', [
+    MatchPair('Slate and chalk', 'Writing at school'),
+    MatchPair('Inkpot', 'Filling a pen'),
+    MatchPair('Telegram', 'Urgent news'),
+    MatchPair('Ration card', 'Buying grain'),
+    MatchPair('Transistor', 'Hearing the news'),
+    MatchPair('Tiffin carrier', 'Carrying lunch'),
+    MatchPair('Sil-batta', 'Grinding masala'),
+    MatchPair('Hand pankha', 'Keeping cool'),
+    MatchPair('Lantern', 'Light at night'),
+    MatchPair('Sewing machine', 'Stitching clothes'),
+  ]),
 ];

@@ -5,6 +5,9 @@ import '../ui/features/games/number_connect/number_connect_metadata.dart';
 import '../ui/features/games/quiz_ladder/quiz_ladder_metadata.dart';
 import '../ui/features/games/simple_choice/song_title_metadata.dart';
 import '../ui/features/games/simple_choice/kahavat_metadata.dart';
+import '../ui/features/games/simple_choice/formula_metadata.dart';
+import '../ui/features/games/simple_choice/galti_metadata.dart';
+import '../ui/features/games/simple_choice/naap_tol_metadata.dart';
 import '../ui/features/games/simple_choice/which_came_first_metadata.dart';
 import '../ui/features/games/simple_choice/tables_metadata.dart';
 import '../ui/features/games/simple_choice/not_like_the_others_metadata.dart';
@@ -362,6 +365,9 @@ List<GameMetadata> _buildGameList() {
     quizLadderMetadata,
     songTitleMetadata,
     kahavatMetadata,
+    formulaMetadata,
+    galtiMetadata,
+    naapTolMetadata,
     whichCameFirstMetadata,
     tablesMetadata,
     notLikeTheOthersMetadata,
