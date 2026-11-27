@@ -42,15 +42,33 @@ class _WordSearchScreenState extends ConsumerState<WordSearchScreen> {
   /// from one another. They are deliberately deep rather than bright: a pale
   /// highlight with dark letters on it is the combination that disappears
   /// first on a phone held at arm's length in daylight.
+  /// One colour per word, and they have to be told apart at a glance.
+  ///
+  /// Ten rather than eight, because the longer board has ten words and a
+  /// repeated colour would put the same marker on two different words.
+  ///
+  /// Chosen by measurement, not by eye. Every one clears 4.2:1 against the
+  /// board, 3.7:1 against the word panel and 4.8:1 under its white letters;
+  /// and every pair is at least 25 apart in CIE Lab with at least 22 degrees
+  /// of hue between them. The hue rule matters as much as the distance: an
+  /// older eye separates colours by hue far better than by lightness, so two
+  /// colours that differ only in how dark they are would not do.
+  ///
+  /// That measurement also turned up a fault in the eight already shipped --
+  /// the orange (#C2410C) sat only 16 Lab units and 17 degrees from the red
+  /// (#B91C1C), close enough to read as the same colour. The orange is gone
+  /// and three new hues take its place. The other seven are unchanged.
   static const List<Color> _wordColours = [
-    Color(0xFFBE185D), // berry
+    Color(0xFFB91C1C), // red
+    Color(0xFF753E1D), // brown
+    Color(0xFF856A00), // dark gold
+    Color(0xFF008500), // green
+    Color(0xFF047857), // emerald
+    Color(0xFF0E7490), // teal
     Color(0xFF1D4ED8), // blue
-    Color(0xFF047857), // green
-    Color(0xFFC2410C), // orange
     Color(0xFF7C3AED), // violet
-    Color(0xFF0E7490), // cyan
-    Color(0xFFB91C1C), // crimson
     Color(0xFFA21CAF), // magenta
+    Color(0xFFBE185D), // pink
   ];
 
   static Color _colourFor(int index) =>

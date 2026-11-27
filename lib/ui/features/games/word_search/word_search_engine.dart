@@ -24,35 +24,66 @@ class WordSearchBoard {
   });
 }
 
+/// What to build. Carried as one object because the board is generated on a
+/// background isolate through [compute], which hands across a single argument.
+class WordSearchRequest {
+  final List<String> candidates;
+  final int boardSize;
+  final int maxWords;
+
+  const WordSearchRequest({
+    required this.candidates,
+    required this.boardSize,
+    required this.maxWords,
+  });
+}
+
 class WordSearchEngine {
+  /// The everyday board.
   static const int boardSize = 10;
+  static const int defaultWordCount = 8;
+
+  /// The longer board, every other round.
+  static const int largeBoardSize = 12;
+  static const int largeWordCount = 10;
+
   static final Random _random = Random();
 
-  static WordSearchBoard generateBoard(List<String> candidates) {
-    List<List<String>> grid =
-        List.generate(boardSize, (_) => List.filled(boardSize, ''));
+  /// The old entry point, kept so anything still calling it gets the
+  /// everyday board.
+  static WordSearchBoard generateBoard(List<String> candidates) => generate(
+        WordSearchRequest(
+          candidates: candidates,
+          boardSize: boardSize,
+          maxWords: defaultWordCount,
+        ),
+      );
+
+  static WordSearchBoard generate(WordSearchRequest request) {
+    final int size = request.boardSize;
+    List<List<String>> grid = List.generate(size, (_) => List.filled(size, ''));
     List<WordSearchWord> placedWords = [];
 
-    // Try to place up to 8 words
-    for (String word in candidates) {
-      if (placedWords.length >= 8) break;
-      _tryPlaceWord(grid, word, placedWords);
+    for (String word in request.candidates) {
+      if (placedWords.length >= request.maxWords) break;
+      _tryPlaceWord(grid, word, placedWords, size);
     }
 
     // Fill remaining empty cells with random letters
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    for (int y = 0; y < boardSize; y++) {
-      for (int x = 0; x < boardSize; x++) {
+    for (int y = 0; y < size; y++) {
+      for (int x = 0; x < size; x++) {
         if (grid[y][x] == '') {
           grid[y][x] = letters[_random.nextInt(letters.length)];
         }
       }
     }
 
-    return WordSearchBoard(size: boardSize, grid: grid, words: placedWords);
+    return WordSearchBoard(size: size, grid: grid, words: placedWords);
   }
 
-  static bool _tryPlaceWord(List<List<String>> grid, String word, List<WordSearchWord> placedWords) {
+  static bool _tryPlaceWord(List<List<String>> grid, String word,
+      List<WordSearchWord> placedWords, int boardSize) {
     // Directions: [dx, dy]
     final directions = [
       [1, 0],   // Horizontal
@@ -74,7 +105,7 @@ class WordSearchEngine {
         int startX = startIndex % boardSize;
         int startY = startIndex ~/ boardSize;
         
-        if (_canPlace(grid, word, startX, startY, dx, dy)) {
+        if (_canPlace(grid, word, startX, startY, dx, dy, boardSize)) {
           List<Point<int>> positions = [];
           for (int i = 0; i < word.length; i++) {
             int x = startX + (i * dx);
@@ -90,7 +121,8 @@ class WordSearchEngine {
     return false;
   }
 
-  static bool _canPlace(List<List<String>> grid, String word, int startX, int startY, int dx, int dy) {
+  static bool _canPlace(List<List<String>> grid, String word, int startX,
+      int startY, int dx, int dy, int boardSize) {
     int endX = startX + (word.length - 1) * dx;
     int endY = startY + (word.length - 1) * dy;
 
