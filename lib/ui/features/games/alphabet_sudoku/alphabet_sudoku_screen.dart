@@ -5,6 +5,7 @@ import '../../../../providers/picked_value_provider.dart';
 import 'alphabet_sudoku_provider.dart';
 import 'alphabet_sudoku_engine.dart';
 import '../../../../widgets/game_completion_dialog.dart';
+import '../../../../widgets/grid_drop_area.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
@@ -19,6 +20,9 @@ class AlphabetSudokuScreen extends ConsumerStatefulWidget {
 }
 
 class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
+  /// Measured by the drop area to work out which square a drop lands in.
+  final GlobalKey _gridKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -88,7 +92,16 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
   }
 
   Widget _buildGrid(AlphabetSudokuState state, AlphabetSudokuNotifier notifier, double maxHeight) {
-    return Padding(
+    // One target for the whole grid. The aim point is the tile's centre
+    // rather than the fingertip 20 pixels below it, and every square's
+    // share of the grid is live, so there is no gap to drop into.
+    return GridDropArea(
+      rows: 9,
+      columns: 9,
+      gridKey: _gridKey,
+      canAccept: (r, c) => state.initialBoard[r][c] == 0,
+      onPlace: (r, c, value) => _applyTo(state, notifier, r, c, value),
+      builder: (context, hoverR, hoverC) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -102,12 +115,17 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(DesignSystem.radiusSM - 2),
               child: Column(
+                key: _gridKey,
                 children: List.generate(9, (r) {
                   return Expanded(
                     child: Row(
                       children: List.generate(9, (c) {
                         return Expanded(
-                          child: AlphabetSudokuCell(row: r, col: c),
+                          child: AlphabetSudokuCell(
+                            row: r,
+                            col: c,
+                            hovered: hoverR == r && hoverC == c,
+                          ),
                         );
                       }),
                     ),
@@ -117,6 +135,7 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -320,10 +339,17 @@ class _AlphabetSudokuScreenState extends ConsumerState<AlphabetSudokuScreen> {
 
 class AlphabetSudokuCell extends ConsumerWidget {
   final int row;
+
+  /// True when a drop would land here. Worked out for the whole grid at
+  /// once by GridDropArea: a DragTarget per cell left the gaps between them
+  /// as dead ground, and the drop point was the fingertip rather than the
+  /// tile he was aiming.
+  final bool hovered;
   final int col;
 
   const AlphabetSudokuCell({
     super.key,
+    this.hovered = false,
     required this.row,
     required this.col,
   });
@@ -335,7 +361,10 @@ class AlphabetSudokuCell extends ConsumerWidget {
     // Selectively watch only the data this cell needs
     final value = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.currentBoard[row][col] ?? 0));
     final isInitial = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.initialBoard[row][col] != 0));
-    final isSelected = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.selectedRow == row && s.value?.selectedCol == col));
+    final isChosen = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.selectedRow == row && s.value?.selectedCol == col));
+    // A square a drop would land in reads the same as a chosen one, so
+    // the colour says where the number is going before he lets go.
+    final isSelected = isChosen || hovered;
 
     final selR = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.selectedRow));
     final selC = ref.watch(alphabetSudokuNotifierProvider.select((s) => s.value?.selectedCol));
@@ -375,10 +404,7 @@ class AlphabetSudokuCell extends ConsumerWidget {
       notifier.setNumber(picked);
     }
 
-    return DragTarget<int>(
-      onWillAcceptWithDetails: (_) => !isInitial,
-      onAcceptWithDetails: (details) => place(details.data),
-      builder: (context, candidate, _) => GestureDetector(
+    return GestureDetector(
       onTap: () {
         HapticFeedbackUtil.selectionClick();
         final picked = ref.read(pickedValueProvider);
@@ -423,7 +449,6 @@ class AlphabetSudokuCell extends ConsumerWidget {
             ),
           ),
         ),
-      ),
       ),
     );
   }

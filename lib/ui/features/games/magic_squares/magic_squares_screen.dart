@@ -8,6 +8,7 @@ import '../../../../../providers/user_providers.dart';
 import '../../../../../utils/haptic_feedback.dart';
 import '../../../core/juice/game_scaffold.dart';
 import '../../../../widgets/game_completion_dialog.dart';
+import '../../../../widgets/grid_drop_area.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../../utils/design_system.dart';
 import 'magic_squares_provider.dart';
@@ -31,6 +32,9 @@ class _MagicSquaresScreenState extends ConsumerState<MagicSquaresScreen> {
   /// measured there (ink 15.7:1 on the mat, the outline 3.8:1 against it),
   /// and a second shade of blue invented here would only make the app look
   /// like two apps.
+  /// Measured by the drop area to work out which cell a drop lands in.
+  final GlobalKey _gridKey = GlobalKey();
+
   static const Color _skyBoard = Color(0xFFE4F2FD);
   static const Color _skyGiven = Color(0xFFCFE6F8);
   static const Color _skyLine = Color(0xFF4A7FA8);
@@ -96,24 +100,35 @@ class _MagicSquaresScreenState extends ConsumerState<MagicSquaresScreen> {
       subtitle: l10n.magicSquaresSubtitle(state.targetSum),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          return Column(
+          // Wrapping the whole body, not just the square, so a tile let go
+          // a little off the edge still finds its cell.
+          return GridDropArea(
+            rows: 3,
+            columns: 3,
+            gridKey: _gridKey,
+            canAccept: (r, c) => !state.fixed[r][c],
+            onPlace: (r, c, value) => _applyTo(notifier, r, c, value),
+            builder: (context, hoverR, hoverC) => Column(
             children: [
               const Spacer(),
               // The square was capped at half the height because the old
               // pad needed the other half. Ten small keys need far less, so
               // the square takes the difference.
-              _buildGrid(state, notifier, constraints.maxHeight * 0.58),
+              _buildGrid(state, notifier, constraints.maxHeight * 0.58,
+                  hoverR, hoverC),
               const Spacer(),
               _buildNumpad(state, notifier),
               const SizedBox(height: DesignSystem.spaceLG),
             ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildGrid(MagicSquaresState state, MagicSquaresNotifier notifier, double maxHeight) {
+  Widget _buildGrid(MagicSquaresState state, MagicSquaresNotifier notifier,
+      double maxHeight, int? hoverR, int? hoverC) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
       child: ConstrainedBox(
@@ -128,6 +143,7 @@ class _MagicSquaresScreenState extends ConsumerState<MagicSquaresScreen> {
             ),
             padding: const EdgeInsets.all(DesignSystem.spaceXS),
             child: Column(
+            key: _gridKey,
             children: List.generate(3, (r) {
               return Expanded(
                 child: Row(
@@ -139,12 +155,10 @@ class _MagicSquaresScreenState extends ConsumerState<MagicSquaresScreen> {
                     return Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(DesignSystem.spaceSM),
-                        child: DragTarget<int>(
-                          onWillAcceptWithDetails: (_) => !isFixed,
-                          onAcceptWithDetails: (details) =>
-                              _applyTo(notifier, r, c, details.data),
-                          builder: (context, candidate, _) {
-                            final lit = isSelected || candidate.isNotEmpty;
+                        child: Builder(
+                          builder: (context) {
+                            final lit = isSelected ||
+                                (hoverR == r && hoverC == c);
                             return TangibleButton(
                           onTap: () => _tapCell(notifier, r, c),
                           color: lit

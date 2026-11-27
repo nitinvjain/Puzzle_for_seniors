@@ -10,6 +10,7 @@ import '../../../../providers/user_providers.dart';
 import '../../../../utils/design_system.dart';
 import '../../../../utils/haptic_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
+import '../../../../widgets/grid_drop_area.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../core/juice/game_scaffold.dart';
 import 'simple_sudoku_engine.dart';
@@ -53,6 +54,9 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
   /// it cannot pay twice, and so that a box dealt already complete can be
   /// marked paid at the start and never earn anything he did not do.
   final Set<int> _boxesPaid = {};
+
+  /// Measured by the drop area to work out which square a drop lands in.
+  final GlobalKey _gridKey = GlobalKey();
 
   @override
   void initState() {
@@ -173,13 +177,13 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
     );
   }
 
-  Widget _buildCell(int r, int c, double size, ColorScheme scheme) {
-    if (_puzzle.isGiven(r, c)) return _cellBody(r, c, size, scheme, false);
-    return DragTarget<int>(
-      onAcceptWithDetails: (details) => _place(Point(r, c), details.data),
-      builder: (context, candidate, _) =>
-          _cellBody(r, c, size, scheme, candidate.isNotEmpty),
-    );
+  /// [hoverR],[hoverC] is the square a drop would currently land in, which
+  /// the drop area works out for the whole grid at once. Each cell used to
+  /// be its own DragTarget, which meant the gaps between them were dead
+  /// ground and a drop there was silently thrown away.
+  Widget _buildCell(int r, int c, double size, ColorScheme scheme, int? hoverR,
+      int? hoverC) {
+    return _cellBody(r, c, size, scheme, hoverR == r && hoverC == c);
   }
 
   /// [hovered] is true while a dragged digit is over this square, which
@@ -349,12 +353,21 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
             );
             final cell = boardSide / 9;
 
-            return Column(
+            // The drop area wraps the whole body, not just the board, so a
+            // tile let go a little off the edge still finds its square.
+            return GridDropArea(
+              rows: 9,
+              columns: 9,
+              gridKey: _gridKey,
+              canAccept: (r, c) => !_puzzle.isGiven(r, c),
+              onPlace: (r, c, value) => _place(Point(r, c), value),
+              builder: (context, hoverR, hoverC) => Column(
               children: [
                 const SizedBox(height: DesignSystem.spaceSM),
                 Expanded(
                   child: Center(
                     child: SizedBox(
+                      key: _gridKey,
                       width: cell * 9,
                       height: cell * 9,
                       child: Column(
@@ -363,7 +376,8 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
                           (r) => Row(
                             children: List.generate(
                               9,
-                              (c) => _buildCell(r, c, cell, scheme),
+                              (c) =>
+                                  _buildCell(r, c, cell, scheme, hoverR, hoverC),
                             ),
                           ),
                         ),
@@ -388,6 +402,7 @@ class _SimpleSudokuScreenState extends ConsumerState<SimpleSudokuScreen> {
                 ),
                 const SizedBox(height: DesignSystem.spaceMD),
               ],
+              ),
             );
           },
         ),

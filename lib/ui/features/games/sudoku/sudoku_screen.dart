@@ -8,6 +8,7 @@ import '../../../../../providers/user_providers.dart';
 import '../../../../../utils/design_system.dart';
 import '../../../../../utils/haptic_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
+import '../../../../widgets/grid_drop_area.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../core/juice/game_scaffold.dart';
 
@@ -19,6 +20,9 @@ class SudokuScreen extends ConsumerStatefulWidget {
 }
 
 class _SudokuScreenState extends ConsumerState<SudokuScreen> {
+  /// Measured by the drop area to work out which square a drop lands in.
+  final GlobalKey _gridKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -90,7 +94,16 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
   }
 
   Widget _buildGrid(SudokuState state, SudokuNotifier notifier, double maxHeight) {
-    return Padding(
+    // One target for the whole grid. The aim point is the tile's centre
+    // rather than the fingertip 20 pixels below it, and every square's
+    // share of the grid is live, so there is no gap to drop into.
+    return GridDropArea(
+      rows: 9,
+      columns: 9,
+      gridKey: _gridKey,
+      canAccept: (r, c) => state.initialBoard[r][c] == 0,
+      onPlace: (r, c, value) => _applyTo(state, notifier, r, c, value),
+      builder: (context, hoverR, hoverC) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceLG),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
@@ -104,12 +117,17 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(DesignSystem.radiusSM - 2),
               child: Column(
+                key: _gridKey,
                 children: List.generate(9, (r) {
                   return Expanded(
                     child: Row(
                       children: List.generate(9, (c) {
                         return Expanded(
-                          child: SudokuCell(row: r, col: c),
+                          child: SudokuCell(
+                            row: r,
+                            col: c,
+                            hovered: hoverR == r && hoverC == c,
+                          ),
                         );
                       }),
                     ),
@@ -119,6 +137,7 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -322,10 +341,17 @@ class _SudokuScreenState extends ConsumerState<SudokuScreen> {
 
 class SudokuCell extends ConsumerWidget {
   final int row;
+
+  /// True when a drop would land here. Worked out for the whole grid at
+  /// once by GridDropArea: a DragTarget per cell left the gaps between them
+  /// as dead ground, and the drop point was the fingertip rather than the
+  /// tile he was aiming.
+  final bool hovered;
   final int col;
 
   const SudokuCell({
     super.key,
+    this.hovered = false,
     required this.row,
     required this.col,
   });
@@ -337,7 +363,10 @@ class SudokuCell extends ConsumerWidget {
     // Selectively watch only the data this cell needs
     final value = ref.watch(sudokuNotifierProvider.select((s) => s.value?.currentBoard[row][col] ?? 0));
     final isInitial = ref.watch(sudokuNotifierProvider.select((s) => s.value?.initialBoard[row][col] != 0));
-    final isSelected = ref.watch(sudokuNotifierProvider.select((s) => s.value?.selectedRow == row && s.value?.selectedCol == col));
+    final isChosen = ref.watch(sudokuNotifierProvider.select((s) => s.value?.selectedRow == row && s.value?.selectedCol == col));
+    // A square a drop would land in reads the same as a chosen one, so
+    // the colour says where the number is going before he lets go.
+    final isSelected = isChosen || hovered;
 
     final selR = ref.watch(sudokuNotifierProvider.select((s) => s.value?.selectedRow));
     final selC = ref.watch(sudokuNotifierProvider.select((s) => s.value?.selectedCol));
@@ -377,10 +406,7 @@ class SudokuCell extends ConsumerWidget {
       notifier.setNumber(picked);
     }
 
-    return DragTarget<int>(
-      onWillAcceptWithDetails: (_) => !isInitial,
-      onAcceptWithDetails: (details) => place(details.data),
-      builder: (context, candidate, _) => GestureDetector(
+    return GestureDetector(
       onTap: () {
         HapticFeedbackUtil.selectionClick();
         final picked = ref.read(pickedValueProvider);
@@ -425,7 +451,6 @@ class SudokuCell extends ConsumerWidget {
             ),
           ),
         ),
-      ),
       ),
     );
   }
