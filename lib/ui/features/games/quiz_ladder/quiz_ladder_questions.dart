@@ -43,6 +43,7 @@ import 'quiz_bank_music.dart';
 import 'quiz_bank_quizbook.dart';
 import 'quiz_bank_quizbook2.dart';
 import 'quiz_bank_quizbook3.dart';
+import 'quiz_bank_quizbook4.dart';
 import 'quiz_bank_science.dart';
 import 'quiz_bank_sports.dart';
 import 'quiz_bank_teaching.dart';
@@ -73,4 +74,5 @@ final List<QuizQuestion> quizQuestions = List<QuizQuestion>.unmodifiable([
   ...quizbookQuestions,
   ...quizbook2Questions,
   ...quizbook3Questions,
+  ...quizbook4Questions,
 ]);
