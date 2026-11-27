@@ -18,6 +18,7 @@ import 'package:puzzle/utils/navigation_utils.dart';
 import 'package:puzzle/ui/features/senior_settings/senior_settings_screen.dart';
 
 import 'widgets/player_greeting.dart';
+import 'widgets/todays_games.dart';
 import 'widgets/favorites_section.dart';
 import 'widgets/category_button.dart';
 import 'widgets/search_bar.dart' as custom;
@@ -147,6 +148,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
               ],
             ),
+            // The greeting has never appeared in a senior build. It was added
+            // to the other branch of this method only -- so the player's name
+            // and his points total, and later the switch in settings that
+            // turns the points off, have all been controlling a widget that
+            // never rendered. Put right here.
+            const SliverToBoxAdapter(child: PlayerGreeting()),
+            const SliverToBoxAdapter(child: TodaysGames()),
             if (SeniorMode.showGameFilters)
               SliverToBoxAdapter(
                 child: _HomeFilterSection(
