@@ -289,12 +289,10 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
         builder: (context, constraints) {
           final isSmallScreen = constraints.maxHeight < 550;
 
-          // Compute size of blocks in the pyramid
-          // The base has 4 blocks. Width of 4 blocks + margins should fit within constraints width
+          // The base has 4 blocks. Width of 4 blocks + margins should fit
+          // within constraints width. The height half of this is worked out
+          // further down, where the pyramid's own box is known.
           final double availableWidth = constraints.maxWidth - (DesignSystem.spaceMD * 2);
-          final double maxBlockSize = SeniorMode.enabled
-              ? (availableWidth / 4.6).clamp(SeniorMode.minGridCell, 104.0)
-              : (availableWidth / 5.2).clamp(42.0, 75.0);
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: DesignSystem.spaceMD, vertical: DesignSystem.spaceSM),
@@ -372,8 +370,40 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
 
                 // Pyramid Area
                 Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
+                  child: LayoutBuilder(builder: (context, box) {
+                    // Blocks were sized from the screen's WIDTH alone, which
+                    // is how the base row came to be cut off by the keypad:
+                    // nothing ever asked whether four rows and three gaps
+                    // would fit in the height left over. They did not, and
+                    // the scroll view below hid the fact by clipping rather
+                    // than overflowing -- so there was no red stripe to see,
+                    // just a missing bottom row.
+                    //
+                    // The pyramid costs rowCount blocks plus their margins,
+                    // and a fraction of a block for each gap between tiers.
+                    // Inverting that gives the largest block the height can
+                    // take; the smaller of the two candidates wins.
+                    const int rowCount = 4;
+                    const int gapCount = rowCount - 1;
+                    final double fromHeight =
+                        (box.maxHeight - rowCount * DesignSystem.spaceXS * 2) /
+                            (rowCount + gapCount * _arrowTierFactor);
+                    final double fromWidth = SeniorMode.enabled
+                        ? availableWidth / 4.6
+                        : availableWidth / 5.2;
+
+                    // The floor is below SeniorMode.minGridCell on purpose.
+                    // On a short screen something has to give, and a block a
+                    // little under the preferred tap target is better than a
+                    // row he cannot see at all; 44 is still a comfortable
+                    // target. The ceiling is unchanged.
+                    final double maxBlockSize = math
+                        .min(fromWidth, fromHeight)
+                        .clamp(SeniorMode.enabled ? 44.0 : 36.0,
+                            SeniorMode.enabled ? 104.0 : 75.0);
+
+                    return Center(
+                      child: SingleChildScrollView(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -416,8 +446,9 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
                           ),
                         ],
                       ),
-                    ),
-                  ),
+                      ),
+                    );
+                  }),
                 ),
 
                 SizedBox(height: isSmallScreen ? DesignSystem.spaceSM : DesignSystem.spaceMD),
