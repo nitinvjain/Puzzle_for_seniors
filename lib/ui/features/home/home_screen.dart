@@ -15,7 +15,7 @@ import 'package:puzzle/widgets/tangible.dart';
 import 'package:puzzle/utils/design_system.dart';
 import 'package:puzzle/utils/haptic_feedback.dart';
 import 'package:puzzle/utils/navigation_utils.dart';
-import 'package:puzzle/ui/features/settings/settings_screen.dart';
+import 'package:puzzle/ui/features/senior_settings/senior_settings_screen.dart';
 
 import 'widgets/player_greeting.dart';
 import 'widgets/favorites_section.dart';
@@ -110,7 +110,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       semanticsLabel: 'Settings',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
-                          builder: (_) => const SettingsScreen(),
+                          builder: (_) => const SeniorSettingsScreen(),
                         ),
                       ),
                       child: Icon(
