@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:puzzle/config/senior_mode.dart';
 import 'package:puzzle/l10n/app_localizations.dart';
 import 'package:puzzle/utils/l10n_game_helpers.dart';
@@ -140,23 +142,50 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
     );
   }
 
-  /// A row of upward arrows sitting between two tiers of the pyramid, one
-  /// under each block of the tier above, so it is visible that a block is fed
-  /// by the two blocks beneath it. [count] is the number of blocks in the
-  /// upper tier.
+  /// How tall a gap between two tiers is, as a fraction of a block.
+  ///
+  /// Slightly deeper than the single arrow needed, because the two slanted
+  /// ones have to reach outwards as well as up and a squat pair would read as
+  /// a flat V rather than the sides of a pyramid. The pyramid sits in a
+  /// scroll view, so the extra depth costs nothing it cannot absorb.
+  static const double _arrowTierFactor = 0.36;
+
+  /// Half the angle at the top of the triangle the two arrows describe.
+  ///
+  /// NJ asked for the two sides of an acute isosceles triangle, and for an
+  /// isosceles triangle that is a single condition: with an apex of A the
+  /// base angles are each (180 - A) / 2, so every angle is under 90 exactly
+  /// when the apex is. At 80 degrees the base angles are 50 and the triangle
+  /// is comfortably acute, with the feet still far enough apart to sit over
+  /// the two blocks they point away from.
+  static const double _apexHalfAngleRadians = 40.0 * math.pi / 180.0;
+
+  /// The gap between two tiers of the pyramid: under each block of the upper
+  /// tier, two arrows slanting up and inwards from the pair below it, so the
+  /// rule of the game -- this one is those two added together -- is drawn
+  /// rather than explained. [count] is the number of blocks in the upper
+  /// tier.
+  ///
+  /// It was one vertical arrow, which said "up" without saying what fed what.
   Widget _buildArrowTier(int count, double blockSize, ColorScheme colorScheme) {
     final pitch = blockSize + DesignSystem.spaceXS * 2;
+    final height = blockSize * _arrowTierFactor;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         count,
         (_) => SizedBox(
           width: pitch,
-          height: blockSize * 0.30,
-          child: Icon(
-            Icons.arrow_upward_rounded,
-            size: blockSize * 0.28,
-            color: colorScheme.primary.withValues(alpha: 0.75),
+          height: height,
+          child: CustomPaint(
+            painter: _FeedArrowsPainter(
+              // Solid, where it used to be the primary colour at 75% alpha.
+              // That blend measured 2.88:1 against the board, under the 3:1
+              // a piece of UI line work needs; at full strength it is 4.3:1.
+              color: colorScheme.primary,
+              stroke: (blockSize * 0.055).clamp(2.0, 5.0),
+              halfBase: height * math.tan(_apexHalfAngleRadians),
+            ),
           ),
         ),
       ),
@@ -455,4 +484,73 @@ class _SumPyramidScreenState extends ConsumerState<SumPyramidScreen> {
       ),
     );
   }
+}
+
+/// The two arrows in one gap of the pyramid.
+///
+/// Drawn rather than assembled from Icon widgets because the geometry has to
+/// be exact: the two strokes are the equal sides of one isosceles triangle
+/// whose apex sits under the block they point at, and a pair of rotated
+/// arrow glyphs would only approximate that.
+///
+/// The canvas is one pitch wide, so its left and right edges fall on the
+/// centres of the two blocks below. The feet sit [halfBase] either side of
+/// the middle, which is inside those edges -- the arrows start over the inner
+/// part of each block and lean in, rather than starting at its centre.
+class _FeedArrowsPainter extends CustomPainter {
+  final Color color;
+  final double stroke;
+  final double halfBase;
+
+  const _FeedArrowsPainter({
+    required this.color,
+    required this.stroke,
+    required this.halfBase,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final line = Paint()
+      ..color = color
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final head = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final centre = size.width / 2;
+    // The two tips stop just short of the apex rather than meeting at it, so
+    // the heads sit shoulder to shoulder instead of overlapping into a blob.
+    final apexGap = stroke * 1.1;
+
+    for (final side in const [-1.0, 1.0]) {
+      final foot = Offset(centre + side * halfBase, size.height);
+      final tip = Offset(centre + side * apexGap, 0);
+      canvas.drawLine(foot, tip, line);
+      _drawHead(canvas, head, foot, tip);
+    }
+  }
+
+  void _drawHead(Canvas canvas, Paint paint, Offset from, Offset tip) {
+    final along = tip - from;
+    final length = along.distance;
+    if (length < 1.0) return;
+    final direction = along / length;
+    final across = Offset(-direction.dy, direction.dx);
+    final back = tip - direction * (stroke * 2.6);
+    final wing = across * (stroke * 1.5);
+    canvas.drawPath(
+      Path()
+        ..moveTo(tip.dx, tip.dy)
+        ..lineTo(back.dx + wing.dx, back.dy + wing.dy)
+        ..lineTo(back.dx - wing.dx, back.dy - wing.dy)
+        ..close(),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_FeedArrowsPainter old) =>
+      old.color != color || old.stroke != stroke || old.halfBase != halfBase;
 }
