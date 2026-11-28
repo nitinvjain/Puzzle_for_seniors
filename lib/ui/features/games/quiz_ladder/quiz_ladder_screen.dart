@@ -10,6 +10,7 @@ import '../../../../utils/haptic_feedback.dart';
 import '../../../../widgets/game_completion_dialog.dart';
 import '../../../../widgets/tangible.dart';
 import '../../../core/juice/game_scaffold.dart';
+import 'quiz_figures.dart';
 import 'quiz_ladder_questions.dart';
 
 /// A fifteen-rung prize ladder, in the shape everyone in India already knows.
@@ -300,11 +301,17 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   /// do.
   void _useSwap() {
     if (_usedSwap || _revealed) return;
-    final inPlay = {for (final q in _round) q.question};
+    // Keyed on the figure as well as the wording. Twelve clock questions
+    // all read "What time does the clock show?" and differ only in the
+    // picture, so comparing the text alone would have the swap reject a
+    // perfectly good question as one already in play -- and if all eight
+    // candidates were clocks, the button would silently do nothing.
+    String key(QuizQuestion q) => '${q.question}|${q.figure ?? ''}';
+    final inPlay = {for (final q in _round) key(q)};
     final candidates = _QuestionPool.take(_question.difficulty, 8);
     QuizQuestion? fresh;
     for (final candidate in candidates) {
-      if (!inPlay.contains(candidate.question)) {
+      if (!inPlay.contains(key(candidate))) {
         fresh = candidate;
         break;
       }
@@ -641,6 +648,22 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                   color: scheme.onSurface,
                 ),
               ),
+
+              // The picture, for the questions that have one.
+              //
+              // Below the words rather than above them, so the order of
+              // reading is the order of thinking: what is being asked,
+              // then the thing it is asked about, then the four answers.
+              //
+              // The body is already a scrolling column, so a figure cannot
+              // overflow the screen -- on a telephone it can push the
+              // answer buttons below the fold, which is why it is capped
+              // rather than sized to the screen. On the eleven-inch tablet
+              // he actually plays on, everything fits at once.
+              if (q.figure != null && hasQuizFigure(q.figure!)) ...[
+                const SizedBox(height: DesignSystem.spaceMD),
+                Center(child: QuizFigure(q.figure!)),
+              ],
               const SizedBox(height: DesignSystem.spaceLG),
 
               // Options, in a shuffled order so the answer is not always in
