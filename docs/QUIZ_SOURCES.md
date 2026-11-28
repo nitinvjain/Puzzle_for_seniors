@@ -21,6 +21,7 @@ because he does not know.
 | `quiz_bank_kbc_archive6.dart` | 321 | season 17, episodes 70–95 |
 | `quiz_bank_kbc_archive7.dart` | 344 | **season 17, episodes 44–69** (not 46) |
 | `quiz_bank_figures.dart` | 145 | written here, each with a drawing |
+| `quiz_bank_home.dart` | 100 | Jain dharma, teaching, Baraut and Baoli |
 
 Banks 1–3 drew on seasons 9 to 11; their exact episode pages were not
 recorded at the time, which is why this file exists. From bank 4 onwards
@@ -56,6 +57,19 @@ is how much of a given episode was built on that week's news.
 | banks 4–5 | 25 | 205 | a third |
 | bank 6 | 25 | 321 | two thirds |
 | bank 7 | 25 | 344 | two thirds |
+
+## The hundred personal questions
+
+`quiz_bank_home.dart` is not from the archive. It covers Jain dharma,
+teaching, and Baraut and Baoli in Baghpat district, on three topic labels
+of its own: JAIN DHARMA, TEACHING, BARAUT. The Jain content is settled
+doctrine. The local content was looked up, not recalled, and the two items
+that rest on the village's own account of itself rather than on a source --
+that Baoli was first called Bahubali, and Baraut's name as the place of
+banyan trees -- are worded as what is said rather than as fact.
+
+It is weighted heavily easy. A wrong answer ends the round, so a question
+tagged hard sits at a rung the player may never reach.
 
 ## Checks every batch passes
 

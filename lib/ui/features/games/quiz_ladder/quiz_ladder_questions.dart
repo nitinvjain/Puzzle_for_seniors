@@ -39,6 +39,7 @@ import 'quiz_bank_films.dart';
 import 'quiz_bank_general.dart';
 import 'quiz_bank_geography.dart';
 import 'quiz_bank_history.dart';
+import 'quiz_bank_home.dart';
 import 'quiz_bank_maths.dart';
 import 'quiz_bank_music.dart';
 import 'quiz_bank_quizbook.dart';
@@ -90,5 +91,6 @@ final List<QuizQuestion> quizQuestions = List<QuizQuestion>.unmodifiable([
   ...kbcArchive5Questions,
   ...kbcArchive6Questions,
   ...kbcArchive7Questions,
+  ...homeQuestions,
   ...figureQuestions,
 ]);
