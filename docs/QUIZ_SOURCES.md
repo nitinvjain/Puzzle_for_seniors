@@ -18,7 +18,9 @@ because he does not know.
 | `quiz_bank_kbc_archive3.dart` | 58 | the same archive, 8 pages |
 | `quiz_bank_kbc_archive4.dart` | 102 | seasons 11–12, 13 pages |
 | `quiz_bank_kbc_archive5.dart` | 103 | seasons 12–13, 12 pages |
-| `quiz_bank_kbc_archive6.dart` | 321 | **season 17, episodes 70–95** |
+| `quiz_bank_kbc_archive6.dart` | 321 | season 17, episodes 70–95 |
+| `quiz_bank_kbc_archive7.dart` | 344 | **season 17, episodes 44–69** (not 46) |
+| `quiz_bank_figures.dart` | 145 | written here, each with a drawing |
 
 Banks 1–3 drew on seasons 9 to 11; their exact episode pages were not
 recorded at the time, which is why this file exists. From bank 4 onwards
@@ -31,9 +33,11 @@ stopped instead of guessing and relying on the duplicate check to notice.
 * **season 11** — 6 pages, and **season 12** — 7 pages (bank 4)
 * **season 12** — 3 pages, and **season 13** — 9 pages (bank 5)
 * **season 17** — episodes 70 to 95, all 26 pages (bank 6)
+* **season 17** — episodes 44 to 69, all but 46, which would not load (bank 7)
 
 Still untouched: most of seasons 9, 10, 12 and 13, all of 14, 15 and 16,
-season 17 below episode 70, and season 18. Roughly 520 pages.
+season 17 below episode 44, and season 18. Roughly 495 pages. Episode 46
+of season 17 is unread and worth another try.
 
 Note that the season 9 and 10 pages use a different URL shape
 (`kbc-9-episode-N-questions-answers-hindi`) from seasons 11 and later
@@ -51,6 +55,7 @@ is how much of a given episode was built on that week's news.
 | banks 1–3 | 25 | 198 | half |
 | banks 4–5 | 25 | 205 | a third |
 | bank 6 | 25 | 321 | two thirds |
+| bank 7 | 25 | 344 | two thirds |
 
 ## Checks every batch passes
 

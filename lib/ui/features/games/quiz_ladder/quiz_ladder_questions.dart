@@ -50,6 +50,7 @@ import 'quiz_bank_kbc_archive3.dart';
 import 'quiz_bank_kbc_archive4.dart';
 import 'quiz_bank_kbc_archive5.dart';
 import 'quiz_bank_kbc_archive6.dart';
+import 'quiz_bank_kbc_archive7.dart';
 import 'quiz_bank_quizbook4.dart';
 import 'quiz_bank_science.dart';
 import 'quiz_bank_sports.dart';
@@ -88,5 +89,6 @@ final List<QuizQuestion> quizQuestions = List<QuizQuestion>.unmodifiable([
   ...kbcArchive4Questions,
   ...kbcArchive5Questions,
   ...kbcArchive6Questions,
+  ...kbcArchive7Questions,
   ...figureQuestions,
 ]);
