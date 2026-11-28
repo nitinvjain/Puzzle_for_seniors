@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../config/senior_mode.dart';
+
 part 'locale_provider.g.dart';
 
 /// Persists the user-selected app locale (or `null` for system default).
@@ -19,17 +21,29 @@ class LocaleNotifier extends _$LocaleNotifier {
     return _cachedBox!;
   }
 
+  /// The locale to use when none has been chosen yet.
+  ///
+  /// Null means follow the tablet, which is what upstream does and what this
+  /// returned before. The senior build names a language instead, because the
+  /// tablet is in English and its owner is not.
+  static Locale? get _default => SeniorMode.enabled &&
+          SeniorMode.defaultLanguage != null
+      ? Locale(SeniorMode.defaultLanguage!)
+      : null;
+
   @override
   Locale? build() {
     _loadLocale();
-    return null;
+    return _default;
   }
 
   Future<void> _loadLocale() async {
     try {
       final box = await _getBox();
       final saved = box.get(_localeKey) as String?;
-      final loaded = _decode(saved);
+      // A saved choice wins; with nothing saved the default stands rather
+      // than falling back to the tablet's language.
+      final loaded = _decode(saved) ?? _default;
       if (state != loaded) state = loaded;
     } catch (_) {}
   }

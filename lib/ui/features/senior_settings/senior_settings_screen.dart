@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../config/app_settings.dart';
+import '../../../config/senior_strings.dart';
+import '../../../providers/locale_provider.dart';
 import '../../../providers/player_name_provider.dart';
 import '../../../providers/settings_provider.dart';
 import '../../../utils/design_system.dart';
@@ -34,20 +36,34 @@ class SeniorSettingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(settingsProvider.notifier);
     final name = ref.watch(playerNameProvider);
+    final s = SeniorStrings.of(context);
 
     return GameScaffold(
-      title: 'SETTINGS',
-      subtitle: 'Sound, size and name',
+      title: s.settingsTitle,
+      subtitle: s.settingsSubtitle,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(DesignSystem.spaceMD),
           children: [
-            _heading('WHO IS PLAYING', scheme),
+            // Language first, and deliberately.
+            //
+            // The build now starts in Hindi, which is right for him but is a
+            // change NJ has to be able to undo in one tap -- if Devanagari
+            // comes out as empty boxes on his tablet's font, this row is the
+            // way back, and it must be reachable without being able to read
+            // the screen. That is why the two choices are written in their
+            // own scripts rather than translated: हिंदी says what it is to
+            // someone who cannot read English, and English says what it is
+            // to someone looking at boxes.
+            _heading(s.headingLanguage, scheme),
+            _languageRow(context, ref, scheme),
+
+            _heading(s.headingWhoIsPlaying, scheme),
             _row(
               scheme: scheme,
-              label: 'Name',
+              label: s.nameLabel,
               trailing: Text(
-                name ?? 'Not set',
+                name ?? s.notSet,
                 style: TextStyle(
                   fontSize: DesignSystem.fontSizeMD,
                   fontWeight: FontWeight.w800,
@@ -59,11 +75,11 @@ class SeniorSettingsScreen extends ConsumerWidget {
               onTap: () => _editName(context, ref, name),
             ),
 
-            _heading('SOUND', scheme),
+            _heading(s.headingSound, scheme),
             _switchRow(
               scheme: scheme,
-              label: 'Sounds',
-              hint: 'A note when a piece is placed, a chime at the end',
+              label: s.sounds,
+              hint: s.soundsHint,
               value: settings.sound,
               // Awaited before the demonstration note, not fired alongside
               // it: the sound utilities read the stored value straight from
@@ -76,8 +92,8 @@ class SeniorSettingsScreen extends ConsumerWidget {
             ),
             _switchRow(
               scheme: scheme,
-              label: 'Vibration',
-              hint: 'A small buzz on each tap',
+              label: s.vibration,
+              hint: s.vibrationHint,
               value: settings.vibration,
               onChanged: (v) async {
                 await notifier.setVibration(v);
@@ -86,20 +102,20 @@ class SeniorSettingsScreen extends ConsumerWidget {
             ),
             _row(
               scheme: scheme,
-              label: 'Test the sound',
+              label: s.testTheSound,
               trailing: Icon(Icons.volume_up_rounded,
                   size: 30, color: scheme.onSurface),
               onTap: () => _testSound(context),
             ),
 
-            _heading('TEXT SIZE', scheme),
+            _heading(s.headingTextSize, scheme),
             _textSizeRow(context, scheme, settings.textScale, notifier),
 
-            _heading('HOME SCREEN', scheme),
+            _heading(s.headingHomeScreen, scheme),
             _switchRow(
               scheme: scheme,
-              label: 'Show points',
-              hint: 'The running total under the greeting',
+              label: s.showPoints,
+              hint: s.showPointsHint,
               value: settings.showPoints,
               onChanged: notifier.setShowPoints,
             ),
@@ -227,10 +243,13 @@ class SeniorSettingsScreen extends ConsumerWidget {
 
   Widget _textSizeRow(BuildContext context, ColorScheme scheme, double current,
       SettingsNotifier notifier) {
-    const options = <String, double>{
-      'Normal': AppSettings.textNormal,
-      'Large': AppSettings.textLarge,
-      'Largest': AppSettings.textLargest,
+    final s = SeniorStrings.of(context);
+    // Keyed on the label in its own language, so the three buttons read
+    // सामान्य / बड़े / सबसे बड़े in Hindi.
+    final options = <String, double>{
+      s.textNormal: AppSettings.textNormal,
+      s.textLarge: AppSettings.textLarge,
+      s.textLargest: AppSettings.textLargest,
     };
     return Row(
       children: [
@@ -266,8 +285,56 @@ class SeniorSettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
-          if (entry.key != 'Largest')
+          if (entry.key != s.textLargest)
             const SizedBox(width: DesignSystem.spaceSM),
+        ],
+      ],
+    );
+  }
+
+  /// Two buttons, each written in its own script.
+  ///
+  /// Not translated on purpose: see the note at the call site. A person who
+  /// can read neither the screen nor the other button can still recognise
+  /// which of the two is the one they want.
+  Widget _languageRow(BuildContext context, WidgetRef ref, ColorScheme scheme) {
+    final current = Localizations.localeOf(context).languageCode;
+    const choices = <String, String>{'हिंदी': 'hi', 'English': 'en'};
+    return Row(
+      children: [
+        for (final entry in choices.entries) ...[
+          Expanded(
+            child: TangibleButton(
+              color: current == entry.value
+                  ? DesignSystem.successDeep
+                  : scheme.surface,
+              radius: DesignSystem.radiusMD,
+              borderWidth: 2.0,
+              borderColor: current == entry.value
+                  ? null
+                  : scheme.onSurface.withValues(alpha: 0.35),
+              onTap: () => ref
+                  .read(localeNotifierProvider.notifier)
+                  .setLocale(Locale(entry.value)),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: DesignSystem.spaceMD),
+                child: Center(
+                  child: Text(
+                    entry.key,
+                    style: TextStyle(
+                      fontSize: DesignSystem.fontSizeMD,
+                      fontWeight: FontWeight.w800,
+                      color: current == entry.value
+                          ? Colors.white
+                          : scheme.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (entry.value != 'en') const SizedBox(width: DesignSystem.spaceSM),
         ],
       ],
     );
@@ -283,6 +350,7 @@ class SeniorSettingsScreen extends ConsumerWidget {
   /// distance: the app may not be making a noise, or the phone may be muted.
   /// This tells them apart in one tap.
   Future<void> _testSound(BuildContext context) async {
+    final s = SeniorStrings.of(context);
     SoundFeedbackUtil.playTest();
     final report = await SoundFeedbackUtil.describe();
     if (!context.mounted) return;
@@ -290,7 +358,7 @@ class SeniorSettingsScreen extends ConsumerWidget {
       SnackBar(
         duration: const Duration(seconds: 10),
         content: Text(
-          'Sound test: $report',
+          s.soundTest(report),
           style: const TextStyle(fontSize: 15, height: 1.3),
         ),
       ),
@@ -303,7 +371,7 @@ class SeniorSettingsScreen extends ConsumerWidget {
     final result = await showDialog<String?>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Who is playing?'),
+        title: Text(SeniorStrings.of(dialogContext).whoIsPlaying),
         content: TextField(
           controller: controller,
           autofocus: true,
@@ -311,17 +379,18 @@ class SeniorSettingsScreen extends ConsumerWidget {
           maxLength: PlayerNameNotifier.maxLength,
           style: const TextStyle(
               fontSize: DesignSystem.fontSizeLG, fontWeight: FontWeight.w700),
-          decoration: const InputDecoration(hintText: 'Name'),
+          decoration: InputDecoration(
+              hintText: SeniorStrings.of(dialogContext).nameLabel),
           onSubmitted: (v) => Navigator.of(dialogContext).pop(v),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancel'),
+            child: Text(SeniorStrings.of(dialogContext).cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(controller.text),
-            child: const Text('Save'),
+            child: Text(SeniorStrings.of(dialogContext).save),
           ),
         ],
       ),

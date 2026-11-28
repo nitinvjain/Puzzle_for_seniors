@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/senior_mode.dart';
+import '../../../../config/senior_strings.dart';
 import '../../../../data/game_metadata.dart';
 import '../../../../data/game_registry.dart';
 import '../../../../providers/user_providers.dart';
@@ -71,6 +72,7 @@ class _TodaysGamesState extends ConsumerState<TodaysGames> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final s = SeniorStrings.of(context);
     final hidden = <String>{
       ...SeniorMode.hiddenGameIds,
       ...ref.watch(
@@ -85,7 +87,7 @@ class _TodaysGamesState extends ConsumerState<TodaysGames> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            dayName(_today),
+            s.dayName(_today),
             textAlign: TextAlign.center,
             style: TextStyle(
               // fontSize2XL, not an invented XXL: the scale runs
@@ -98,7 +100,7 @@ class _TodaysGamesState extends ConsumerState<TodaysGames> {
           ),
           const SizedBox(height: 2),
           Text(
-            dateLine(_today),
+            s.dateLine(_today),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: DesignSystem.fontSizeLG,
@@ -109,7 +111,7 @@ class _TodaysGamesState extends ConsumerState<TodaysGames> {
           if (games.isNotEmpty) ...[
             const SizedBox(height: DesignSystem.spaceLG),
             Text(
-              'TODAY\'S GAMES',
+              s.todaysGames,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: DesignSystem.fontSizeSM,
@@ -160,26 +162,12 @@ class _TodaysGamesState extends ConsumerState<TodaysGames> {
 
   // --- the date, in words -------------------------------------------------
 
-  /// Written out here rather than taken from intl's DateFormat.
-  ///
-  /// DateFormat needs its locale data initialised before it will produce
-  /// anything but English, and throws if it has not been -- a crash on the
-  /// home screen, in a build whose every other word is already English.
-  static const List<String> _days = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-    'Friday', 'Saturday', 'Sunday',
-  ];
-
-  static const List<String> _months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
-
-  static String dayName(DateTime d) => _days[d.weekday - 1];
-
-  /// 27 November 2026.
-  static String dateLine(DateTime d) =>
-      '${d.day} ${_months[d.month - 1]} ${d.year}';
+  // The day and month names moved to SeniorStrings, which carries both
+  // languages. They were written out by hand rather than taken from intl's
+  // DateFormat for the same reason as before: DateFormat throws if its
+  // locale data has not been initialised, which would be a crash on the home
+  // screen -- and now that the home screen is in Hindi, exactly the locale
+  // whose data is least likely to be loaded.
 
   // --- choosing the four --------------------------------------------------
 

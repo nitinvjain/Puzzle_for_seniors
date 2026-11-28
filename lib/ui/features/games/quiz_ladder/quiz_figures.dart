@@ -28,6 +28,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../config/senior_strings.dart';
+
 const Color _paper = Color(0xFFF4FAFF);
 const Color _ink = Color(0xFF102A3A);
 const Color _accent = Color(0xFF1D6FA8);
@@ -2352,7 +2354,7 @@ class QuizFigure extends StatelessWidget {
     if (draw == null) return const SizedBox.shrink();
     final side = quizFigureSide(context);
     return Semantics(
-      label: 'A picture belonging to this question',
+      label: SeniorStrings.of(context).figureLabel,
       child: Container(
         width: side,
         height: side,

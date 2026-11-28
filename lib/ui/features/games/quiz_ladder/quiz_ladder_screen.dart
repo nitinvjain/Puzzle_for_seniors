@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../config/senior_strings.dart';
 import '../../../../providers/user_providers.dart';
 import '../../../../config/rewards.dart';
 import '../../../../utils/design_system.dart';
@@ -369,18 +370,17 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     if (perfect) {
       ref.read(gameStreakNotifierProvider.notifier).completeGame('quiz_ladder');
     }
+    final s = SeniorStrings.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (_) => GameCompletionDialog(
         // The game's own name, so the heading says where he is rather than
         // how he did. How he did is the line underneath.
-        title: 'KBC INDIA',
+        title: s.quizTitle,
         message: perfect
-            ? 'All $_rungs questions right — ₹${formatIndianNumber(won)}'
-            : (won > 0
-                ? 'You take home ₹${formatIndianNumber(won)}'
-                : 'No prize this time — have another go'),
+            ? s.allRight(_rungs, formatIndianNumber(won))
+            : (won > 0 ? s.takeHome(formatIndianNumber(won)) : s.noPrize),
         onHome: () {
           Navigator.of(context).pop();
           Navigator.of(context).pop();
@@ -545,6 +545,12 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
               label,
               textAlign: TextAlign.center,
               maxLines: 1,
+              // Hindi sets these labels wider than English -- नया सवाल
+              // against "New one" -- and Android's Devanagari font is wider
+              // again than the one I could check against here. An ellipsis
+              // degrades gracefully; the default clip would cut a glyph in
+              // half, which looks like a fault rather than a long word.
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: DesignSystem.fontSize2XS,
                 fontWeight: FontWeight.w900,
@@ -562,6 +568,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final s = SeniorStrings.of(context);
     final q = _question;
 
     // The options in the order they will be shown, with anything the 50:50
@@ -572,12 +579,12 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
     ];
 
     return GameScaffold(
-      title: 'KBC INDIA',
-      subtitle: 'Fifteen questions, climbing for the top prize',
+      title: s.quizTitle,
+      subtitle: s.quizSubtitle,
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh_rounded),
-          tooltip: 'Start again',
+          tooltip: s.startAgain,
           onPressed: _startGame,
         ),
       ],
@@ -594,7 +601,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Question ${_rung + 1} of $_rungs',
+                      s.questionCount(_rung + 1, _rungs),
                       style: TextStyle(
                         fontSize: DesignSystem.fontSizeSM,
                         fontWeight: FontWeight.w700,
@@ -603,7 +610,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                     ),
                     const SizedBox(height: DesignSystem.spaceXS),
                     Text(
-                      'Playing for ₹${formatIndianNumber(_prizes[_rung])}',
+                      s.playingFor(formatIndianNumber(_prizes[_rung])),
                       style: TextStyle(
                         fontSize: DesignSystem.fontSizeXL,
                         fontWeight: FontWeight.w900,
@@ -613,7 +620,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                     if (_guaranteed > 0) ...[
                       const SizedBox(height: DesignSystem.spaceXS),
                       Text(
-                        'Guaranteed so far: ₹${formatIndianNumber(_guaranteed)}',
+                        s.guaranteedSoFar(formatIndianNumber(_guaranteed)),
                         style: TextStyle(
                           fontSize: DesignSystem.fontSizeSM,
                           fontWeight: FontWeight.w600,
@@ -628,7 +635,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
 
               // The question.
               Text(
-                q.topic.toUpperCase(),
+                s.topicLabel(q.topic),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: DesignSystem.fontSize2XS,
@@ -684,7 +691,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                     child: _lifeline(
                       scheme: scheme,
                       icon: Icons.call_split_rounded,
-                      label: '50 : 50',
+                      label: s.lifelineFifty,
                       used: _usedFiftyFifty,
                       colour: DesignSystem.gamePurple,
                       onTap: _useFiftyFifty,
@@ -695,7 +702,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                     child: _lifeline(
                       scheme: scheme,
                       icon: Icons.groups_rounded,
-                      label: 'Audience',
+                      label: s.lifelineAudience,
                       used: _usedPoll,
                       colour: DesignSystem.gameTeal,
                       onTap: _usePoll,
@@ -706,7 +713,7 @@ class _QuizLadderScreenState extends ConsumerState<QuizLadderScreen> {
                     child: _lifeline(
                       scheme: scheme,
                       icon: Icons.autorenew_rounded,
-                      label: 'New one',
+                      label: s.lifelineSwap,
                       used: _usedSwap,
                       colour: DesignSystem.gameOrange,
                       onTap: _useSwap,

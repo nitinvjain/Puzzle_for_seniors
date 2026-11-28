@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../config/rewards.dart';
+import '../../../../config/senior_strings.dart';
 import '../../../../providers/settings_provider.dart';
 import '../../../../providers/player_name_provider.dart';
 import '../../../../providers/user_providers.dart';
@@ -54,7 +55,9 @@ class PlayerGreeting extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    name == null ? 'Tap here to add your name' : 'Namaste, $name',
+                    name == null
+                        ? SeniorStrings.of(context).addYourName
+                        : SeniorStrings.of(context).greeting(name),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -119,9 +122,9 @@ class PlayerGreeting extends ConsumerWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(DesignSystem.radiusLG),
           ),
-          title: const Text(
-            'Who is playing?',
-            style: TextStyle(
+          title: Text(
+            SeniorStrings.of(dialogContext).whoIsPlaying,
+            style: const TextStyle(
               fontFamily: 'Geist',
               fontSize: DesignSystem.fontSizeLG,
               fontWeight: FontWeight.w900,
@@ -140,7 +143,7 @@ class PlayerGreeting extends ConsumerWidget {
               fontWeight: FontWeight.w800,
             ),
             decoration: InputDecoration(
-              hintText: 'Name',
+              hintText: SeniorStrings.of(dialogContext).nameLabel,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(DesignSystem.radiusMD),
               ),
@@ -156,7 +159,7 @@ class PlayerGreeting extends ConsumerWidget {
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
-                'CANCEL',
+                SeniorStrings.of(dialogContext).cancel.toUpperCase(),
                 style: TextStyle(
                   fontFamily: 'Geist',
                   fontSize: DesignSystem.fontSizeMD,
@@ -176,7 +179,7 @@ class PlayerGreeting extends ConsumerWidget {
                 ),
               ),
               child: const Text(
-                'SAVE',
+                SeniorStrings.of(dialogContext).save.toUpperCase(),
                 style: TextStyle(
                   fontFamily: 'Geist',
                   fontSize: DesignSystem.fontSizeMD,

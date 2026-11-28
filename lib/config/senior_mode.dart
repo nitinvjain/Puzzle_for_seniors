@@ -198,6 +198,18 @@ class SeniorMode {
   /// session, and it is indistinguishable from the press that left a game.
   static const bool blockBackAtHome = true;
 
+  /// The language the app starts in.
+  ///
+  /// His mother tongue is Hindi and he taught in a UP Board college, so
+  /// Hindi medium. The app was running in English only because nothing had
+  /// ever set a locale and the tablet is in English -- not for any good
+  /// reason. Upstream's own Hindi translation was sitting there unused.
+  ///
+  /// This is the default, not a lock: it applies when no language has been
+  /// chosen, and the settings screen can change it either way. Set it to
+  /// null to follow the tablet again.
+  static const String? defaultLanguage = 'hi';
+
   /// Always generate the easiest variant and hide any difficulty selector.
   static const bool lockEasiestDifficulty = true;
 
