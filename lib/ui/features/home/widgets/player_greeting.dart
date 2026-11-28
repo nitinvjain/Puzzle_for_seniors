@@ -178,7 +178,7 @@ class PlayerGreeting extends ConsumerWidget {
                   vertical: DesignSystem.spaceSM,
                 ),
               ),
-              child: const Text(
+              child: Text(
                 SeniorStrings.of(dialogContext).save.toUpperCase(),
                 style: TextStyle(
                   fontFamily: 'Geist',
